@@ -1,0 +1,74 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  height: 100%;
+}
+
+.header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0 0 0.5rem 0;
+}
+
+.subtitle {
+  color: var(--text-color);
+  font-size: 1rem;
+  margin: 0;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+  flex: 1;
+}
+
+.calendarArea {
+  background-color: var(--bg-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+}
+
+.calendarPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: #94a3b8;
+}
+
+.calendarPlaceholder i {
+  font-size: 3rem;
+  opacity: 0.5;
+}
+
+.calendarPlaceholder p {
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.sidebarArea {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Make ScheduleWidget stretch if needed */
+.sidebarArea > div {
+  flex: 1;
+}
+
+@media (max-width: 1024px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+  
+  .calendarArea {
+    min-height: 400px;
+  }
+}

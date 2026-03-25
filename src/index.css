@@ -1,0 +1,46 @@
+:root {
+  --primary-blue: #003366;
+  --accent-green: #90ee90; /* lightgreen */
+  --bg-color: #ffffff;
+  --bg-secondary: #f3f4f6; /* Soft gray for backgrounds behind cards based on design guide */
+  --text-color: #666666;
+  --text-dark: #333333;
+  --border-color: #e5e7eb;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  color: var(--text-color);
+  background-color: var(--bg-secondary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--primary-blue);
+  margin-top: 0;
+}
+
+a {
+  color: var(--primary-blue);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+#root {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}

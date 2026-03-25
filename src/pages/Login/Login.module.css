@@ -1,0 +1,297 @@
+.loginContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.loginContainer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-blue), var(--accent-green));
+}
+
+.progressContainer {
+  margin-bottom: 2rem;
+}
+
+.progressBar {
+  display: flex;
+  height: 8px;
+  background-color: var(--bg-secondary);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.progressFill {
+  background-color: var(--primary-blue);
+  transition: width 0.3s ease;
+}
+
+.progressFill.active {
+  background-color: var(--primary-blue);
+}
+
+.progressLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: var(--text-color);
+}
+
+.progressLabel.active {
+  color: var(--primary-blue);
+  font-weight: 600;
+}
+
+.loginCard {
+  background-color: var(--bg-color);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  width: 100%;
+  max-width: 400px;
+  padding: 2.5rem;
+}
+
+.loginHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.loginLogo {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 1rem;
+}
+
+.loginTitle {
+  color: var(--primary-blue);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-color);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.formIcon {
+  font-size: 1rem;
+}
+
+.formInput {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: var(--text-dark);
+  background-color: var(--bg-color);
+  transition: all 0.2s ease;
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+}
+
+.submitButton {
+  background-color: var(--primary-blue);
+  color: var(--bg-color);
+  border: none;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.submitButton:hover:not(:disabled) {
+  background-color: #002852; /* Darker blue */
+}
+
+.submitButton:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.backButton, .nextButton {
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.backButton {
+  background-color: var(--bg-secondary);
+  color: var(--text-dark);
+}
+
+.backButton:hover {
+  background-color: #e5e7eb;
+}
+
+.nextButton {
+  background-color: var(--primary-blue);
+  color: var(--bg-color);
+}
+
+.nextButton:hover:not(:disabled) {
+  background-color: #002852;
+}
+
+.nextButton:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.navButtons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.errorMessage {
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #fecaca;
+  font-size: 0.875rem;
+  margin-top: 1rem;
+}
+
+.authMethodSelection {
+  text-align: center;
+}
+
+.sectionTitle {
+  color: var(--text-dark);
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.authOptions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.authOptionButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--bg-secondary);
+  border: none;
+  padding: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 120px;
+}
+
+.authOptionButton:hover {
+  background-color: #e5e7eb;
+}
+
+.authOptionButton.active {
+  background-color: var(--primary-blue);
+  color: var(--bg-color);
+}
+
+.authOptionButton.active:hover {
+  background-color: #002852;
+}
+
+.authIcon {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+@media (max-width: 480px) {
+  .loginCard {
+    padding: 1.5rem;
+  }
+  
+  .loginHeader {
+    margin-bottom: 1.5rem;
+  }
+  
+  .loginLogo {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .loginTitle {
+    font-size: 1.25rem;
+  }
+  
+  .formGroup {
+    gap: 0.25rem;
+  }
+  
+  .formLabel {
+    font-size: 0.75rem;
+  }
+  
+  .formInput {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+  
+  .submitButton, .backButton, .nextButton {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .navButtons {
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  .authOptions {
+    gap: 0.5rem;
+  }
+  
+  .authOptionButton {
+    padding: 0.75rem;
+    width: 100px;
+  }
+  
+  .authIcon {
+    font-size: 1.25rem;
+  }
+}
