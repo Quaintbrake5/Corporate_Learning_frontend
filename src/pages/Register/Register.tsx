@@ -19,8 +19,8 @@ const Register: React.FC = () => {
     username: '',
     password: '',
     pin: '',
-    department: '',
     division: '',
+    department: '',
     confirmPassword: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -30,7 +30,7 @@ const Register: React.FC = () => {
   const [showPin, setShowPin] = useState(false);
   const [step, setStep] = useState<RegisterStep>(RegisterStep.PersonalInfo);
 
-  // Sample department and division data
+  // Sample division and department data
   const divisions = [
     { value: '', label: 'Select Division' },
     { value: 'CS', label: 'Corporate Services (CS)' },
@@ -71,11 +71,20 @@ const Register: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    const checked = (e.target as HTMLInputElement).checked;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? !!checked : value,
-    }));
+    // When division changes, we should clear the department selection
+    if (name === 'division') {
+      setFormData(prev => ({
+        ...prev,
+        division: value,
+        department: '', // reset secondary dropdown
+      }));
+    } else {
+      const checked = (e.target as HTMLInputElement).checked;
+      setFormData(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? !!checked : value,
+      }));
+    }
     // Clear error for this field when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
@@ -90,7 +99,7 @@ const Register: React.FC = () => {
       setStep(RegisterStep.Credentials);
     } else if (step === RegisterStep.Credentials && formData.password && formData.password.length >= 8) {
       setStep(RegisterStep.DepartmentDivision);
-    } else if (step === RegisterStep.DepartmentDivision && formData.department && formData.division) {
+    } else if (step === RegisterStep.DepartmentDivision && formData.division && formData.department) {
       setStep(RegisterStep.Confirmation);
     }
   };
@@ -140,12 +149,12 @@ const Register: React.FC = () => {
       newErrors.pin = 'PIN must be exactly 4 digits';
     }
 
-    if (!formData.department) {
-      newErrors.department = 'Please select a department';
+    if (!formData.division) {
+      newErrors.division = 'Please select a division';
     }
 
-    if (formData.department && !formData.division) {
-      newErrors.division = 'Please select a division';
+    if (formData.division && !formData.department) {
+      newErrors.department = 'Please select a department';
     }
 
     if (!formData.confirmPassword) {
@@ -158,7 +167,7 @@ const Register: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
     if (validateForm()) {
       setLoading(true);
@@ -343,37 +352,13 @@ const Register: React.FC = () => {
           
           {step === RegisterStep.DepartmentDivision && (
             <>
-              <h4 className={styles.formTitle}>Department & Division</h4>
-              <div className={styles.formGroup}>
-                <label htmlFor="department" className={styles.formLabel}>
-                  Department
-                </label>
-                <div className={styles.inputWrapper}>
-                  <FontAwesomeIcon icon={faBuilding} className={styles.inputIcon} />
-                  <select
-                    id="department"
-                    name="department"
-                    value={formData.department}
-                    onChange={handleChange}
-                    className={`${styles.formSelect} ${errors.department ? styles.inputError : ''}`}
-                    style={{ paddingLeft: '2.5rem' }}
-                  >
-                    {departments.map(dept => (
-                      <option key={dept.value} value={dept.value}>
-                        {dept.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                {errors.department && <span className={styles.errorText}>{errors.department}</span>}
-              </div>
-
+              <h4 className={styles.formTitle}>Division & Department</h4>
               <div className={styles.formGroup}>
                 <label htmlFor="division" className={styles.formLabel}>
                   Division
                 </label>
                 <div className={styles.inputWrapper}>
-                  <FontAwesomeIcon icon={faUserGroup} className={styles.inputIcon} />
+                  <FontAwesomeIcon icon={faBuilding} className={styles.inputIcon} />
                   <select
                     id="division"
                     name="division"
@@ -382,7 +367,7 @@ const Register: React.FC = () => {
                     className={`${styles.formSelect} ${errors.division ? styles.inputError : ''}`}
                     style={{ paddingLeft: '2.5rem' }}
                   >
-                    {(divisions[formData.department] || [{ value: '', label: 'Select Division first' }]).map((div) => (
+                    {divisions.map(div => (
                       <option key={div.value} value={div.value}>
                         {div.label}
                       </option>
@@ -390,6 +375,30 @@ const Register: React.FC = () => {
                   </select>
                 </div>
                 {errors.division && <span className={styles.errorText}>{errors.division}</span>}
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="department" className={styles.formLabel}>
+                  Department
+                </label>
+                <div className={styles.inputWrapper}>
+                  <FontAwesomeIcon icon={faUserGroup} className={styles.inputIcon} />
+                  <select
+                    id="department"
+                    name="department"
+                    value={formData.department}
+                    onChange={handleChange}
+                    className={`${styles.formSelect} ${errors.department ? styles.inputError : ''}`}
+                    style={{ paddingLeft: '2.5rem' }}
+                  >
+                    {(departments[formData.division] || [{ value: '', label: 'Select Division first' }]).map((dept) => (
+                      <option key={dept.value} value={dept.value}>
+                        {dept.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {errors.department && <span className={styles.errorText}>{errors.department}</span>}
               </div>
               
               <div className={styles.navButtons}>

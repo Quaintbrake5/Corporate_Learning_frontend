@@ -112,8 +112,8 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #d1e0d9;
-  font-size: 0.75rem;
+  color: #ffffff;
+  font-size: 0.8rem;
   font-weight: 500;
 }
 
@@ -164,7 +164,7 @@
 
 .submitButton, .nextButton {
   background: linear-gradient(90deg, #12B8D9, #20D071);
-  color: #ffffff;
+  color: #0B3149;
   border: none;
   padding: 0.75rem;
   border-radius: 8px;
