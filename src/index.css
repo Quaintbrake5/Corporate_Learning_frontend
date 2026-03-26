@@ -1,14 +1,20 @@
 :root {
   --primary-blue: #003366;
-  --accent-green: #90ee90; /* lightgreen */
+  --accent-green: #00C853;
   --bg-color: #ffffff;
   --bg-secondary: #f3f4f6; /* Soft gray for backgrounds behind cards based on design guide */
-  --text-color: #666666;
-  --text-dark: #333333;
-  --border-color: #e5e7eb;
+  --text-color: #1A1A1A;
+  --text-dark: #1A1A1A;
+  --border-color: #E0E0E0;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  --button-hover: #002852;
+  --button-disabled: #9ca3af;
+  --button-secondary-hover: #e5e7eb;
+  --error-bg: #fee2e2;
+  --error-text: #dc2626;
+  --error-border: #fecaca;
 }
 
 body {

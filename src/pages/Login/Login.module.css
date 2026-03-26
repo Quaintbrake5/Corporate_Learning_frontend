@@ -134,13 +134,13 @@
 }
 
 .submitButton:hover:not(:disabled) {
-  background-color: #002852; /* Darker blue */
-}
+   background-color: var(--button-hover);
+ }
 
 .submitButton:disabled {
-  background-color: #9ca3af;
-  cursor: not-allowed;
-}
+   background-color: var(--button-disabled);
+   cursor: not-allowed;
+ }
 
 .backButton, .nextButton {
   padding: 0.75rem;
@@ -158,8 +158,8 @@
 }
 
 .backButton:hover {
-  background-color: #e5e7eb;
-}
+   background-color: var(--button-secondary-hover);
+ }
 
 .nextButton {
   background-color: var(--primary-blue);
@@ -167,8 +167,8 @@
 }
 
 .nextButton:hover:not(:disabled) {
-  background-color: #002852;
-}
+   background-color: var(--button-hover);
+ }
 
 .nextButton:disabled {
   background-color: #9ca3af;
@@ -182,14 +182,14 @@
 }
 
 .errorMessage {
-  background-color: #fee2e2;
-  color: #dc2626;
-  padding: 0.75rem;
-  border-radius: 8px;
-  border: 1px solid #fecaca;
-  font-size: 0.875rem;
-  margin-top: 1rem;
-}
+   background-color: var(--error-bg);
+   color: var(--error-text);
+   padding: 0.75rem;
+   border-radius: 8px;
+   border: 1px solid var(--error-border);
+   font-size: 0.875rem;
+   margin-top: 1rem;
+ }
 
 .authMethodSelection {
   text-align: center;
@@ -233,8 +233,8 @@
 }
 
 .authOptionButton.active:hover {
-  background-color: #002852;
-}
+   background-color: var(--button-hover);
+ }
 
 .authIcon {
   font-size: 1.5rem;

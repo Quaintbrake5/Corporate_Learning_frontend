@@ -76,8 +76,8 @@
 }
 
 .backButton:hover {
-  background-color: #e5e7eb;
-}
+   background-color: var(--button-secondary-hover);
+ }
 
 .nextButton {
   background-color: var(--primary-blue);
@@ -85,13 +85,13 @@
 }
 
 .nextButton:hover:not(:disabled) {
-  background-color: #002852;
-}
+   background-color: var(--button-hover);
+ }
 
 .nextButton:disabled {
-  background-color: #9ca3af;
-  cursor: not-allowed;
-}
+   background-color: var(--button-disabled);
+   cursor: not-allowed;
+ }
 
 .linkButton {
   background: transparent;
@@ -105,8 +105,8 @@
 }
 
 .linkButton:hover {
-  color: #002852;
-}
+   color: var(--button-hover);
+ }
 
 .registerCard {
   background-color: var(--bg-color);
@@ -209,10 +209,10 @@
 }
 
 .errorText {
-  color: #dc2626;
-  font-size: 0.75rem;
-  margin-top: 0.25rem;
-}
+   color: var(--error-text);
+   font-size: 0.75rem;
+   margin-top: 0.25rem;
+ }
 
 .togglePassword {
   background: transparent;
@@ -267,8 +267,8 @@
 }
 
 .linkButton:hover {
-  color: #002852;
-}
+   color: var(--button-hover);
+ }
 
 .formActions {
   display: flex;
