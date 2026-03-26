@@ -31,8 +31,8 @@ const Register: React.FC = () => {
   const [step, setStep] = useState<RegisterStep>(RegisterStep.PersonalInfo);
 
   // Sample department and division data
-  const departments = [
-    { value: '', label: 'Select Department' },
+  const divisions = [
+    { value: '', label: 'Select Division' },
     { value: 'CS', label: 'Corporate Services (CS)' },
     { value: 'ENG', label: 'Engineering (ENG)' },
     { value: 'OPS', label: 'Operations (OPS)' },
@@ -40,9 +40,9 @@ const Register: React.FC = () => {
     { value: 'HR', label: 'Human Resources (HR)' },
   ];
 
-  const divisions: Record<string, Array<{ value: string; label: string }>> = {
+  const departments: Record<string, Array<{ value: string; label: string }>> = {
     CS: [
-      { value: '', label: 'Select Division' },
+      { value: '', label: 'Select Department' },
       { value: 'CSS', label: 'Security Services (CSS)' },
       { value: 'CSI', label: 'Information Management & Technology (CSI)' },
       { value: 'CSD', label: 'Digital & Innovation (CSD)' },
@@ -50,22 +50,22 @@ const Register: React.FC = () => {
       { value: 'CSE', label: 'Estates (CSE)' },
     ],
     ENG: [
-      { value: '', label: 'Select Division' },
-      { value: 'ENG1', label: 'Engineering Division 1' },
-      { value: 'ENG2', label: 'Engineering Division 2' },
+      { value: '', label: 'Select Department' },
+      { value: 'ENG1', label: 'Engineering Department 1' },
+      { value: 'ENG2', label: 'Engineering Department 2' },
     ],
     OPS: [
-      { value: '', label: 'Select Division' },
-      { value: 'OPS1', label: 'Operations Division 1' },
-      { value: 'OPS2', label: 'Operations Division 2' },
+      { value: '', label: 'Select Department' },
+      { value: 'OPS1', label: 'Operations Department 1' },
+      { value: 'OPS2', label: 'Operations Department 2' },
     ],
     FIN: [
-      { value: '', label: 'Select Division' },
-      { value: 'FIN1', label: 'Finance Division 1' },
+      { value: '', label: 'Select Department' },
+      { value: 'FIN1', label: 'Finance Department 1' },
     ],
     HR: [
-      { value: '', label: 'Select Division' },
-      { value: 'HR1', label: 'HR Division 1' },
+      { value: '', label: 'Select Department' },
+      { value: 'HR1', label: 'HR Department 1' },
     ],
   };
 
@@ -481,4 +481,4 @@ const Register: React.FC = () => {
   );
 };
 
-export default Register;
+export default Register;
