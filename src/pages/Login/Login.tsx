@@ -14,7 +14,7 @@ const LoginStep = {
 type LoginStep = typeof LoginStep[keyof typeof LoginStep];
 
 const Login: React.FC = () => {
-  const [step, setStep] = useState<LoginStep>(LoginStep.Username); // 1: username, 2: password/pin selection, 3: password input, 4: pin input
+  const [step, setStep] = useState<LoginStep>(LoginStep.Username);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [pin, setPin] = useState('');
@@ -58,7 +58,7 @@ const Login: React.FC = () => {
     }
   };
 
-  const handleSubmit = async (e: React.SubmitEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
@@ -66,11 +66,8 @@ const Login: React.FC = () => {
     // Simulate API call
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      // In a real app, you would call your authentication service here
-      // Redirect to dashboard or appropriate page
-      // navigate('/dashboard');
-       } catch {
-         setError('Invalid credentials. Please try again.');
+    } catch {
+      setError('Invalid credentials. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -80,52 +77,41 @@ const Login: React.FC = () => {
     <div className={styles.loginContainer}>
       <div className={styles.loginCard}>
         <div className={styles.loginHeader}>
-          <img
-            src={nlngLogo}
-            alt="NLNG Logo"
-            className={styles.loginLogo}
-          />
-          <h2 className={styles.loginTitle}>Corporate Learning Platform</h2>
+          <div className={styles.logoWrapper}>
+            <img src={nlngLogo} alt="NLNG Logo" className={styles.loginLogo} />
+          </div>
+          <h2 className={styles.companyName}>NLNG</h2>
+          <p className={styles.companySub}>NIGERIA LNG LIMITED</p>
+          
+          <div className={styles.divider}></div>
+          
+          <h3 className={styles.appTitle}>Corporate Learning Platform</h3>
+          <p className={styles.appSub}>NLNG Corporate Services</p>
         </div>
-        
+
         <div className={styles.progressContainer}>
-          <div className={styles.progressBar}>
-            <div 
-              className={`${styles.progressFill} ${step === LoginStep.Username ? styles.active : ''}`}
-              style={{ width: '33%' }}
-            ></div>
-            <div 
-              className={`${styles.progressFill} ${step === LoginStep.AuthMethodSelection ? styles.active : ''}`}
-              style={{ width: '33%' }}
-            ></div>
-             <div 
-               className={`${styles.progressFill} ${(step === LoginStep.Password || step === LoginStep.Pin) ? styles.active : ''}`}
-               style={{ width: '34%' }}
-             ></div>
-          </div>
-          <div className={styles.progressLabels}>
-              <span className={`${styles.progressLabel} ${step === LoginStep.Username ? styles.active : ''}`}>1. Username</span>
-             <span className={`${styles.progressLabel} ${step === LoginStep.AuthMethodSelection ? styles.active : ''}`}>2. Auth Method</span>
-             <span className={`${styles.progressLabel} ${(step === LoginStep.Password || step === LoginStep.Pin) ? styles.active : ''}`}>3. Credentials</span>
-          </div>
+           <div className={styles.progressBar}></div>
         </div>
 
         {step === LoginStep.Username && (
           <form className={styles.loginForm} onSubmit={(e) => { e.preventDefault(); handleNextStep(); }}>
+            <h4 className={styles.formTitle}>Sign in to your account</h4>
             <div className={styles.formGroup}>
               <label htmlFor="username" className={styles.formLabel}>
-                <FontAwesomeIcon icon={faUser} className={styles.formIcon} />
                 Username
               </label>
-              <input
-                type="text"
-                id="username"
-                value={username}
-                onChange={handleUsernameChange}
-                className={styles.formInput}
-                placeholder="Enter your username"
-                autoFocus
-              />
+              <div className={styles.inputWrapper}>
+                <FontAwesomeIcon icon={faUser} className={styles.inputIcon} />
+                <input
+                  type="text"
+                  id="username"
+                  value={username}
+                  onChange={handleUsernameChange}
+                  className={styles.formInput}
+                  placeholder="Enter your username"
+                  autoFocus
+                />
+              </div>
             </div>
             <button 
               type="submit" 
@@ -146,7 +132,7 @@ const Login: React.FC = () => {
                 onClick={() => setAuthMethod('password')}
               >
                 <FontAwesomeIcon icon={faLock} className={styles.authIcon} />
-                <span>NLNG Password</span>
+                <span>Password</span>
               </button>
               <button
                 className={`${styles.authOptionButton} ${authMethod === 'pin' ? styles.active : ''}`}
@@ -175,10 +161,21 @@ const Login: React.FC = () => {
 
         {step === LoginStep.Password && (
           <form className={styles.loginForm} onSubmit={handleSubmit}>
+            <h4 className={styles.formTitle}>Sign in to your account</h4>
             <div className={styles.formGroup}>
               <label htmlFor="password" className={styles.formLabel}>
-                <FontAwesomeIcon icon={faLock} className={styles.formIcon} />
                 Password
+              </label>
+              <div className={styles.inputWrapper}>
+                <FontAwesomeIcon icon={faLock} className={styles.inputIcon} />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  value={password}
+                  onChange={handlePasswordChange}
+                  className={styles.formInput}
+                  placeholder="Enter your NLNG password"
+                />
                 <button
                   type="button"
                   className={styles.togglePassword}
@@ -187,22 +184,14 @@ const Login: React.FC = () => {
                 >
                   <FontAwesomeIcon 
                     icon={showPassword ? faEye : faEyeSlash} 
-                    className={styles.toggleIcon} 
                   />
                 </button>
-              </label>
-               <input
-                 type={showPassword ? 'text' : 'password'}
-                 id="password"
-                 value={password}
-                 onChange={handlePasswordChange}
-                 className={styles.formInput}
-                 placeholder="Enter your NLNG password"
-               />
+              </div>
             </div>
             <div className={styles.navButtons}>
               <button 
                 className={styles.backButton} 
+                type="button"
                 onClick={handleBackStep}
               >
                 Back
@@ -221,24 +210,28 @@ const Login: React.FC = () => {
 
         {step === LoginStep.Pin && (
           <form className={styles.loginForm} onSubmit={handleSubmit}>
+            <h4 className={styles.formTitle}>Sign in to your account</h4>
             <div className={styles.formGroup}>
               <label htmlFor="pin" className={styles.formLabel}>
-                <FontAwesomeIcon icon={faLock} className={styles.formIcon} />
                 PIN
               </label>
+              <div className={styles.inputWrapper}>
+                <FontAwesomeIcon icon={faLock} className={styles.inputIcon} />
                 <input
-                type="password"
-                id="pin"
-                value={pin}
-                onChange={handlePinChange}
-                className={styles.formInput}
-                placeholder="Enter your PIN"
-                maxLength={4}
-              />
+                  type="password"
+                  id="pin"
+                  value={pin}
+                  onChange={handlePinChange}
+                  className={styles.formInput}
+                  placeholder="Enter your PIN"
+                  maxLength={4}
+                />
+              </div>
             </div>
             <div className={styles.navButtons}>
               <button 
                 className={styles.backButton} 
+                type="button"
                 onClick={handleBackStep}
               >
                 Back
@@ -254,6 +247,10 @@ const Login: React.FC = () => {
             {error && <div className={styles.errorMessage}>{error}</div>}
           </form>
         )}
+
+        <div className={styles.systemFooter}>
+          NLNG HRMS - Corporate Learning Platform
+        </div>
       </div>
     </div>
   );

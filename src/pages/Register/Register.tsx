@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import styles from './Register.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faLock, faKey, faPhone, faBuilding, faUserGroup, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import nlngLogo from '/NLNG logo.jpg';
+import { faUser, faLock, faPhone, faBuilding, faUserGroup, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 const RegisterStep = {
   PersonalInfo: 0,
@@ -164,12 +165,9 @@ const Register: React.FC = () => {
       // Simulate API call
       try {
         await new Promise(resolve => setTimeout(resolve, 1500));
-        // In a real app, you would call your registration service here
         console.log('Registration successful:', formData);
-        // Redirect to login page or appropriate page
         // navigate('/login');
       } catch (error) {
-        // Handle error
         console.error('Registration failed:', error);
       } finally {
         setLoading(false);
@@ -181,83 +179,66 @@ const Register: React.FC = () => {
     <div className={styles.registerContainer}>
       <div className={styles.registerCard}>
         <div className={styles.registerHeader}>
-          <img 
-            src="/assets/NLNG logo.jpg" 
-            alt="NLNG Logo" 
-            className={styles.registerLogo}
-          />
-          <h2 className={styles.registerTitle}>Create Your Account</h2>
-          <p className={styles.registerSubtitle}>
-            Join the NLNG Corporate Learning Platform
-          </p>
+          <div className={styles.logoWrapper}>
+            <img src={nlngLogo} alt="NLNG Logo" className={styles.registerLogo} />
+          </div>
+          <h2 className={styles.companyName}>NLNG</h2>
+          <p className={styles.companySub}>NIGERIA LNG LIMITED</p>
+          
+          <div className={styles.divider}></div>
+          
+          <h3 className={styles.appTitle}>Corporate Learning Platform</h3>
+          <p className={styles.appSub}>NLNG Corporate Services</p>
+        </div>
+
+        <div className={styles.progressContainer}>
+           <div className={styles.progressBar}></div>
         </div>
 
         <form className={styles.registerForm} onSubmit={handleSubmit}>
-          <div className={styles.progressContainer}>
-            <div className={styles.progressBar}>
-              <div 
-                className={`${styles.progressFill} ${step === RegisterStep.PersonalInfo && styles.active}`}
-                style={{ width: '25%' }}
-              ></div>
-              <div 
-                className={`${styles.progressFill} ${step === RegisterStep.Credentials && styles.active}`}
-                style={{ width: '25%' }}
-              ></div>
-              <div 
-                className={`${styles.progressFill} ${step === RegisterStep.DepartmentDivision && styles.active}`}
-                style={{ width: '25%' }}
-              ></div>
-              <div 
-                className={`${styles.progressFill} ${step === RegisterStep.Confirmation && styles.active}`}
-                style={{ width: '25%' }}
-              ></div>
-            </div>
-            <div className={styles.progressLabels}>
-              <span className={`${styles.progressLabel} ${step === RegisterStep.PersonalInfo && styles.active}`}>1. Personal Info</span>
-              <span className={`${styles.progressLabel} ${step === RegisterStep.Credentials && styles.active}`}>2. Credentials</span>
-              <span className={`${styles.progressLabel} ${step === RegisterStep.DepartmentDivision && styles.active}`}>3. Department/Division</span>
-              <span className={`${styles.progressLabel} ${step === RegisterStep.Confirmation && styles.active}`}>4. Confirmation</span>
-            </div>
-          </div>
-          
           {step === RegisterStep.PersonalInfo && (
             <>
+              <h4 className={styles.formTitle}>Create Your Account</h4>
               <div className={styles.formGroup}>
                 <label htmlFor="fullName" className={styles.formLabel}>
-                  <FontAwesomeIcon icon={faUser} className={styles.formIcon} />
                   Full Name
                 </label>
-                <input
-                  type="text"
-                  id="fullName"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  className={`${styles.formInput} ${errors.fullName ? styles.inputError : ''}`}
-                  placeholder="Enter your full name"
-                  autoFocus
-                />
+                <div className={styles.inputWrapper}>
+                  <FontAwesomeIcon icon={faUser} className={styles.inputIcon} />
+                  <input
+                    type="text"
+                    id="fullName"
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleChange}
+                    className={`${styles.formInput} ${errors.fullName ? styles.inputError : ''}`}
+                    placeholder="Enter your full name"
+                    autoFocus
+                  />
+                </div>
                 {errors.fullName && <span className={styles.errorText}>{errors.fullName}</span>}
               </div>
 
               <div className={styles.formGroup}>
                 <label htmlFor="username" className={styles.formLabel}>
-                  <FontAwesomeIcon icon={faUser} className={styles.formIcon} />
                   Username
                 </label>
-                <input
-                  type="text"
-                  id="username"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  className={`${styles.formInput} ${errors.username ? styles.inputError : ''}`}
-                  placeholder="Choose a username"
-                />
+                <div className={styles.inputWrapper}>
+                  <FontAwesomeIcon icon={faUser} className={styles.inputIcon} />
+                  <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleChange}
+                    className={`${styles.formInput} ${errors.username ? styles.inputError : ''}`}
+                    placeholder="Choose a username"
+                  />
+                </div>
                 {errors.username && <span className={styles.errorText}>{errors.username}</span>}
               </div>
               
-              <div className={styles.formActions}>
+              <div className={styles.navButtons}>
                 <button 
                   type="button" 
                   className={styles.backButton}
@@ -280,10 +261,22 @@ const Register: React.FC = () => {
           
           {step === RegisterStep.Credentials && (
             <>
+              <h4 className={styles.formTitle}>Set Up Credentials</h4>
               <div className={styles.formGroup}>
                 <label htmlFor="password" className={styles.formLabel}>
-                  <FontAwesomeIcon icon={faLock} className={styles.formIcon} />
                   Password
+                </label>
+                <div className={styles.inputWrapper}>
+                  <FontAwesomeIcon icon={faLock} className={styles.inputIcon} />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className={`${styles.formInput} ${errors.password ? styles.inputError : ''}`}
+                    placeholder="Create a password"
+                  />
                   <button
                     type="button"
                     className={styles.togglePassword}
@@ -291,27 +284,29 @@ const Register: React.FC = () => {
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     <FontAwesomeIcon 
-                      icon={showPassword ? faKey : faLock} 
-                      className={styles.toggleIcon} 
+                      icon={showPassword ? faEye : faEyeSlash} 
                     />
                   </button>
-                </label>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  id="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className={`${styles.formInput} ${errors.password ? styles.inputError : ''}`}
-                  placeholder="Create a password"
-                />
+                </div>
                 {errors.password && <span className={styles.errorText}>{errors.password}</span>}
               </div>
 
               <div className={styles.formGroup}>
                 <label htmlFor="pin" className={styles.formLabel}>
-                  <FontAwesomeIcon icon={faPhone} className={styles.formIcon} />
                   PIN (Optional)
+                </label>
+                <div className={styles.inputWrapper}>
+                  <FontAwesomeIcon icon={faPhone} className={styles.inputIcon} />
+                  <input
+                    type={showPin ? 'text' : 'password'}
+                    id="pin"
+                    name="pin"
+                    value={formData.pin}
+                    onChange={handleChange}
+                    className={`${styles.formInput} ${errors.pin ? styles.inputError : ''}`}
+                    placeholder="Enter 4-digit PIN"
+                    maxLength={4}
+                  />
                   <button
                     type="button"
                     className={styles.togglePassword}
@@ -319,25 +314,14 @@ const Register: React.FC = () => {
                     aria-label={showPin ? 'Hide PIN' : 'Show PIN'}
                   >
                     <FontAwesomeIcon 
-                      icon={showPin ? faKey : faPhone} 
-                      className={styles.toggleIcon} 
+                      icon={showPin ? faEye : faEyeSlash} 
                     />
                   </button>
-                </label>
-                <input
-                  type={showPin ? 'text' : 'password'}
-                  id="pin"
-                  name="pin"
-                  value={formData.pin}
-                  onChange={handleChange}
-                  className={`${styles.formInput} ${errors.pin ? styles.inputError : ''}`}
-                  placeholder="Enter 4-digit PIN"
-                  maxLength={4}
-                />
+                </div>
                 {errors.pin && <span className={styles.errorText}>{errors.pin}</span>}
               </div>
               
-              <div className={styles.formActions}>
+              <div className={styles.navButtons}>
                 <button 
                   type="button" 
                   className={styles.backButton}
@@ -359,49 +343,56 @@ const Register: React.FC = () => {
           
           {step === RegisterStep.DepartmentDivision && (
             <>
+              <h4 className={styles.formTitle}>Department & Division</h4>
               <div className={styles.formGroup}>
                 <label htmlFor="department" className={styles.formLabel}>
-                  <FontAwesomeIcon icon={faBuilding} className={styles.formIcon} />
                   Department
                 </label>
-                <select
-                  id="department"
-                  name="department"
-                  value={formData.department}
-                  onChange={handleChange}
-                  className={`${styles.formSelect} ${errors.department ? styles.inputError : ''}`}
-                >
-                  {departments.map(dept => (
-                    <option key={dept.value} value={dept.value}>
-                      {dept.label}
-                    </option>
-                  ))}
-                </select>
+                <div className={styles.inputWrapper}>
+                  <FontAwesomeIcon icon={faBuilding} className={styles.inputIcon} />
+                  <select
+                    id="department"
+                    name="department"
+                    value={formData.department}
+                    onChange={handleChange}
+                    className={`${styles.formSelect} ${errors.department ? styles.inputError : ''}`}
+                    style={{ paddingLeft: '2.5rem' }}
+                  >
+                    {departments.map(dept => (
+                      <option key={dept.value} value={dept.value}>
+                        {dept.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 {errors.department && <span className={styles.errorText}>{errors.department}</span>}
               </div>
 
               <div className={styles.formGroup}>
                 <label htmlFor="division" className={styles.formLabel}>
-                  <FontAwesomeIcon icon={faUserGroup} className={styles.formIcon} />
                   Division
                 </label>
-                <select
-                  id="division"
-                  name="division"
-                  value={formData.division}
-                  onChange={handleChange}
-                  className={`${styles.formSelect} ${errors.division ? styles.inputError : ''}`}
-                >
-                  {(divisions[formData.department] || [{ value: '', label: 'Select Division first' }]).map((div) => (
-                    <option key={div.value} value={div.value}>
-                      {div.label}
-                    </option>
-                  ))}
-                </select>
+                <div className={styles.inputWrapper}>
+                  <FontAwesomeIcon icon={faUserGroup} className={styles.inputIcon} />
+                  <select
+                    id="division"
+                    name="division"
+                    value={formData.division}
+                    onChange={handleChange}
+                    className={`${styles.formSelect} ${errors.division ? styles.inputError : ''}`}
+                    style={{ paddingLeft: '2.5rem' }}
+                  >
+                    {(divisions[formData.department] || [{ value: '', label: 'Select Division first' }]).map((div) => (
+                      <option key={div.value} value={div.value}>
+                        {div.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 {errors.division && <span className={styles.errorText}>{errors.division}</span>}
               </div>
               
-              <div className={styles.formActions}>
+              <div className={styles.navButtons}>
                 <button 
                   type="button" 
                   className={styles.backButton}
@@ -423,10 +414,22 @@ const Register: React.FC = () => {
           
           {step === RegisterStep.Confirmation && (
             <>
+              <h4 className={styles.formTitle}>Confirm Password</h4>
               <div className={styles.formGroup}>
                 <label htmlFor="confirmPassword" className={styles.formLabel}>
-                  <FontAwesomeIcon icon={faLock} className={styles.formIcon} />
                   Confirm Password
+                </label>
+                <div className={styles.inputWrapper}>
+                  <FontAwesomeIcon icon={faLock} className={styles.inputIcon} />
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className={`${styles.formInput} ${errors.confirmPassword ? styles.inputError : ''}`}
+                    placeholder="Confirm your password"
+                  />
                   <button
                     type="button"
                     className={styles.togglePassword}
@@ -434,24 +437,14 @@ const Register: React.FC = () => {
                     aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
                   >
                     <FontAwesomeIcon 
-                      icon={showConfirmPassword ? faKey : faLock} 
-                      className={styles.toggleIcon} 
+                      icon={showConfirmPassword ? faEye : faEyeSlash} 
                     />
                   </button>
-                </label>
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className={`${styles.formInput} ${errors.confirmPassword ? styles.inputError : ''}`}
-                  placeholder="Confirm your password"
-                />
+                </div>
                 {errors.confirmPassword && <span className={styles.errorText}>{errors.confirmPassword}</span>}
               </div>
               
-              <div className={styles.formActions}>
+              <div className={styles.navButtons}>
                 <button 
                   type="button" 
                   className={styles.backButton}
@@ -466,22 +459,26 @@ const Register: React.FC = () => {
                 >
                   {loading ? 'Creating Account...' : 'Register'}
                 </button>
-                <button 
-                  type="button" 
-                  className={styles.linkButton}
-                  onClick={() => {
-                    // navigate('/login');
-                  }}
-                >
-                  Already have an account? Sign In
-                </button>
               </div>
             </>
           )}
+          <button 
+            type="button" 
+            className={styles.linkButton}
+            onClick={() => {
+              // navigate('/login');
+            }}
+          >
+            Already have an account? Sign In
+          </button>
         </form>
+
+        <div className={styles.systemFooter}>
+          NLNG HRMS - Corporate Learning Platform
+        </div>
       </div>
     </div>
   );
 };
 
-export default Register;
+export default Register;

@@ -3,87 +3,103 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: var(--bg-color);
+  width: 100%;
+  background: radial-gradient(circle at top center, #0B3149, #134B36);
   padding: 2rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.loginContainer::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--primary-blue), var(--accent-green));
-}
-
-.progressContainer {
-  margin-bottom: 2rem;
-}
-
-.progressBar {
-  display: flex;
-  height: 8px;
-  background-color: var(--bg-secondary);
-  border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: 1rem;
-}
-
-.progressFill {
-  background-color: var(--primary-blue);
-  transition: width 0.3s ease;
-}
-
-.progressFill.active {
-  background-color: var(--primary-blue);
-}
-
-.progressLabels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.875rem;
-  color: var(--text-color);
-}
-
-.progressLabel.active {
-  color: var(--primary-blue);
-  font-weight: 600;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 .loginCard {
-  background-color: var(--bg-color);
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   width: 100%;
   max-width: 400px;
-  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .loginHeader {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.logoWrapper {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  width: 64px;
+  height: 64px;
 }
 
 .loginLogo {
-  width: 80px;
-  height: 80px;
-  margin-bottom: 1rem;
+  width: 100%;
+  height: auto;
 }
 
-.loginTitle {
-  color: var(--primary-blue);
-  font-size: 1.5rem;
-  font-weight: 600;
+.companyName {
+  color: #00B4DB;
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.companySub {
+  color: #00C853;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 200, 83, 0.4), transparent);
+  margin: 1.5rem 0;
+}
+
+.appTitle {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+}
+
+.appSub {
+  color: #9ab0a6;
+  font-size: 0.75rem;
   margin: 0;
 }
 
-.loginForm {
+.progressContainer {
+  display: none;
+}
+
+.loginForm, .authMethodSelection {
+  background-color: #1A3E31;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.formTitle {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  text-align: center;
 }
 
 .formGroup {
@@ -96,117 +112,121 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--text-color);
-  font-size: 0.875rem;
+  color: #d1e0d9;
+  font-size: 0.75rem;
   font-weight: 500;
 }
 
-.formIcon {
-  font-size: 1rem;
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 1rem;
+  color: #6b7280;
+  font-size: 0.85rem;
 }
 
 .formInput {
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--border-color);
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: none;
   border-radius: 8px;
   font-size: 0.875rem;
-  color: var(--text-dark);
-  background-color: var(--bg-color);
+  color: #1a1a1a;
+  background-color: #e8f0fe;
   transition: all 0.2s ease;
 }
 
 .formInput:focus {
   outline: none;
-  border-color: var(--primary-blue);
-  box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+  box-shadow: 0 0 0 2px #00B4DB;
 }
 
-.submitButton {
-  background-color: var(--primary-blue);
-  color: var(--bg-color);
+.togglePassword {
+  position: absolute;
+  right: 1rem;
+  background: transparent;
   border: none;
+  padding: 0;
+  cursor: pointer;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+}
+
+.submitButton, .nextButton {
+  background: linear-gradient(90deg, #12B8D9, #20D071);
+  color: #ffffff;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.submitButton:hover:not(:disabled), .nextButton:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.submitButton:disabled, .nextButton:disabled {
+  background: #6b7280;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.backButton {
+  background: transparent;
+  color: #d1e0d9;
+  border: 1px solid #d1e0d9;
   padding: 0.75rem;
   border-radius: 8px;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.submitButton:hover:not(:disabled) {
-   background-color: var(--button-hover);
- }
-
-.submitButton:disabled {
-   background-color: var(--button-disabled);
-   cursor: not-allowed;
- }
-
-.backButton, .nextButton {
-  padding: 0.75rem;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
   transition: all 0.2s ease;
-  border: none;
-}
-
-.backButton {
-  background-color: var(--bg-secondary);
-  color: var(--text-dark);
+  width: 100%;
+  text-align: center;
 }
 
 .backButton:hover {
-   background-color: var(--button-secondary-hover);
- }
-
-.nextButton {
-  background-color: var(--primary-blue);
-  color: var(--bg-color);
-}
-
-.nextButton:hover:not(:disabled) {
-   background-color: var(--button-hover);
- }
-
-.nextButton:disabled {
-  background-color: #9ca3af;
-  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .navButtons {
   display: flex;
   gap: 1rem;
-  margin-top: 1.5rem;
+  margin-top: 0.5rem;
 }
 
 .errorMessage {
-   background-color: var(--error-bg);
-   color: var(--error-text);
-   padding: 0.75rem;
-   border-radius: 8px;
-   border: 1px solid var(--error-border);
-   font-size: 0.875rem;
-   margin-top: 1rem;
- }
-
-.authMethodSelection {
+  background-color: rgba(220, 38, 38, 0.1);
+  color: #ff8a8a;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  font-size: 0.75rem;
   text-align: center;
 }
 
-.sectionTitle {
-  color: var(--text-dark);
-  font-size: 1.125rem;
-  font-weight: 600;
-  margin-bottom: 1.5rem;
+.systemFooter {
+  margin-top: 2rem;
+  color: #799a8b;
+  font-size: 0.65rem;
+  text-align: center;
 }
 
 .authOptions {
   display: flex;
   gap: 1rem;
   justify-content: center;
-  margin-bottom: 1.5rem;
 }
 
 .authOptionButton {
@@ -214,84 +234,39 @@
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  background-color: var(--bg-secondary);
-  border: none;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
   padding: 1rem;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
-  width: 120px;
+  width: 100px;
 }
 
 .authOptionButton:hover {
-  background-color: #e5e7eb;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .authOptionButton.active {
-  background-color: var(--primary-blue);
-  color: var(--bg-color);
+  background: linear-gradient(90deg, #12B8D9, #20D071);
+  border-color: transparent;
+  color: #fff;
 }
 
-.authOptionButton.active:hover {
-   background-color: var(--button-hover);
- }
-
 .authIcon {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   margin-bottom: 0.25rem;
 }
 
-@media (max-width: 480px) {
-  .loginCard {
-    padding: 1.5rem;
-  }
-  
-  .loginHeader {
-    margin-bottom: 1.5rem;
-  }
-  
-  .loginLogo {
-    width: 60px;
-    height: 60px;
-  }
-  
-  .loginTitle {
-    font-size: 1.25rem;
-  }
-  
-  .formGroup {
-    gap: 0.25rem;
-  }
-  
-  .formLabel {
-    font-size: 0.75rem;
-  }
-  
-  .formInput {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.75rem;
-  }
-  
-  .submitButton, .backButton, .nextButton {
-    padding: 0.5rem;
-    font-size: 0.75rem;
-  }
-  
-  .navButtons {
-    gap: 0.5rem;
-    margin-top: 1rem;
-  }
-  
-  .authOptions {
-    gap: 0.5rem;
-  }
-  
-  .authOptionButton {
-    padding: 0.75rem;
-    width: 100px;
-  }
-  
-  .authIcon {
-    font-size: 1.25rem;
-  }
+.sectionTitle {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.formIcon {
+  display: none;
 }
