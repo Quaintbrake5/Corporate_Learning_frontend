@@ -4,37 +4,53 @@ import AlertBanner from '../../components/ui/AlertBanner';
 import StatCard from '../../components/ui/StatCard';
 import AnalyticsPlaceholder from '../../components/ui/AnalyticsPlaceholder';
 import CourseCard from '../../components/ui/CourseCard';
-import { getUserProfile } from '../../services/userService';
-import type { UserProfile } from '../../services/userService';
+import { useAppSelector } from '../../store/hooks';
+import { getCourses, type Course } from '../../services/courseService';
 import styles from './Dashboard.module.css';
 
+const subdivisionMap: Record<number, string> = {
+  1: 'CS',
+  2: 'ENG',
+  3: 'OPS',
+  4: 'FIN',
+  5: 'HR',
+};
+
+const getSubdivisionName = (id: number): string => {
+  return subdivisionMap[id] ?? 'Unknown';
+};
+
+const formatDuration = (minutes: number): string => {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (h > 0 && m > 0) return `${h}h ${m}m`;
+  if (h > 0) return `${h}h 00m`;
+  return `0h ${m}m`;
+};
+
 const Dashboard: React.FC = () => {
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const user = useAppSelector(state => state.auth.user);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [coursesLoading, setCoursesLoading] = useState(true);
+  const [coursesError, setCoursesError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fetch user profile from mock service
-    const profile = getUserProfile();
-    setUserProfile(profile);
-    setLoading(false);
+    const fetchCourses = async () => {
+      try {
+        setCoursesLoading(true);
+        setCoursesError(null);
+        const data = await getCourses(1, 20);
+        setCourses(data.items);
+      } catch (err) {
+        setCoursesError('Failed to load courses. Please try again later.');
+      } finally {
+        setCoursesLoading(false);
+      }
+    };
+    fetchCourses();
   }, []);
 
-  if (loading) {
-    return (
-      <DashboardLayout>
-        <div className={styles.dashboardContainer}>
-          <div className={styles.headerSection}>
-            <div>
-              <h1 className={styles.title}>Welcome back!</h1>
-              <p className={styles.subtitle}>Loading your profile...</p>
-            </div>
-          </div>
-        </div>
-      </DashboardLayout>
-    );
-  }
-
-  if (!userProfile) {
+  if (!user) {
     return (
       <DashboardLayout>
         <div className={styles.dashboardContainer}>
@@ -49,149 +65,18 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  // Define subdivision-specific learning path courses
-  const getLearningPathCourses = (subdivision: string) => {
-    switch (subdivision) {
-      case 'CSD':
-        return [
-          {
-            id: 'csd-agile-fundamentals',
-            title: 'Agile Fundamentals for CSD',
-            subdivision: 'CSD',
-            duration: '3h 00m',
-            progress: 60,
-            isMandatory: true
-          },
-          {
-            id: 'csd-devops-practices',
-            title: 'DevOps Practices in CSD',
-            subdivision: 'CSD',
-            duration: '4h 00m',
-            progress: 30,
-            isMandatory: true
-          },
-          {
-            id: 'csd-security-basics',
-            title: 'Security Basics for CSD Teams',
-            subdivision: 'CSD',
-            duration: '2h 30m',
-            progress: 80,
-            isMandatory: true
-          }
-        ];
-      case 'CSS':
-        return [
-          {
-            id: 'css-tactical-response',
-            title: 'Advanced Tactical Response',
-            subdivision: 'CSS',
-            duration: '4h 30m',
-            progress: 45,
-            isMandatory: true
-          },
-          {
-            id: 'css-maritime-security',
-            title: 'Maritime Security Protocols',
-            subdivision: 'CSS',
-            duration: '2h 15m',
-            progress: 0,
-            isMandatory: true
-          },
-          {
-            id: 'css-emergency-evacuation',
-            title: 'Emergency Evacuation Coordination',
-            subdivision: 'CSS',
-            duration: '1h 45m',
-            progress: 100,
-            isMandatory: true
-          }
-        ];
-      case 'CSI':
-        return [
-          {
-            id: 'csi-cyber-threat-intel',
-            title: 'Cyber Threat Intelligence',
-            subdivision: 'CSI',
-            duration: '3h 30m',
-            progress: 20,
-            isMandatory: true
-          },
-          {
-            id: 'csi-network-forensics',
-            title: 'Network Forensics Analysis',
-            subdivision: 'CSI',
-            duration: '4h 00m',
-            progress: 10,
-            isMandatory: true
-          },
-          {
-            id: 'csi-incident-response',
-            title: 'Incident Response Procedures',
-            subdivision: 'CSI',
-            duration: '2h 45m',
-            progress: 50,
-            isMandatory: true
-          }
-        ];
-      case 'HR':
-        return [
-          {
-            id: 'hr-talent-management',
-            title: 'Talent Management Strategies',
-            subdivision: 'HR',
-            duration: '3h 00m',
-            progress: 40,
-            isMandatory: true
-          },
-          {
-            id: 'hr-employee-relations',
-            title: 'Employee Relations Best Practices',
-            subdivision: 'HR',
-            duration: '2h 30m',
-            progress: 60,
-            isMandatory: true
-          },
-          {
-            id: 'hr-hris-fundamentals',
-            title: 'HRIS Fundamentals',
-            subdivision: 'HR',
-            duration: '3h 30m',
-            progress: 25,
-            isMandatory: true
-          }
-        ];
-      default:
-        // Fallback to CSS if subdivision not recognized
-        return [
-          {
-            id: 'default-course-1',
-            title: 'Default Course 1',
-            subdivision: subdivision,
-            duration: '2h 00m',
-            progress: 0,
-            isMandatory: true
-          },
-          {
-            id: 'default-course-2',
-            title: 'Default Course 2',
-            subdivision: subdivision,
-            duration: '1h 30m',
-            progress: 0,
-            isMandatory: true
-          }
-        ];
-    }
-  };
-  
-  // Get learning path courses for current user's subdivision
-  const learningPathCourses = getLearningPathCourses(userProfile.subdivision);
+  const userSubdivision = getSubdivisionName(user.subdivision_id);
+
+  const learningPathCourses = courses
+    .filter(c => c.subdivision_owner === userSubdivision || c.is_cross_subdivision)
+    .slice(0, 6);
 
   return (
     <DashboardLayout>
       <div className={styles.dashboardContainer}>
         <div className={styles.headerSection}>
           <div>
-            <h1 className={styles.title}>Welcome back, {userProfile.name}!</h1>
+            <h1 className={styles.title}>Welcome back, {user.name}!</h1>
             <p className={styles.subtitle}>Let's check your learning progress</p>
           </div>
         </div>
@@ -229,21 +114,27 @@ const Dashboard: React.FC = () => {
         {/* Priority 2: Subdivision-specific Learning Path */}
         <section className={styles.dashboardSection}>
           <div className={styles.sectionHeader}>
-            <h2>Your Learning Path: {userProfile.subdivision}</h2>
+            <h2>Your Learning Path: {userSubdivision}</h2>
             <button className={styles.btnLink}>View All</button>
           </div>
           <div className={styles.coursesGrid}>
-            {/* Courses are already filtered by subdivision in getLearningPathCourses */}
-            {learningPathCourses.map(course => (
-              <CourseCard
-                key={course.id}
-                title={course.title}
-                subdivision={course.subdivision}
-                duration={course.duration}
-                progress={course.progress}
-                isMandatory={course.isMandatory}
-              />
-            ))}
+            {coursesLoading ? (
+              <p>Loading courses...</p>
+            ) : coursesError ? (
+              <p>{coursesError}</p>
+            ) : learningPathCourses.length === 0 ? (
+              <p>No courses available for your subdivision.</p>
+            ) : (
+              learningPathCourses.map(course => (
+                <CourseCard
+                  key={course.id}
+                  title={course.title}
+                  subdivision={course.subdivision_owner}
+                  duration={formatDuration(course.duration_in_minutes)}
+                  isMandatory={course.is_mandatory}
+                />
+              ))
+            )}
           </div>
         </section>
 
@@ -254,21 +145,24 @@ const Dashboard: React.FC = () => {
             <button className={styles.btnLink}>Browse Catalog</button>
           </div>
           <div className={styles.coursesGrid}>
-            <CourseCard
-              title="Introduction to Agile Methodologies"
-              subdivision="CSD"
-              duration="3h 00m"
-            />
-            <CourseCard
-              title="Cybersecurity Fundamentals"
-              subdivision="CSI"
-              duration="2h 30m"
-            />
-            <CourseCard
-              title="Effective Communication in Teams"
-              subdivision="HR"
-              duration="1h 15m"
-            />
+            {coursesLoading ? (
+              <p>Loading electives...</p>
+            ) : coursesError ? (
+              <p>{coursesError}</p>
+            ) : (
+              courses
+                .filter(c => c.subdivision_owner !== userSubdivision && !c.is_cross_subdivision)
+                .slice(0, 3)
+                .map(course => (
+                  <CourseCard
+                    key={course.id}
+                    title={course.title}
+                    subdivision={course.subdivision_owner}
+                    duration={formatDuration(course.duration_in_minutes)}
+                    isMandatory={course.is_mandatory}
+                  />
+                ))
+            )}
           </div>
         </section>
       </div>

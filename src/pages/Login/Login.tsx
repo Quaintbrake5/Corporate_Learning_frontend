@@ -1,30 +1,36 @@
 import React, { useState } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import styles from './Login.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import nlngLogo from '/NLNG logo.jpg';
-import { faUser, faLock, faPhone, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { useAppDispatch } from '../../store/hooks';
+import { setCredentials } from '../../store/authSlice';
+import { login } from '../../services/authService';
 
 const LoginStep = {
-  Username: 0,
-  AuthMethodSelection: 1,
-  Password: 2,
-  Pin: 3,
+  Email: 0,
+  Password: 1,
 } as const;
 
 type LoginStep = typeof LoginStep[keyof typeof LoginStep];
 
 const Login: React.FC = () => {
-  const [step, setStep] = useState<LoginStep>(LoginStep.Username);
-  const [username, setUsername] = useState('');
+  const [step, setStep] = useState<LoginStep>(LoginStep.Email);
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [pin, setPin] = useState('');
-  const [authMethod, setAuthMethod] = useState<'password' | 'pin'>('password');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  
-  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(e.target.value);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useAppDispatch();
+
+  const from = (location.state as { from?: string })?.from || '/';
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
     setError(null);
   };
 
@@ -33,41 +39,38 @@ const Login: React.FC = () => {
     setError(null);
   };
 
-  const handlePinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPin(e.target.value);
-    setError(null);
-  };
-
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
   };
 
   const handleNextStep = () => {
-    if (step === LoginStep.Username && username.trim() !== '') {
-      setStep(LoginStep.AuthMethodSelection);
-    } else if (step === LoginStep.AuthMethodSelection) {
-      setStep(authMethod === 'password' ? LoginStep.Password : LoginStep.Pin);
+    if (step === LoginStep.Email && email.trim() !== '') {
+      setStep(LoginStep.Password);
     }
   };
 
   const handleBackStep = () => {
-    if (step === LoginStep.Password || step === LoginStep.Pin) {
-      setStep(LoginStep.AuthMethodSelection);
-    } else if (step === LoginStep.AuthMethodSelection) {
-      setStep(LoginStep.Username);
+    if (step === LoginStep.Password) {
+      setStep(LoginStep.Email);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    // Simulate API call
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    } catch {
-      setError('Invalid credentials. Please try again.');
+      const response = await login(email, password);
+      dispatch(setCredentials({ token: response.access_token, user: response.user }));
+      navigate(from, { replace: true });
+    } catch (err: unknown) {
+      const errorObj = err as { response?: { data?: { detail?: string; message?: string } } };
+      const message =
+        errorObj.response?.data?.detail ||
+        errorObj.response?.data?.message ||
+        'Invalid credentials. Please try again.';
+      setError(typeof message === 'string' ? message : 'Invalid credentials. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -93,22 +96,22 @@ const Login: React.FC = () => {
            <div className={styles.progressBar}></div>
         </div>
 
-        {step === LoginStep.Username && (
+        {step === LoginStep.Email && (
           <form className={styles.loginForm} onSubmit={(e) => { e.preventDefault(); handleNextStep(); }}>
             <h4 className={styles.formTitle}>Sign in to your account</h4>
             <div className={styles.formGroup}>
-              <label htmlFor="username" className={styles.formLabel}>
-                Username
+              <label htmlFor="email" className={styles.formLabel}>
+                Email
               </label>
               <div className={styles.inputWrapper}>
                 <FontAwesomeIcon icon={faUser} className={styles.inputIcon} />
                 <input
-                  type="text"
-                  id="username"
-                  value={username}
-                  onChange={handleUsernameChange}
+                  type="email"
+                  id="email"
+                  value={email}
+                  onChange={handleEmailChange}
                   className={styles.formInput}
-                  placeholder="Enter your username"
+                  placeholder="Enter your NLNG email"
                   autoFocus
                 />
               </div>
@@ -116,47 +119,11 @@ const Login: React.FC = () => {
             <button 
               type="submit" 
               className={styles.submitButton}
-              disabled={loading || !username.trim()}
+              disabled={loading || !email.trim()}
             >
               {loading ? 'Verifying...' : 'Next'}
             </button>
           </form>
-        )}
-
-        {step === LoginStep.AuthMethodSelection && (
-          <div className={styles.authMethodSelection}>
-            <h3 className={styles.sectionTitle}>How would you like to sign in?</h3>
-            <div className={styles.authOptions}>
-              <button
-                className={`${styles.authOptionButton} ${authMethod === 'password' ? styles.active : ''}`}
-                onClick={() => setAuthMethod('password')}
-              >
-                <FontAwesomeIcon icon={faLock} className={styles.authIcon} />
-                <span>Password</span>
-              </button>
-              <button
-                className={`${styles.authOptionButton} ${authMethod === 'pin' ? styles.active : ''}`}
-                onClick={() => setAuthMethod('pin')}
-              >
-                <FontAwesomeIcon icon={faPhone} className={styles.authIcon} />
-                <span>PIN</span>
-              </button>
-            </div>
-            <div className={styles.navButtons}>
-              <button 
-                className={styles.backButton} 
-                onClick={handleBackStep}
-              >
-                Back
-              </button>
-              <button 
-                className={styles.nextButton} 
-                onClick={handleNextStep}
-              >
-                Next
-              </button>
-            </div>
-          </div>
         )}
 
         {step === LoginStep.Password && (
@@ -208,45 +175,9 @@ const Login: React.FC = () => {
           </form>
         )}
 
-        {step === LoginStep.Pin && (
-          <form className={styles.loginForm} onSubmit={handleSubmit}>
-            <h4 className={styles.formTitle}>Sign in to your account</h4>
-            <div className={styles.formGroup}>
-              <label htmlFor="pin" className={styles.formLabel}>
-                PIN
-              </label>
-              <div className={styles.inputWrapper}>
-                <FontAwesomeIcon icon={faLock} className={styles.inputIcon} />
-                <input
-                  type="password"
-                  id="pin"
-                  value={pin}
-                  onChange={handlePinChange}
-                  className={styles.formInput}
-                  placeholder="Enter your PIN"
-                  maxLength={4}
-                />
-              </div>
-            </div>
-            <div className={styles.navButtons}>
-              <button 
-                className={styles.backButton} 
-                type="button"
-                onClick={handleBackStep}
-              >
-                Back
-              </button>
-              <button 
-                type="submit"
-                className={styles.submitButton}
-                disabled={loading || !pin.trim()}
-              >
-                {loading ? 'Logging in...' : 'Sign In'}
-              </button>
-            </div>
-            {error && <div className={styles.errorMessage}>{error}</div>}
-          </form>
-        )}
+        <div className={styles.registerLink}>
+          Don't have an account? <Link to="/register">Register</Link>
+        </div>
 
         <div className={styles.systemFooter}>
           NLNG HRMS - Corporate Learning Platform

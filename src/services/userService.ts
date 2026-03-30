@@ -1,24 +1,26 @@
-// Mock user service
-// In a real application, this would make an API call to fetch user data
+import api from './api';
 
 export interface UserProfile {
   id: string;
   name: string;
-  subdivision: string; // e.g., 'CSD', 'CSS', 'CSI', 'CSE', 'CSL'
+  email: string;
+  subdivision_id: number;
   role: string;
+  is_verified: boolean;
 }
 
-/**
- * Get the current user's profile
- * @returns UserProfile object
- */
-export const getUserProfile = (): UserProfile => {
-  // For mock data, we're returning a user in the CSD subdivision
-  // This can be changed to test other subdivisions
-  return {
-    id: '1',
-    name: 'Alex',
-    subdivision: 'CSD',
-    role: 'Employee'
-  };
+export interface Subdivision {
+  id: number;
+  name: string;
+  lead_id: string | null;
+}
+
+export const getUserProfile = async (): Promise<UserProfile> => {
+  const response = await api.get<UserProfile>('/users/profile');
+  return response.data;
+};
+
+export const getSubdivision = async (): Promise<Subdivision> => {
+  const response = await api.get<Subdivision>('/users/subdivision');
+  return response.data;
 };

@@ -1,17 +1,25 @@
 
 import styles from './Sidebar.module.css';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { useAppDispatch } from '../../store/hooks';
+import { logout } from '../../store/authSlice';
 
 const navItems = [
   { path: '/', label: 'Overview', icon: 'fa-solid fa-home' },
   { path: '/courses', label: 'My Courses', icon: 'fa-solid fa-book-open' },
   { path: '/schedule', label: 'Schedule', icon: 'fa-solid fa-calendar-days' },
-  { path: '/settings', label: 'Settings', icon: 'fa-solid fa-gear' },
 ];
 
 const Sidebar: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/login');
+  };
 
   return (
     <aside className={`${styles.sidebar} ${isCollapsed ? styles.collapsed : ''}`}>
@@ -42,7 +50,7 @@ const Sidebar: React.FC = () => {
       </nav>
       
       <div className={styles.logoutContainer}>
-         <button className={styles.logoutButton}>
+         <button className={styles.logoutButton} onClick={handleLogout}>
            <i className="fa-solid fa-arrow-right-from-bracket"></i>
            {!isCollapsed && <span>Log Out</span>}
          </button>

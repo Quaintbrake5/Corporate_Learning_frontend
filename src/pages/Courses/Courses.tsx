@@ -1,9 +1,52 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import CourseCard from '../../components/ui/CourseCard';
+import { getCourses, type Course } from '../../services/courseService';
 import styles from './Courses.module.css';
 
+const subdivisionMap: Record<string, string> = {
+  '1': 'CS',
+  '2': 'ENG',
+  '3': 'OPS',
+  '4': 'FIN',
+  '5': 'HR',
+};
+
+const formatDuration = (minutes: number): string => {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  return `${hours}h ${mins.toString().padStart(2, '0')}m`;
+};
+
+const mapSubdivision = (value: string): string => {
+  return subdivisionMap[value] || value;
+};
+
 const Courses: React.FC = () => {
+  const [mandatoryCourses, setMandatoryCourses] = useState<Course[]>([]);
+  const [electiveCourses, setElectiveCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        setLoading(true);
+        const [mandatoryRes, electiveRes] = await Promise.all([
+          getCourses(1, 10, true),
+          getCourses(1, 10, false),
+        ]);
+        setMandatoryCourses(mandatoryRes.items);
+        setElectiveCourses(electiveRes.items);
+      } catch (error) {
+        console.error('Failed to fetch courses:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
+
   return (
     <DashboardLayout>
       <div className={styles.container}>
@@ -12,54 +55,48 @@ const Courses: React.FC = () => {
           <p className={styles.subtitle}>Explore and manage all your learning activities.</p>
         </div>
 
-        <section className={styles.section}>
-          <h2>Mandatory Training</h2>
-          <div className={styles.grid}>
-            <CourseCard 
-              title="ISPS Code Compliance v2"
-              subdivision="CSS"
-              duration="2h 00m"
-              progress={0}
-              isMandatory={true}
-            />
-            <CourseCard 
-              title="Advanced Tactical Response"
-              subdivision="CSS"
-              duration="4h 30m"
-              progress={45}
-              isMandatory={true}
-            />
-            <CourseCard 
-              title="Emergency Evacuation Coordination"
-              subdivision="CSS"
-              duration="1h 45m"
-              progress={100}
-              isMandatory={true}
-            />
-          </div>
-        </section>
+        {loading ? (
+          <div className={styles.loading}>Loading courses...</div>
+        ) : (
+          <>
+            <section className={styles.section}>
+              <h2>Mandatory Training</h2>
+              <div className={styles.grid}>
+                {mandatoryCourses.length > 0 ? (
+                  mandatoryCourses.map((course) => (
+                    <CourseCard
+                      key={course.id}
+                      title={course.title}
+                      subdivision={mapSubdivision(course.subdivision_owner)}
+                      duration={formatDuration(course.duration_in_minutes)}
+                      isMandatory={course.is_mandatory}
+                    />
+                  ))
+                ) : (
+                  <p>No mandatory courses found.</p>
+                )}
+              </div>
+            </section>
 
-        <section className={styles.section}>
-          <h2>Elective Courses</h2>
-          <div className={styles.grid}>
-            <CourseCard 
-              title="Introduction to Agile Methodologies"
-              subdivision="CSD"
-              duration="3h 00m"
-            />
-            <CourseCard 
-              title="Cybersecurity Fundamentals"
-              subdivision="CSI"
-              duration="2h 30m"
-              progress={15}
-            />
-            <CourseCard 
-              title="Effective Communication in Teams"
-              subdivision="HR"
-              duration="1h 15m"
-            />
-          </div>
-        </section>
+            <section className={styles.section}>
+              <h2>Elective Courses</h2>
+              <div className={styles.grid}>
+                {electiveCourses.length > 0 ? (
+                  electiveCourses.map((course) => (
+                    <CourseCard
+                      key={course.id}
+                      title={course.title}
+                      subdivision={mapSubdivision(course.subdivision_owner)}
+                      duration={formatDuration(course.duration_in_minutes)}
+                    />
+                  ))
+                ) : (
+                  <p>No elective courses found.</p>
+                )}
+              </div>
+            </section>
+          </>
+        )}
       </div>
     </DashboardLayout>
   );

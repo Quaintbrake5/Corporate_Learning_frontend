@@ -1,4 +1,4 @@
-.registerContainer {
+.verifyContainer {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -9,15 +9,15 @@
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-.registerCard {
+.verifyCard {
   width: 100%;
-  max-width: 420px;
+  max-width: 400px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.registerHeader {
+.verifyHeader {
   text-align: center;
   margin-bottom: 1.5rem;
   display: flex;
@@ -38,7 +38,7 @@
   height: 64px;
 }
 
-.registerLogo {
+.verifyLogo {
   width: 100%;
   height: auto;
 }
@@ -79,90 +79,46 @@
   margin: 0;
 }
 
-.progressContainer {
-  display: none;
-}
-
-.registerForm, .authMethodSelection {
+.verifyForm {
   background-color: #1A3E31;
   border-radius: 12px;
-  padding: 2rem;
+  padding: 2.5rem 2rem;
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.5rem;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  text-align: center;
+}
+
+.statusSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.statusIcon {
+  font-size: 3.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .formTitle {
   color: #ffffff;
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 700;
-  margin: 0 0 0.5rem 0;
+  margin: 0;
   text-align: center;
 }
 
-.formGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.statusMessage {
+  color: #d1e0d9;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0 0 1rem 0;
 }
 
-.formLabel {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #ffffff;
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-
-.inputWrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.inputIcon {
-  position: absolute;
-  left: 1rem;
-  color: #6b7280;
-  font-size: 0.85rem;
-}
-
-.formInput, .formSelect {
-  width: 100%;
-  padding: 0.75rem 1rem 0.75rem 2.5rem;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  color: #1a1a1a;
-  background-color: #e8f0fe;
-  transition: all 0.2s ease;
-}
-
-.formInput:focus, .formSelect:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px #00B4DB;
-}
-
-.formInput.inputError, .formSelect.inputError {
-  box-shadow: 0 0 0 2px #ef4444;
-}
-
-.togglePassword {
-  position: absolute;
-  right: 1rem;
-  background: transparent;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  color: #6b7280;
-  display: flex;
-  align-items: center;
-}
-
-.submitButton, .nextButton {
+.submitButton {
   background: linear-gradient(90deg, #12B8D9, #20D071);
   color: #0B3149;
   border: none;
@@ -176,14 +132,8 @@
   margin-top: 0.5rem;
 }
 
-.submitButton:hover:not(:disabled), .nextButton:hover:not(:disabled) {
+.submitButton:hover {
   opacity: 0.9;
-}
-
-.submitButton:disabled, .nextButton:disabled {
-  background: #6b7280;
-  cursor: not-allowed;
-  opacity: 0.7;
 }
 
 .backButton {
@@ -204,44 +154,9 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-.navButtons {
-  display: flex;
-  gap: 1rem;
-  margin-top: 0.5rem;
-  flex-direction: row;
-}
-
-.errorText {
-  color: #ff8a8a;
-  font-size: 0.75rem;
-  padding-left: 0.25rem;
-}
-
 .systemFooter {
-  margin-top: 2rem;
+  margin-top: 1rem;
   color: #799a8b;
   font-size: 0.65rem;
   text-align: center;
-}
-
-.linkButton {
-  background: transparent;
-  border: none;
-  color: #00B4DB;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0.5rem 0;
-  text-decoration: underline;
-  text-align: center;
-  width: 100%;
-  margin-top: 1rem;
-}
-
-.linkButton:hover {
-  color: #12B8D9;
-}
-
-.formIcon {
-  display: none;
 }

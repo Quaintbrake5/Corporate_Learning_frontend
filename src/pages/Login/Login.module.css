@@ -160,7 +160,7 @@
 
 .submitButton, .nextButton {
   background: linear-gradient(90deg, #12B8D9, #20D071);
-  color: #ffffff;
+  color: #0B3149;
   border: none;
   padding: 0.75rem;
   border-radius: 8px;
@@ -216,8 +216,25 @@
   text-align: center;
 }
 
+.registerLink {
+  margin-top: 1.5rem;
+  color: #9ab0a6;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.registerLink a {
+  color: #00B4DB;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.registerLink a:hover {
+  text-decoration: underline;
+}
+
 .systemFooter {
-  margin-top: 2rem;
+  margin-top: 1rem;
   color: #799a8b;
   font-size: 0.65rem;
   text-align: center;
