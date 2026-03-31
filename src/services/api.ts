@@ -24,9 +24,14 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      // Clear both localStorage and any stale auth state
       localStorage.removeItem('access_token');
       localStorage.removeItem('user');
-      globalThis.location.href = '/login';
+      // Redirect to login with a full page reload to reset all state.
+      // Return a never-resolving promise to prevent downstream .catch()
+      // handlers from executing on a page that's about to navigate away.
+      globalThis.window.location.replace('/login');
+      return new Promise(() => {});
     }
     return Promise.reject(error);
   }

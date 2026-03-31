@@ -39,8 +39,8 @@ const Dashboard: React.FC = () => {
       try {
         setCoursesLoading(true);
         setCoursesError(null);
-        const data = await getCourses(1, 20);
-        setCourses(data.items);
+        const data = await getCourses(1, 20) as any;
+        setCourses(Array.isArray(data) ? data : (data?.items || []));
       } catch (err) {
         setCoursesError('Failed to load courses. Please try again later.');
       } finally {
