@@ -487,6 +487,7 @@ const ProfileDashboardSection: React.FC = () => {
                   <select
                     value={selectedDivisionForChange || ''}
                     onChange={handleDivisionChange}
+                    title="Select New Division"
                     className={`${styles.formSelect} ${divisionsLoading ? '' : ''}`}
                     disabled={divisionsLoading}
                   >
@@ -504,6 +505,7 @@ const ProfileDashboardSection: React.FC = () => {
                 <select
                   value={selectedDepartmentForChange || ''}
                   onChange={handleDepartmentChange}
+                  title="Select New Department"
                   className={styles.formSelect}
                   disabled={!selectedDivisionForChange || departmentsLoading}
                 >
