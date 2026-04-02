@@ -87,7 +87,7 @@ const ProfileDashboardSection: React.FC = () => {
         
         // Load departments for the user's division
         const selectedDivision = divisionsData.data.find(d => d.id === profileData.subdivision_id);
-        if (selectedDivision && selectedDivision.subdivisions) {
+        if (selectedDivision?.subdivisions) {
           setDepartments(selectedDivision.subdivisions.map((sub: DepartmentOption) => ({
             id: sub.id,
             name: sub.name,
@@ -304,7 +304,87 @@ const ProfileDashboardSection: React.FC = () => {
       {!loading && profile && subdivision && (
         <>
           <div className={styles.profileContent}>
-            {!isEditMode ? (
+            {isEditMode ? (
+              <form className={styles.editMode} onSubmit={e => e.preventDefault()}>
+                <div className={styles.formGroup}>
+                  <label htmlFor="name" className={styles.formLabel}>Name</label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="Enter your full name"
+                    title="Full Name"
+                    className={`${styles.formInput} ${formErrors.name ? styles.inputError : ''}`}
+                  />
+                  {formErrors.name && <span className={styles.errorText}>{formErrors.name}</span>}
+                </div>
+                
+                <div className={styles.formGroup}>
+                  <label htmlFor="email" className={styles.formLabel}>Email</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Enter your email address"
+                    title="Email Address"
+                    className={`${styles.formInput} ${formErrors.email ? styles.inputError : ''}`}
+                  />
+                  {formErrors.email && <span className={styles.errorText}>{formErrors.email}</span>}
+                </div>
+                
+                <div className={styles.formGroup}>
+                  <label htmlFor="phone" className={styles.formLabel}>Phone</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="Enter your phone number"
+                    title="Phone Number"
+                    className={`${styles.formInput} ${formErrors.phone ? styles.inputError : ''}`}
+                  />
+                  {formErrors.phone && <span className={styles.errorText}>{formErrors.phone}</span>}
+                </div>
+                
+                <div className={styles.formGroup}>
+                  <div className={styles.formLabel}>Division</div>
+                  <div className={styles.readonlyValue}>
+                    {subdivision.name}
+                  </div>
+                </div>
+                
+                <div className={styles.formGroup}>
+                  <div className={styles.formLabel}>Department</div>
+                  <div className={styles.readonlyValue}>
+                    {subdivision.name}
+                  </div>
+                </div>
+                
+                <div className={styles.formActions}>
+                  <button 
+                    type="button" 
+                    className={styles.cancelButton} 
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </button>
+                  
+                  <button 
+                    type="submit" 
+                    className={styles.saveButton} 
+                    onClick={handleSave}
+                    disabled={loading}
+                  >
+                    {loading ? 'Saving...' : 'Save Changes'}
+                  </button>
+                </div>
+              </form>
+            ) : (
               <div className={styles.viewMode}>
                 <div className={styles.infoGroup}>
                   <div className={styles.infoLabel}>Name</div>
@@ -351,83 +431,6 @@ const ProfileDashboardSection: React.FC = () => {
                   </button>
                 </div>
               </div>
-            ) : (
-              <form className={styles.editMode} onSubmit={e => e.preventDefault()}>
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>Name</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="Enter your full name"
-                    title="Full Name"
-                    className={`${styles.formInput} ${formErrors.name ? styles.inputError : ''}`}
-                  />
-                  {formErrors.name && <span className={styles.errorText}>{formErrors.name}</span>}
-                </div>
-                
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="Enter your email address"
-                    title="Email Address"
-                    className={`${styles.formInput} ${formErrors.email ? styles.inputError : ''}`}
-                  />
-                  {formErrors.email && <span className={styles.errorText}>{formErrors.email}</span>}
-                </div>
-                
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>Phone</label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    placeholder="Enter your phone number"
-                    title="Phone Number"
-                    className={`${styles.formInput} ${formErrors.phone ? styles.inputError : ''}`}
-                  />
-                  {formErrors.phone && <span className={styles.errorText}>{formErrors.phone}</span>}
-                </div>
-                
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>Division</label>
-                  <div className={styles.readonlyValue}>
-                    {subdivision.name}
-                  </div>
-                </div>
-                
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>Department</label>
-                  <div className={styles.readonlyValue}>
-                    {subdivision.name}
-                  </div>
-                </div>
-                
-                <div className={styles.formActions}>
-                  <button 
-                    type="button" 
-                    className={styles.cancelButton} 
-                    onClick={handleCancel}
-                  >
-                    Cancel
-                  </button>
-                  
-                  <button 
-                    type="submit" 
-                    className={styles.saveButton} 
-                    onClick={handleSave}
-                    disabled={loading}
-                  >
-                    {loading ? 'Saving...' : 'Save Changes'}
-                  </button>
-                </div>
-              </form>
             )}
           </div>
           
@@ -483,12 +486,13 @@ const ProfileDashboardSection: React.FC = () => {
             {!changeLoading && !changeError && !changeSuccess && (
               <>
                 <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>New Division</label>
+                  <label htmlFor="newDivision" className={styles.formLabel}>New Division</label>
                   <select
+                    id="newDivision"
                     value={selectedDivisionForChange || ''}
                     onChange={handleDivisionChange}
                     title="Select New Division"
-                    className={`${styles.formSelect} ${divisionsLoading ? '' : ''}`}
+                    className={styles.formSelect}
                     disabled={divisionsLoading}
                   >
                     <option value="">Select Division</option>
@@ -501,8 +505,9 @@ const ProfileDashboardSection: React.FC = () => {
                 </div>
                 
                 <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>New Department</label>
+                  <label htmlFor="newDepartment" className={styles.formLabel}>New Department</label>
                 <select
+                  id="newDepartment"
                   value={selectedDepartmentForChange || ''}
                   onChange={handleDepartmentChange}
                   title="Select New Department"
