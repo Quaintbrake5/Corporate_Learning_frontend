@@ -7,6 +7,7 @@ export interface UserProfile {
   subdivision_id: number;
   role: string;
   is_verified: boolean;
+  phone?: string;
 }
 
 export interface Subdivision {

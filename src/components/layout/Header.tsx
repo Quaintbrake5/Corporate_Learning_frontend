@@ -2,6 +2,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass, faUser, faChevronDown, faBell } from '@fortawesome/free-solid-svg-icons';
 import styles from './Header.module.css';
 import { useAppSelector } from '../../store/hooks';
+import { useState } from 'react';
+import ProfileModal from './ProfileModal';
 
 const subdivisionMap: Record<number, string> = {
   1: 'CS',
@@ -14,6 +16,7 @@ const subdivisionMap: Record<number, string> = {
 const Header: React.FC = () => {
   const user = useAppSelector((state) => state.auth.user);
   const subdivision = user?.subdivision_id ? subdivisionMap[user.subdivision_id] || 'N/A' : 'N/A';
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   return (
     <header className={styles.header}>
@@ -32,7 +35,7 @@ const Header: React.FC = () => {
           <span className={styles.badge}></span>
         </button>
 
-        <div className={styles.profile}>
+        <div className={styles.profile} onClick={() => setIsProfileModalOpen(true)}>
           <div className={styles.avatarInfo}>
             <span className={styles.name}>{user?.name || 'User'}</span>
             <span className={styles.role}>{subdivision}</span>
@@ -42,6 +45,8 @@ const Header: React.FC = () => {
           </div>
           <FontAwesomeIcon icon={faChevronDown} className={styles.chevronIcon} />
         </div>
+        
+        <ProfileModal isOpen={isProfileModalOpen} onClose={() => setIsProfileModalOpen(false)} />
       </div>
     </header>
   );

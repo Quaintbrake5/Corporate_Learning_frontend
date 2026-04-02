@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Register.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import nlngLogo from '/NLNG logo.jpg';
 import { faUser, faLock, faEnvelope, faBuilding, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { register as registerUser } from '../../services/authService';
+import api from '../../services/api';
 
 const RegisterStep = {
   PersonalInfo: 0,
@@ -14,28 +15,25 @@ const RegisterStep = {
 
 type RegisterStep = typeof RegisterStep[keyof typeof RegisterStep];
 
-const divisionToSubdivisionId: Record<string, number> = {
-  CS: 1,
-  ENG: 2,
-  OPS: 3,
-  FIN: 4,
-  HR: 5,
-};
+interface Subdivision {
+  id: number;
+  name: string;
+  division_id: number;
+}
 
-const divisions = [
-  { value: '', label: 'Select Division' },
-  { value: 'CS', label: 'Corporate Services (CS)' },
-  { value: 'ENG', label: 'Engineering (ENG)' },
-  { value: 'OPS', label: 'Operations (OPS)' },
-  { value: 'FIN', label: 'Finance (FIN)' },
-  { value: 'HR', label: 'Human Resources (HR)' },
-];
+interface Division {
+  id: number;
+  code: string;
+  name: string | null;
+  subdivisions: Subdivision[];
+}
 
 const VALIDATION_MESSAGES = {
   fullNameRequired: 'Full name is required',
   emailRequired: 'Email is required',
   emailInvalid: 'Email must match FirstName.LastName@nlng.com',
   divisionRequired: 'Please select a division',
+  departmentRequired: 'Please select a department',
   pwdRequired: 'Password required',
   pwdMinLength: 'Password must be at least 8 characters',
   pwdLowercase: 'Password must contain at least one lowercase letter',
@@ -89,11 +87,16 @@ const extractFromNestedObject = (
 const Register: React.FC = () => {
   const navigate = useNavigate();
 
+  const [divisions, setDivisions] = useState<Division[]>([]);
+  const [departments, setDepartments] = useState<Subdivision[]>([]);
+  const [divisionsLoading, setDivisionsLoading] = useState(true);
+
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     password: '',
     division: '',
+    department: '',
     confirmPassword: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -102,6 +105,20 @@ const Register: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [step, setStep] = useState<RegisterStep>(RegisterStep.PersonalInfo);
+
+  useEffect(() => {
+    const fetchDivisions = async () => {
+      try {
+        const response = await api.get<Division[]>('/divisions');
+        setDivisions(response.data);
+      } catch {
+        // Silently fail — dropdown will just show "Select Division"
+      } finally {
+        setDivisionsLoading(false);
+      }
+    };
+    fetchDivisions();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -116,10 +133,16 @@ const Register: React.FC = () => {
       }));
     }
     setApiError('');
+
+    if (name === 'division') {
+      const selectedDivision = divisions.find(d => d.id === Number(value));
+      setDepartments(selectedDivision?.subdivisions ?? []);
+      setFormData(prev => ({ ...prev, department: '' }));
+    }
   };
 
   const handleNextStep = () => {
-    if (step === RegisterStep.PersonalInfo && formData.fullName.trim() !== '' && formData.email.trim() !== '' && formData.division !== '') {
+    if (step === RegisterStep.PersonalInfo && formData.fullName.trim() !== '' && formData.email.trim() !== '' && formData.division !== '' && formData.department !== '') {
       setStep(RegisterStep.Credentials);
     } else if (step === RegisterStep.Credentials && formData.password && formData.password.length >= 8) {
       setStep(RegisterStep.Confirmation);
@@ -143,6 +166,7 @@ const Register: React.FC = () => {
     validateFullName(formData.fullName, newErrors);
     validateEmail(formData.email, newErrors);
     validateDivision(formData.division, newErrors);
+    validateDepartment(formData.department, newErrors);
     validatePassword(formData.password, newErrors);
     validateConfirmPassword(formData.confirmPassword, formData.password, newErrors);
 
@@ -171,6 +195,12 @@ const Register: React.FC = () => {
   const validateDivision = (division: string, errors: Record<string, string>): void => {
     if (!division) {
       errors.division = VALIDATION_MESSAGES.divisionRequired;
+    }
+  };
+
+  const validateDepartment = (department: string, errors: Record<string, string>): void => {
+    if (!department) {
+      errors.department = VALIDATION_MESSAGES.departmentRequired;
     }
   };
 
@@ -217,12 +247,11 @@ const Register: React.FC = () => {
       setLoading(true);
       setApiError('');
       try {
-        const subdivisionId = divisionToSubdivisionId[formData.division];
         await registerUser({
           email: formData.email,
           password: formData.password,
           name: formData.fullName,
-          subdivision_id: subdivisionId,
+          subdivision_id: Number(formData.department),
         });
         navigate('/login', { state: { message: 'Registration successful! Please sign in.' } });
       } catch (error: unknown) {
@@ -316,9 +345,10 @@ const Register: React.FC = () => {
                     className={`${styles.formSelect} ${errors.division ? styles.inputError : ''}`}
                     style={{ paddingLeft: '2.5rem' }}
                   >
+                    <option value="">{divisionsLoading ? 'Loading...' : 'Select Division'}</option>
                     {divisions.map(div => (
-                      <option key={div.value} value={div.value}>
-                        {div.label}
+                      <option key={div.id} value={div.id}>
+                        {div.name || div.code}
                       </option>
                     ))}
                   </select>
@@ -326,12 +356,44 @@ const Register: React.FC = () => {
                 {errors.division && <span className={styles.errorText}>{errors.division}</span>}
               </div>
 
+              <div className={styles.formGroup}>
+                <label htmlFor="department" className={styles.formLabel}>
+                  Department
+                </label>
+                <div className={styles.inputWrapper}>
+                  <FontAwesomeIcon icon={faBuilding} className={styles.inputIcon} />
+                  <select
+                    id="department"
+                    name="department"
+                    value={formData.department}
+                    onChange={handleChange}
+                    className={`${styles.formSelect} ${errors.department ? styles.inputError : ''}`}
+                    style={{ paddingLeft: '2.5rem' }}
+                    disabled={!formData.division}
+                  >
+                    <option value="">
+                      {!formData.division
+                        ? 'Select a division first'
+                        : departments.length === 0
+                          ? 'No departments available'
+                          : 'Select Department'}
+                    </option>
+                    {departments.map(dept => (
+                      <option key={dept.id} value={dept.id}>
+                        {dept.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {errors.department && <span className={styles.errorText}>{errors.department}</span>}
+              </div>
+
               <div className={styles.navButtons}>
                 <button
                   type="button"
                   className={styles.nextButton}
                   onClick={handleNextStep}
-                  disabled={!(formData.fullName.trim() && formData.email.trim() && formData.division) || loading}
+                  disabled={!(formData.fullName.trim() && formData.email.trim() && formData.division && formData.department) || loading}
                 >
                   Next
                 </button>
@@ -454,10 +516,25 @@ const Register: React.FC = () => {
                   <input
                     id="confirmDivision"
                     type="text"
-                    value={divisions.find(d => d.value === formData.division)?.label || ''}
+                    value={divisions.find(d => d.id === Number(formData.division))?.name || divisions.find(d => d.id === Number(formData.division))?.code || ''}
                     className={styles.formInput}
                     disabled
                     aria-label="Division confirmation"
+                  />
+                </div>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="confirmDepartment" className={styles.formLabel}>Department</label>
+                <div className={styles.inputWrapper}>
+                  <FontAwesomeIcon icon={faBuilding} className={styles.inputIcon} />
+                  <input
+                    id="confirmDepartment"
+                    type="text"
+                    value={departments.find(d => d.id === Number(formData.department))?.name || ''}
+                    className={styles.formInput}
+                    disabled
+                    aria-label="Department confirmation"
                   />
                 </div>
               </div>

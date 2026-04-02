@@ -26,19 +26,22 @@ const Courses: React.FC = () => {
   const [mandatoryCourses, setMandatoryCourses] = useState<Course[]>([]);
   const [electiveCourses, setElectiveCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
         setLoading(true);
+        setError(null);
         const [mandatoryRes, electiveRes] = await Promise.all([
           getCourses(1, 10, true),
           getCourses(1, 10, false),
         ]);
         setMandatoryCourses(mandatoryRes.items);
         setElectiveCourses(electiveRes.items);
-      } catch (error) {
-        console.error('Failed to fetch courses:', error);
+      } catch (err) {
+        console.error('Failed to fetch courses:', err);
+        setError('Failed to load courses. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -46,6 +49,20 @@ const Courses: React.FC = () => {
 
     fetchCourses();
   }, []);
+
+  if (error) {
+    return (
+      <DashboardLayout>
+        <div className={styles.container}>
+          <div className={styles.error}>
+            <h2>Error</h2>
+            <p>{error}</p>
+            <button onClick={() => globalThis.window.location.reload()}>Try Again</button>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
