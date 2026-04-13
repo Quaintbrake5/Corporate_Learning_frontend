@@ -35,7 +35,11 @@ const Header: React.FC = () => {
           <span className={styles.badge}></span>
         </button>
 
-        <div className={styles.profile} onClick={() => setIsProfileModalOpen(true)}>
+        <button 
+          className={styles.profile} 
+          onClick={() => setIsProfileModalOpen(true)}
+          style={{ background: 'transparent', border: 'none', textAlign: 'left', padding: 0 }}
+        >
           <div className={styles.avatarInfo}>
             <span className={styles.name}>{user?.name || 'User'}</span>
             <span className={styles.role}>{subdivision}</span>
@@ -44,7 +48,7 @@ const Header: React.FC = () => {
             <FontAwesomeIcon icon={faUser} className={styles.avatarIcon} />
           </div>
           <FontAwesomeIcon icon={faChevronDown} className={styles.chevronIcon} />
-        </div>
+        </button>
         
         <ProfileModal isOpen={isProfileModalOpen} onClose={() => setIsProfileModalOpen(false)} />
       </div>

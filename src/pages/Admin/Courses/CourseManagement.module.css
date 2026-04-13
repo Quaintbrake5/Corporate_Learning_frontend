@@ -1,0 +1,162 @@
+.container {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
+  margin-top: 1rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 1rem;
+}
+
+.header h2 {
+  color: #003366;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.addButton {
+  background-color: #90ee90;
+  color: #003366;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.addButton:hover {
+  background-color: #7ccc7c;
+  transform: translateY(-1px);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table th,
+.table td {
+  padding: 1rem;
+  text-align: left;
+  color: #333333;
+}
+
+.table th {
+  font-weight: 600;
+  background-color: rgba(0, 51, 102, 0.05);
+  color: #003366;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
+.table th:first-child {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+.table th:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.table tr {
+  border-bottom: 1px solid #eeeeee;
+  transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(144, 238, 144, 0.1);
+}
+
+.mandatoryBadge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background-color: rgba(211, 47, 47, 0.1);
+  color: #b71c1c;
+}
+
+.electiveBadge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background-color: rgba(0, 51, 102, 0.1);
+  color: #003366;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actionButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.editButton {
+  color: #003366;
+}
+
+.editButton:hover {
+  background-color: rgba(0, 51, 102, 0.1);
+}
+
+.modulesButton {
+  color: #90ee90;
+}
+
+.modulesButton:hover {
+  background-color: rgba(144, 238, 144, 0.2);
+  color: #003366;
+}
+
+.deleteButton {
+  color: #b71c1c;
+}
+
+.deleteButton:hover {
+  background-color: rgba(211, 47, 47, 0.1);
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: #003366;
+}
+
+.error {
+  color: #d32f2f;
+  background-color: rgba(211, 47, 47, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}

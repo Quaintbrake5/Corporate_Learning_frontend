@@ -1,64 +1,84 @@
 .dashboardContainer {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 2.5rem;
+  padding: 1rem 0;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .headerSection {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(0, 51, 102, 0.08);
 }
 
 .title {
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 700;
-  color: var(--text-dark);
-  margin: 0 0 0.25rem 0;
+  color: var(--primary-blue);
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.02em;
 }
 
 .subtitle {
-  color: var(--text-color);
-  font-size: 0.95rem;
+  color: #6b7280;
+  font-size: 1.05rem;
   margin: 0;
+  font-weight: 500;
 }
 
 .dashboardSection {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
 .sectionHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0 0.25rem;
 }
 
-.sectionHeader h2 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text-dark);
+.sectionTitle {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--primary-blue);
   margin: 0;
+  letter-spacing: -0.01em;
 }
 
 .btnLink {
-  background: none;
-  border: none;
+  background: rgba(0, 51, 102, 0.05);
+  border: 1px solid rgba(0, 51, 102, 0.1);
   color: var(--primary-blue);
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   cursor: pointer;
+  padding: 0.5rem 1.25rem;
+  border-radius: 20px;
+  transition: all 0.2s ease;
 }
 
 .btnLink:hover {
-  text-decoration: underline;
+  background: rgba(0, 51, 102, 0.1);
+  transform: translateY(-1px);
 }
 
 .analyticsGrid {
   display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 1.5rem;
+  grid-template-columns: 350px 1fr;
+  gap: 2rem;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 2rem;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
 }
 
 .statsColumn {
@@ -69,16 +89,44 @@
 
 .chartsColumn {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .coursesGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.5rem;
+}
+
+.loadingText, .emptyText {
+  color: #6b7280;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-align: center;
+  grid-column: 1 / -1;
+  padding: 3rem;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 16px;
+  border: 1px dashed rgba(0, 51, 102, 0.2);
+}
+
+.errorText {
+  color: var(--error-text);
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-align: center;
+  grid-column: 1 / -1;
+  padding: 3rem;
+  background: var(--error-bg);
+  border-radius: 16px;
+  border: 1px solid var(--error-border);
 }
 
 @media (max-width: 1024px) {
   .analyticsGrid {
     grid-template-columns: 1fr;
+    padding: 1.5rem;
   }
 }

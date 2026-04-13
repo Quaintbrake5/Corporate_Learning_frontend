@@ -372,11 +372,7 @@ const Register: React.FC = () => {
                     disabled={!formData.division}
                   >
                     <option value="">
-                      {!formData.division
-                        ? 'Select a division first'
-                        : departments.length === 0
-                          ? 'No departments available'
-                          : 'Select Department'}
+                      {!formData.division ? 'Select a division first' : (departments.length === 0 ? 'No departments available' : 'Select Department')}
                     </option>
                     {departments.map(dept => (
                       <option key={dept.id} value={dept.id}>
@@ -393,7 +389,7 @@ const Register: React.FC = () => {
                   type="button"
                   className={styles.nextButton}
                   onClick={handleNextStep}
-                  disabled={!(formData.fullName.trim() && formData.email.trim() && formData.division && formData.department) || loading}
+                  disabled={!formData.fullName.trim() || !formData.email.trim() || !formData.division || !formData.department || loading}
                 >
                   Next
                 </button>

@@ -1,0 +1,174 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.pageHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pageHeader h2 {
+  margin: 0;
+  color: #003366;
+  font-size: 1.75rem;
+}
+
+.pageHeader p {
+  margin: 0;
+  color: #666;
+}
+
+.courseSelection {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.selectGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.selectLabel {
+  font-weight: 600;
+  color: #003366;
+  font-size: 0.9rem;
+}
+
+.select {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #333;
+}
+
+.enrollmentSection {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  color: #003366;
+  font-weight: 700;
+  margin: 0;
+}
+
+.addUserBtn {
+  background-color: #90ee90;
+  color: #003366;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.addUserBtn:hover {
+  background-color: #7ccc7c;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table th, .table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.table th {
+  font-weight: 600;
+  color: #003366;
+  background-color: #f9fafc;
+}
+
+.table tr:hover {
+  background-color: rgba(144, 238, 144, 0.05);
+}
+
+.removeBtn {
+  background: transparent;
+  border: none;
+  color: #d32f2f;
+  cursor: pointer;
+  padding: 0.4rem;
+  border-radius: 4px;
+}
+
+.removeBtn:hover {
+  background-color: rgba(211, 47, 47, 0.05);
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem;
+  color: #999;
+}
+
+/* User Selection Modal styles */
+.userPicker {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.searchBox {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.userList {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 8px;
+}
+
+.userOption {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.userOption:hover {
+  background-color: #f0f7f0;
+}
+
+.userOptionName {
+  font-weight: 600;
+  color: #333;
+}
+
+.userOptionEmail {
+  font-size: 0.8rem;
+  color: #666;
+}
