@@ -30,28 +30,12 @@
   border-radius: 12px;
   box-shadow: var(--shadow-sm);
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  overflow: hidden;
   min-height: 500px;
 }
 
-.calendarPlaceholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  color: #94a3b8;
-}
 
-.calendarPlaceholder i {
-  font-size: 3rem;
-  opacity: 0.5;
-}
-
-.calendarPlaceholder p {
-  font-size: 1.125rem;
-  font-weight: 500;
-}
 
 .sidebarArea {
   display: flex;

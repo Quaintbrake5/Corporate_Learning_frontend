@@ -17,7 +17,7 @@ const AdminProtectedRoute: React.FC<AdminProtectedRouteProps> = ({ children }) =
   }
 
   // Check for admin role
-  if (user?.role !== 'admin') {
+  if (user?.role?.toLowerCase() !== 'admin') {
     // If authenticated but not admin, redirect to normal dashboard
     return <Navigate to="/" replace />;
   }

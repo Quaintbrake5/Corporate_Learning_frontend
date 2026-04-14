@@ -64,14 +64,20 @@ const Login: React.FC = () => {
       const response = await login(email, password);
       dispatch(setCredentials({ token: response.access_token, user: response.user }));
       
-      const defaultPath = response.user.role === 'admin' ? '/admin' : '/';
+      const userRole = response.user.role?.toLowerCase() || '';
+      const defaultPath = userRole === 'admin' ? '/admin' : '/';
       const stateFrom = (location.state as { from?: { pathname?: string } | string })?.from;
 
       let finalPath = defaultPath;
       if (stateFrom) {
-        const path = typeof stateFrom === 'object' ? stateFrom.pathname : stateFrom;
-        if (path && path !== '/') {
-          finalPath = path;
+        const path = typeof stateFrom === 'object' ? stateFrom.pathname : String(stateFrom);
+        if (path && path !== '/' && path !== '/login') {
+          // Prevent non-admins from trying to redirect to admin routes
+          if (path.startsWith('/admin') && userRole !== 'admin') {
+            finalPath = '/';
+          } else {
+            finalPath = path;
+          }
         }
       }
 

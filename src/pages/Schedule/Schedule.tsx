@@ -1,6 +1,7 @@
 import React from 'react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import ScheduleWidget from '../../components/dashboard/ScheduleWidget';
+import Calendar from '../../components/ui/Calendar';
 import styles from './Schedule.module.css';
 
 const Schedule: React.FC = () => {
@@ -14,10 +15,7 @@ const Schedule: React.FC = () => {
 
         <div className={styles.content}>
           <div className={styles.calendarArea}>
-            <div className={styles.calendarPlaceholder}>
-              <i className="fa-regular fa-calendar-days"></i>
-              <p>Full Calendar View</p>
-            </div>
+            <Calendar />
           </div>
           <div className={styles.sidebarArea}>
             <ScheduleWidget />
