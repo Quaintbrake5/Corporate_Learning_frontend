@@ -4,6 +4,12 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   padding: 2rem;
   margin-top: 1rem;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .header {
@@ -53,9 +59,9 @@
 
 .table th,
 .table td {
-  padding: 1rem;
+  padding: 1.25rem 1rem;
   text-align: left;
-  color: #333333;
+  color: #666666;
 }
 
 .table th {
@@ -87,7 +93,7 @@
 }
 
 .mandatoryBadge {
-  padding: 0.25rem 0.75rem;
+  padding: 0.35rem 0.85rem;
   border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 600;
@@ -96,7 +102,7 @@
 }
 
 .electiveBadge {
-  padding: 0.25rem 0.75rem;
+  padding: 0.35rem 0.85rem;
   border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 600;
@@ -113,9 +119,9 @@
   background: transparent;
   border: none;
   cursor: pointer;
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -135,7 +141,7 @@
 }
 
 .modulesButton:hover {
-  background-color: rgba(144, 238, 144, 0.2);
+  background-color: rgba(144, 238, 144, 0.3);
   color: #003366;
 }
 

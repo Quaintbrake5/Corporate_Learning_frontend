@@ -8,7 +8,7 @@
 
 .sidebar {
   width: 220px;
-  background-color: #1a1a1a;
+  background-color: #003366;
   color: #ffffff;
   display: flex;
   flex-direction: column;
@@ -62,14 +62,14 @@
 }
 
 .toggleButton:hover {
-  color: #ffca28;
-  background-color: #333333;
+  color: #90ee90;
+  background-color: rgba(255, 255, 255, 0.1);
   transform: scale(1.1);
 }
 
 .logoContainer i {
   font-size: 1.5rem;
-  color: #ffca28;
+  color: #90ee90;
 }
 
 .logoContainer h2 {
@@ -107,13 +107,13 @@
 .navLink:hover {
   text-decoration: none;
   color: #ffffff;
-  background-color: #2a2a2a;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .navLink.active {
-  background-color: #ffca28;
-  color: #1a1a1a;
-  box-shadow: 0 4px 12px rgba(255, 202, 40, 0.2);
+  background-color: #90ee90;
+  color: #003366;
+  box-shadow: 0 4px 12px rgba(144, 238, 144, 0.2);
 }
 
 .navIcon {
@@ -161,6 +161,7 @@
   overflow-y: auto;
   padding: 2rem;
   background-color: #f7f9fc;
+  color: #666666;
 }
 
 @media (max-width: 768px) {

@@ -9,8 +9,6 @@ const adminNavItems = [
   { path: '/admin', label: 'Dashboard', icon: 'fa-solid fa-gauge' },
   { path: '/admin/users', label: 'Users', icon: 'fa-solid fa-users' },
   { path: '/admin/courses', label: 'Courses', icon: 'fa-solid fa-book' },
-  { path: '/admin/enrollments', label: 'Enrollments', icon: 'fa-solid fa-user-check' },
-  { path: '/admin/subdivisions', label: 'Subdivisions', icon: 'fa-solid fa-sitemap' },
   { path: '/', label: 'Exit Admin', icon: 'fa-solid fa-arrow-left' },
 ];
 

@@ -16,7 +16,8 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onSuccess, onCancel }) 
     subdivision_owner: 1,
     duration_in_minutes: 60,
     is_mandatory: false,
-    is_cross_subdivision: false
+    is_cross_subdivision: false,
+    video_url: '' // NEW FIELD FOR VIDEO COURSE
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +30,8 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onSuccess, onCancel }) 
         subdivision_owner: typeof course.subdivision_owner === 'string' ? Number.parseInt(course.subdivision_owner, 10) : course.subdivision_owner,
         duration_in_minutes: course.duration_in_minutes,
         is_mandatory: course.is_mandatory,
-        is_cross_subdivision: course.is_cross_subdivision
+        is_cross_subdivision: course.is_cross_subdivision,
+        video_url: '' // Will not populate for edit by default to keep it simple, or user can edit via module manager
       });
     }
   }, [course]);
@@ -51,14 +53,27 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onSuccess, onCancel }) 
 
     try {
       const payload = {
-        ...formData,
-        subdivision_owner: String(formData.subdivision_owner)
+        title: formData.title,
+        description: formData.description,
+        subdivision_owner: String(formData.subdivision_owner),
+        duration_in_minutes: formData.duration_in_minutes,
+        is_mandatory: formData.is_mandatory,
+        is_cross_subdivision: formData.is_cross_subdivision
       };
 
       if (course) {
         await adminService.updateCourse(course.id, payload);
       } else {
-        await adminService.createCourse(payload);
+        const newCourse = await adminService.createCourse(payload);
+        // Automatically create a video module if a URL is provided
+        if (formData.video_url.trim() !== '') {
+          await adminService.createModule(newCourse.id, {
+            title: formData.title + ' - Primary Video',
+            content_type: 'video',
+            content_url: formData.video_url,
+            order_index: 0
+          });
+        }
       }
       onSuccess();
     } catch (err: unknown) {
@@ -89,9 +104,25 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onSuccess, onCancel }) 
           onChange={handleChange}
           className={styles.input}
           required
-          placeholder="e.g. HSE Maritime Safety"
+          placeholder="e.g. Masterclass: Security"
         />
       </div>
+
+      {!course && (
+        <div className={styles.formGroup}>
+          <label htmlFor="video-url" className={styles.label}><i className="fa-solid fa-video" style={{color: '#ffca28', marginRight: '5px'}}></i> Primary Video URL</label>
+          <input
+            id="video-url"
+            type="text"
+            name="video_url"
+            value={formData.video_url}
+            onChange={handleChange}
+            className={styles.input}
+            placeholder="https://example.com/video.mp4"
+            required={!course}
+          />
+        </div>
+      )}
 
       <div className={styles.formGroup}>
         <label htmlFor="course-desc" className={styles.label}>Description</label>
@@ -115,11 +146,11 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onSuccess, onCancel }) 
             onChange={handleChange}
             className={styles.select}
           >
-            <option value={1}>CSS (Security)</option>
-            <option value={2}>CSI (IMT/IT)</option>
-            <option value={3}>CSD (Digital)</option>
-            <option value={4}>CSL (Logistics)</option>
-            <option value={5}>CSE (Estates)</option>
+            <option value={1}>CSS</option>
+            <option value={2}>CSI</option>
+            <option value={3}>CSD</option>
+            <option value={4}>CSL</option>
+            <option value={5}>CSE</option>
           </select>
         </div>
 
@@ -168,9 +199,9 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onSuccess, onCancel }) 
         </button>
         <button type="submit" className={styles.submitButton} disabled={loading}>
           {loading ? (
-            <><i className="fa-solid fa-spinner fa-spin"></i> Saving...</>
+            <><i className="fa-solid fa-circle-notch fa-spin"></i> Saving...</>
           ) : (
-            'Save Course'
+            course ? 'Update Course' : 'Create Video Course'
           )}
         </button>
       </div>

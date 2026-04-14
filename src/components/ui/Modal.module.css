@@ -14,7 +14,7 @@
 .modal {
   background-color: white;
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
@@ -31,6 +31,7 @@
 .title {
   margin: 0;
   font-size: 1.25rem;
+  color: #003366;
 }
 
 .closeButton {
@@ -40,6 +41,7 @@
   cursor: pointer;
   padding: 0.25rem;
   line-height: 1;
+  color: #666;
 }
 
 .closeButton:hover {

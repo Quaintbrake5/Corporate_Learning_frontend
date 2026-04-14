@@ -22,8 +22,8 @@ const CourseManagement: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await getCourses(1, 100);
-      setCourses(data.items);
+      const data = await getCourses(1, 100) as any;
+      setCourses(data?.items || (Array.isArray(data) ? data : []));
     } catch (err: unknown) {
       let message = 'Failed to load courses';
       if (err && typeof err === 'object' && 'response' in err) {

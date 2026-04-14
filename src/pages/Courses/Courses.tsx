@@ -34,11 +34,11 @@ const Courses: React.FC = () => {
         setLoading(true);
         setError(null);
         const [mandatoryRes, electiveRes] = await Promise.all([
-          getCourses(1, 10, true),
-          getCourses(1, 10, false),
+          getCourses(1, 10, true) as any,
+          getCourses(1, 10, false) as any,
         ]);
-        setMandatoryCourses(mandatoryRes.items);
-        setElectiveCourses(electiveRes.items);
+        setMandatoryCourses(mandatoryRes?.items || (Array.isArray(mandatoryRes) ? mandatoryRes : []));
+        setElectiveCourses(electiveRes?.items || (Array.isArray(electiveRes) ? electiveRes : []));
       } catch (err) {
         console.error('Failed to fetch courses:', err);
         setError('Failed to load courses. Please try again later.');

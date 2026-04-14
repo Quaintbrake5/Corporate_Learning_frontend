@@ -27,7 +27,7 @@ const Login: React.FC = () => {
   const location = useLocation();
   const dispatch = useAppDispatch();
 
-  const from = (location.state as { from?: string })?.from || '/';
+  // "from" extracted inline during submit
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -63,7 +63,19 @@ const Login: React.FC = () => {
     try {
       const response = await login(email, password);
       dispatch(setCredentials({ token: response.access_token, user: response.user }));
-      navigate(from, { replace: true });
+      
+      const defaultPath = response.user.role === 'admin' ? '/admin' : '/';
+      const stateFrom = (location.state as { from?: { pathname?: string } | string })?.from;
+
+      let finalPath = defaultPath;
+      if (stateFrom) {
+        const path = typeof stateFrom === 'object' ? stateFrom.pathname : stateFrom;
+        if (path && path !== '/') {
+          finalPath = path;
+        }
+      }
+
+      navigate(finalPath, { replace: true });
     } catch (err: unknown) {
       const errorObj = err as { response?: { data?: { detail?: string; message?: string } } };
       const message =
