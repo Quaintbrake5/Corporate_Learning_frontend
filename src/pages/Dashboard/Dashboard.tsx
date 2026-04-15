@@ -72,10 +72,12 @@ const Dashboard: React.FC = () => {
     return courseList.map(course => (
       <CourseCard
         key={course.id}
+        id={course.id}
         title={course.title}
         subdivision={course.subdivision_owner}
         duration={formatDuration(course.duration_in_minutes)}
         isMandatory={course.is_mandatory}
+        thumbnailUrl={course.thumbnail_url}
       />
     ));
   };

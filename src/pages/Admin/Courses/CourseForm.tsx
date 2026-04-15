@@ -17,7 +17,8 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onSuccess, onCancel }) 
     duration_in_minutes: 60,
     is_mandatory: false,
     is_cross_subdivision: false,
-    video_url: '' // NEW FIELD FOR VIDEO COURSE
+    video_url: '',
+    thumbnail_url: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +32,8 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onSuccess, onCancel }) 
         duration_in_minutes: course.duration_in_minutes,
         is_mandatory: course.is_mandatory,
         is_cross_subdivision: course.is_cross_subdivision,
-        video_url: '' // Will not populate for edit by default to keep it simple, or user can edit via module manager
+        video_url: '',
+        thumbnail_url: course.thumbnail_url || ''
       });
     }
   }, [course]);
@@ -58,7 +60,8 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onSuccess, onCancel }) 
         subdivision_owner: String(formData.subdivision_owner),
         duration_in_minutes: formData.duration_in_minutes,
         is_mandatory: formData.is_mandatory,
-        is_cross_subdivision: formData.is_cross_subdivision
+        is_cross_subdivision: formData.is_cross_subdivision,
+        thumbnail_url: formData.thumbnail_url || null
       };
 
       if (course) {
@@ -133,6 +136,19 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onSuccess, onCancel }) 
           onChange={handleChange}
           className={styles.textarea}
           placeholder="Summarize course content and goals..."
+        />
+      </div>
+
+      <div className={styles.formGroup}>
+        <label htmlFor="thumbnail-url" className={styles.label}><i className="fa-solid fa-image" style={{color: '#66bb6a', marginRight: '5px'}}></i> Thumbnail URL</label>
+        <input
+          id="thumbnail-url"
+          type="text"
+          name="thumbnail_url"
+          value={formData.thumbnail_url}
+          onChange={handleChange}
+          className={styles.input}
+          placeholder="https://example.com/thumbnail.jpg"
         />
       </div>
 

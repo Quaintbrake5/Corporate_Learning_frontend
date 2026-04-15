@@ -9,7 +9,6 @@ const adminNavItems = [
   { path: '/admin', label: 'Dashboard', icon: 'fa-solid fa-gauge' },
   { path: '/admin/users', label: 'Users', icon: 'fa-solid fa-users' },
   { path: '/admin/courses', label: 'Courses', icon: 'fa-solid fa-book' },
-  { path: '/', label: 'Exit Admin', icon: 'fa-solid fa-arrow-left' },
 ];
 
 const AdminLayout: React.FC = () => {

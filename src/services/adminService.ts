@@ -12,7 +12,7 @@ export interface AdminUser {
 }
 
 export interface PaginatedUsers {
-  users: AdminUser[];
+  items: AdminUser[];
   total: number;
   page: number;
   page_size: number;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Register.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -44,30 +44,6 @@ const VALIDATION_MESSAGES = {
   pwdMismatch: 'Mismatched passwords!',
 };
 
-const extractErrorMessage = (error: unknown): string => {
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  if (!error || typeof error !== 'object') {
-    return 'Registration failed. Please try again.';
-  }
-
-  const errObj = error as Record<string, unknown>;
-  const responseMessage = extractFromNestedObject(errObj, ['response', 'data', 'detail'])
-    || extractFromNestedObject(errObj, ['response', 'data', 'message']);
-
-  if (responseMessage) {
-    return responseMessage;
-  }
-
-  if (typeof errObj.message === 'string') {
-    return errObj.message;
-  }
-
-  return 'Registration failed. Please try again.';
-};
-
 const extractFromNestedObject = (
   obj: Record<string, unknown>,
   keys: string[]
@@ -82,6 +58,35 @@ const extractFromNestedObject = (
   }
 
   return typeof current === 'string' ? current : null;
+};
+
+const extractErrorMessage = (error: unknown): string => {
+  if (error instanceof Error) return error.message;
+  if (!error || typeof error !== 'object') return 'Registration failed. Please try again.';
+
+  const errObj = error as Record<string, unknown>;
+  const responseMessage = extractFromNestedObject(errObj, ['response', 'data', 'detail'])
+    || extractFromNestedObject(errObj, ['response', 'data', 'message']);
+
+  return responseMessage || (typeof errObj.message === 'string' ? errObj.message : 'Registration failed. Please try again.');
+};
+
+// --- Validation Helpers ---
+const validatePasswordRules = (password: string) => {
+  if (!password) return VALIDATION_MESSAGES.pwdRequired;
+  
+  const rules = [
+    { test: /.{8,}/, message: VALIDATION_MESSAGES.pwdMinLength },
+    { test: /(?=.*[a-z])/, message: VALIDATION_MESSAGES.pwdLowercase },
+    { test: /(?=.*[A-Z])/, message: VALIDATION_MESSAGES.pwdUppercase },
+    { test: /(?=.*\d)/, message: VALIDATION_MESSAGES.pwdNumber },
+    { test: /[!@#$%^&*(),.?":{}|<>]/, message: VALIDATION_MESSAGES.pwdSpecial },
+  ];
+
+  for (const rule of rules) {
+    if (!rule.test.test(password)) return rule.message;
+  }
+  return null;
 };
 
 const Register: React.FC = () => {
@@ -112,7 +117,7 @@ const Register: React.FC = () => {
         const response = await api.get<Division[]>('/divisions');
         setDivisions(response.data);
       } catch {
-        // Silently fail — dropdown will just show "Select Division"
+        // Silently fail
       } finally {
         setDivisionsLoading(false);
       }
@@ -122,16 +127,8 @@ const Register: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: '',
-      }));
-    }
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
     setApiError('');
 
     if (name === 'division') {
@@ -142,124 +139,96 @@ const Register: React.FC = () => {
   };
 
   const handleNextStep = () => {
-    if (step === RegisterStep.PersonalInfo && formData.fullName.trim() !== '' && formData.email.trim() !== '' && formData.division !== '' && formData.department !== '') {
+    const isFirstStepValid = step === RegisterStep.PersonalInfo && 
+      formData.fullName.trim() !== '' && 
+      formData.email.trim() !== '' && 
+      formData.division !== '' && 
+      formData.department !== '';
+      
+    const isSecondStepValid = step === RegisterStep.Credentials && 
+      formData.password && 
+      formData.password.length >= 8;
+
+    if (isFirstStepValid) {
       setStep(RegisterStep.Credentials);
-    } else if (step === RegisterStep.Credentials && formData.password && formData.password.length >= 8) {
+    } else if (isSecondStepValid) {
       setStep(RegisterStep.Confirmation);
     }
   };
 
   const handleBackStep = () => {
-    if (step === RegisterStep.Credentials) {
-      setStep(RegisterStep.PersonalInfo);
-    } else if (step === RegisterStep.Confirmation) {
-      setStep(RegisterStep.Credentials);
-    }
+    if (step === RegisterStep.Credentials) setStep(RegisterStep.PersonalInfo);
+    else if (step === RegisterStep.Confirmation) setStep(RegisterStep.Credentials);
   };
-
-  const handleTogglePassword = () => setShowPassword(!showPassword);
-  const handleToggleConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    validateFullName(formData.fullName, newErrors);
-    validateEmail(formData.email, newErrors);
-    validateDivision(formData.division, newErrors);
-    validateDepartment(formData.department, newErrors);
-    validatePassword(formData.password, newErrors);
-    validateConfirmPassword(formData.confirmPassword, formData.password, newErrors);
+    if (!formData.fullName.trim()) newErrors.fullName = VALIDATION_MESSAGES.fullNameRequired;
+    
+    if (!formData.email.trim()) {
+      newErrors.email = VALIDATION_MESSAGES.emailRequired;
+    } else if (!/^[A-Za-z]+\.[A-Za-z]+@nlng\.com$/.test(formData.email)) {
+      newErrors.email = VALIDATION_MESSAGES.emailInvalid;
+    }
+
+    if (!formData.division) newErrors.division = VALIDATION_MESSAGES.divisionRequired;
+    if (!formData.department) newErrors.department = VALIDATION_MESSAGES.departmentRequired;
+
+    const pwdError = validatePasswordRules(formData.password);
+    if (pwdError) newErrors.password = pwdError;
+
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = VALIDATION_MESSAGES.confirmRequired;
+    } else if (formData.confirmPassword !== formData.password) {
+      newErrors.confirmPassword = VALIDATION_MESSAGES.pwdMismatch;
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const validateFullName = (fullName: string, errors: Record<string, string>): void => {
-    if (!fullName.trim()) {
-      errors.fullName = VALIDATION_MESSAGES.fullNameRequired;
-    }
-  };
-
-  const validateEmail = (email: string, errors: Record<string, string>): void => {
-    if (!email.trim()) {
-      errors.email = VALIDATION_MESSAGES.emailRequired;
-      return;
-    }
-
-    const emailPattern = /^[A-Za-z]+\.[A-Za-z]+@nlng\.com$/;
-    if (!emailPattern.test(email)) {
-      errors.email = VALIDATION_MESSAGES.emailInvalid;
-    }
-  };
-
-  const validateDivision = (division: string, errors: Record<string, string>): void => {
-    if (!division) {
-      errors.division = VALIDATION_MESSAGES.divisionRequired;
-    }
-  };
-
-  const validateDepartment = (department: string, errors: Record<string, string>): void => {
-    if (!department) {
-      errors.department = VALIDATION_MESSAGES.departmentRequired;
-    }
-  };
-
-  const validatePassword = (password: string, errors: Record<string, string>): void => {
-    if (!password) {
-      errors.password = VALIDATION_MESSAGES.pwdRequired;
-      return;
-    }
-
-    const passwordValidationRules: Array<{ test: RegExp; message: string }> = [
-      { test: /.{8,}/, message: VALIDATION_MESSAGES.pwdMinLength },
-      { test: /(?=.*[a-z])/, message: VALIDATION_MESSAGES.pwdLowercase },
-      { test: /(?=.*[A-Z])/, message: VALIDATION_MESSAGES.pwdUppercase },
-      { test: /(?=.*\d)/, message: VALIDATION_MESSAGES.pwdNumber },
-      { test: /[!@#$%^&*(),.?":{}|<>]/, message: VALIDATION_MESSAGES.pwdSpecial },
-    ];
-
-    for (const rule of passwordValidationRules) {
-      if (!rule.test.test(password)) {
-        errors.password = rule.message;
-        return;
-      }
-    }
-  };
-
-  const validateConfirmPassword = (
-    confirmPassword: string,
-    password: string,
-    errors: Record<string, string>
-  ): void => {
-    if (!confirmPassword) {
-      errors.confirmPassword = VALIDATION_MESSAGES.confirmRequired;
-      return;
-    }
-
-    if (confirmPassword !== password) {
-      errors.confirmPassword = VALIDATION_MESSAGES.pwdMismatch;
-    }
-  };
-
-  const handleSubmit = async (e: React.SubmitEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      setLoading(true);
-      setApiError('');
-      try {
-        await registerUser({
-          email: formData.email,
-          password: formData.password,
-          name: formData.fullName,
-          subdivision_id: Number(formData.department),
-        });
-        navigate('/login', { state: { message: 'Registration successful! Please sign in.' } });
-      } catch (error: unknown) {
-        setApiError(extractErrorMessage(error));
-      } finally {
-        setLoading(false);
-      }
+    if (!validateForm()) return;
+
+    setLoading(true);
+    setApiError('');
+    try {
+      await registerUser({
+        email: formData.email,
+        password: formData.password,
+        name: formData.fullName,
+        subdivision_id: Number(formData.department),
+      });
+      navigate('/login', { state: { message: 'Registration successful! Please sign in.' } });
+    } catch (error: unknown) {
+      setApiError(extractErrorMessage(error));
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const deptPlaceholder = useMemo(() => {
+    if (formData.division) {
+       return departments.length === 0 ? 'No departments available' : 'Select Department';
+    }
+    return 'Select a division first';
+  }, [formData.division, departments.length]);
+
+  const isNextDisabled = useMemo(() => {
+    if (step === RegisterStep.PersonalInfo) {
+      return !formData.fullName.trim() || !formData.email.trim() || !formData.division || !formData.department || loading;
+    }
+    if (step === RegisterStep.Credentials) {
+      return !(formData.password && formData.password.length >= 8 && formData.confirmPassword) || loading;
+    }
+    return loading;
+  }, [step, formData, loading]);
+
+  const getDivisionValue = () => {
+    const div = divisions.find(d => d.id === Number(formData.division));
+    return div?.name || div?.code || '';
   };
 
   return (
@@ -271,9 +240,7 @@ const Register: React.FC = () => {
           </div>
           <h2 className={styles.companyName}>NLNG</h2>
           <p className={styles.companySub}>NIGERIA LNG LIMITED</p>
-
           <div className={styles.divider}></div>
-
           <h3 className={styles.appTitle}>Corporate Learning Platform</h3>
           <p className={styles.appSub}>NLNG Corporate Services</p>
         </div>
@@ -290,12 +257,10 @@ const Register: React.FC = () => {
           )}
 
           {step === RegisterStep.PersonalInfo && (
-            <>
+            <div key="step-0">
               <h4 className={styles.formTitle}>Create Your Account</h4>
               <div className={styles.formGroup}>
-                <label htmlFor="fullName" className={styles.formLabel}>
-                  Full Name
-                </label>
+                <label htmlFor="fullName" className={styles.formLabel}>Full Name</label>
                 <div className={styles.inputWrapper}>
                   <FontAwesomeIcon icon={faUser} className={styles.inputIcon} />
                   <input
@@ -313,9 +278,7 @@ const Register: React.FC = () => {
               </div>
 
               <div className={styles.formGroup}>
-                <label htmlFor="email" className={styles.formLabel}>
-                  Email
-                </label>
+                <label htmlFor="email" className={styles.formLabel}>Email</label>
                 <div className={styles.inputWrapper}>
                   <FontAwesomeIcon icon={faEnvelope} className={styles.inputIcon} />
                   <input
@@ -332,9 +295,7 @@ const Register: React.FC = () => {
               </div>
 
               <div className={styles.formGroup}>
-                <label htmlFor="division" className={styles.formLabel}>
-                  Division
-                </label>
+                <label htmlFor="division" className={styles.formLabel}>Division</label>
                 <div className={styles.inputWrapper}>
                   <FontAwesomeIcon icon={faBuilding} className={styles.inputIcon} />
                   <select
@@ -347,9 +308,7 @@ const Register: React.FC = () => {
                   >
                     <option value="">{divisionsLoading ? 'Loading...' : 'Select Division'}</option>
                     {divisions.map(div => (
-                      <option key={div.id} value={div.id}>
-                        {div.name || div.code}
-                      </option>
+                      <option key={div.id} value={div.id}>{div.name || div.code}</option>
                     ))}
                   </select>
                 </div>
@@ -357,9 +316,7 @@ const Register: React.FC = () => {
               </div>
 
               <div className={styles.formGroup}>
-                <label htmlFor="department" className={styles.formLabel}>
-                  Department
-                </label>
+                <label htmlFor="department" className={styles.formLabel}>Department</label>
                 <div className={styles.inputWrapper}>
                   <FontAwesomeIcon icon={faBuilding} className={styles.inputIcon} />
                   <select
@@ -371,13 +328,9 @@ const Register: React.FC = () => {
                     style={{ paddingLeft: '2.5rem' }}
                     disabled={!formData.division}
                   >
-                    <option value="">
-                      {!formData.division ? 'Select a division first' : (departments.length === 0 ? 'No departments available' : 'Select Department')}
-                    </option>
+                    <option value="">{deptPlaceholder}</option>
                     {departments.map(dept => (
-                      <option key={dept.id} value={dept.id}>
-                        {dept.name}
-                      </option>
+                      <option key={dept.id} value={dept.id}>{dept.name}</option>
                     ))}
                   </select>
                 </div>
@@ -385,25 +338,18 @@ const Register: React.FC = () => {
               </div>
 
               <div className={styles.navButtons}>
-                <button
-                  type="button"
-                  className={styles.nextButton}
-                  onClick={handleNextStep}
-                  disabled={!formData.fullName.trim() || !formData.email.trim() || !formData.division || !formData.department || loading}
-                >
+                <button type="button" className={styles.nextButton} onClick={handleNextStep} disabled={isNextDisabled}>
                   Next
                 </button>
               </div>
-            </>
+            </div>
           )}
 
           {step === RegisterStep.Credentials && (
-            <>
+            <div key="step-1">
               <h4 className={styles.formTitle}>Set Up Credentials</h4>
               <div className={styles.formGroup}>
-                <label htmlFor="password" className={styles.formLabel}>
-                  Password
-                </label>
+                <label htmlFor="password" className={styles.formLabel}>Password</label>
                 <div className={styles.inputWrapper}>
                   <FontAwesomeIcon icon={faLock} className={styles.inputIcon} />
                   <input
@@ -418,21 +364,17 @@ const Register: React.FC = () => {
                   <button
                     type="button"
                     className={styles.togglePassword}
-                    onClick={handleTogglePassword}
+                    onClick={() => setShowPassword(!showPassword)}
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
-                    <FontAwesomeIcon
-                      icon={showPassword ? faEye : faEyeSlash}
-                    />
+                    <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
                   </button>
                 </div>
                 {errors.password && <span className={styles.errorText}>{errors.password}</span>}
               </div>
 
               <div className={styles.formGroup}>
-                <label htmlFor="confirmPassword" className={styles.formLabel}>
-                  Confirm Password
-                </label>
+                <label htmlFor="confirmPassword" className={styles.formLabel}>Confirm Password</label>
                 <div className={styles.inputWrapper}>
                   <FontAwesomeIcon icon={faLock} className={styles.inputIcon} />
                   <input
@@ -447,129 +389,73 @@ const Register: React.FC = () => {
                   <button
                     type="button"
                     className={styles.togglePassword}
-                    onClick={handleToggleConfirmPassword}
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
                   >
-                    <FontAwesomeIcon
-                      icon={showConfirmPassword ? faEye : faEyeSlash}
-                    />
+                    <FontAwesomeIcon icon={showConfirmPassword ? faEye : faEyeSlash} />
                   </button>
                 </div>
                 {errors.confirmPassword && <span className={styles.errorText}>{errors.confirmPassword}</span>}
               </div>
 
               <div className={styles.navButtons}>
-                <button
-                  type="button"
-                  className={styles.nextButton}
-                  onClick={handleNextStep}
-                  disabled={!(formData.password && formData.password.length >= 8 && formData.confirmPassword) || loading}
-                >
+                <button type="button" className={styles.nextButton} onClick={handleNextStep} disabled={isNextDisabled}>
                   Next
                 </button>
               </div>
-            </>
+            </div>
           )}
 
           {step === RegisterStep.Confirmation && (
-            <>
+            <div key="step-2">
               <h4 className={styles.formTitle}>Review & Confirm</h4>
-
               <div className={styles.formGroup}>
                 <label htmlFor="confirmFullName" className={styles.formLabel}>Full Name</label>
                 <div className={styles.inputWrapper}>
                   <FontAwesomeIcon icon={faUser} className={styles.inputIcon} />
-                  <input
-                    id="confirmFullName"
-                    type="text"
-                    value={formData.fullName}
-                    className={styles.formInput}
-                    disabled
-                    aria-label="Full name confirmation"
-                  />
+                  <input id="confirmFullName" type="text" value={formData.fullName} className={styles.formInput} disabled />
                 </div>
               </div>
-
               <div className={styles.formGroup}>
                 <label htmlFor="confirmEmail" className={styles.formLabel}>Email</label>
                 <div className={styles.inputWrapper}>
                   <FontAwesomeIcon icon={faEnvelope} className={styles.inputIcon} />
-                  <input
-                    id="confirmEmail"
-                    type="email"
-                    value={formData.email}
-                    className={styles.formInput}
-                    disabled
-                    aria-label="Email confirmation"
-                  />
+                  <input id="confirmEmail" type="email" value={formData.email} className={styles.formInput} disabled />
                 </div>
               </div>
-
               <div className={styles.formGroup}>
                 <label htmlFor="confirmDivision" className={styles.formLabel}>Division</label>
                 <div className={styles.inputWrapper}>
                   <FontAwesomeIcon icon={faBuilding} className={styles.inputIcon} />
-                  <input
-                    id="confirmDivision"
-                    type="text"
-                    value={divisions.find(d => d.id === Number(formData.division))?.name || divisions.find(d => d.id === Number(formData.division))?.code || ''}
-                    className={styles.formInput}
-                    disabled
-                    aria-label="Division confirmation"
-                  />
+                  <input id="confirmDivision" type="text" value={getDivisionValue()} className={styles.formInput} disabled />
                 </div>
               </div>
-
               <div className={styles.formGroup}>
                 <label htmlFor="confirmDepartment" className={styles.formLabel}>Department</label>
                 <div className={styles.inputWrapper}>
                   <FontAwesomeIcon icon={faBuilding} className={styles.inputIcon} />
-                  <input
-                    id="confirmDepartment"
-                    type="text"
-                    value={departments.find(d => d.id === Number(formData.department))?.name || ''}
-                    className={styles.formInput}
-                    disabled
-                    aria-label="Department confirmation"
-                  />
+                  <input id="confirmDepartment" type="text" value={departments.find(d => d.id === Number(formData.department))?.name || ''} className={styles.formInput} disabled />
                 </div>
               </div>
-
               <div className={styles.navButtons}>
-                <button
-                  type="button"
-                  className={styles.backButton}
-                  onClick={handleBackStep}
-                >
-                  Back
-                </button>
-                <button
-                  type="submit"
-                  className={styles.submitButton}
-                  disabled={loading}
-                >
+                <button type="button" className={styles.backButton} onClick={handleBackStep}>Back</button>
+                <button type="submit" className={styles.submitButton} disabled={loading}>
                   {loading ? 'Creating Account...' : 'Register'}
                 </button>
               </div>
-            </>
+            </div>
           )}
 
           <button
             type="button"
             className={styles.linkButton}
-            title="Already have an account? Sign In"
-            aria-label="Already have an account? Sign In"
-            onClick={() => {
-              navigate('/login');
-            }}
+            onClick={() => navigate('/login')}
           >
             Already have an account? Sign In
           </button>
         </form>
 
-        <div className={styles.systemFooter}>
-          NLNG HRMS - Corporate Learning Platform
-        </div>
+        <div className={styles.systemFooter}>NLNG HRMS - Corporate Learning Platform</div>
       </div>
     </div>
   );

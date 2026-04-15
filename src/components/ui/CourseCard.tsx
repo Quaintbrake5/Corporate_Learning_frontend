@@ -1,27 +1,44 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './CourseCard.module.css';
 
 interface CourseCardProps {
+  id: string;
   title: string;
   subdivision?: string;
   duration?: string;
   progress?: number;
   isMandatory?: boolean;
+  thumbnailUrl?: string;
 }
 
 const CourseCard: React.FC<CourseCardProps> = ({ 
+  id,
   title, 
   subdivision, 
   duration, 
   progress, 
-  isMandatory 
+  isMandatory,
+  thumbnailUrl
 }) => {
+  const navigate = useNavigate();
+
+  const handleStart = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    window.open(`/course/${id}`, '_blank');
+  };
+
   return (
-    <div className={styles.card}>
-      <div className={styles.header}>
-        <div className={styles.iconContainer}>
-          <i className="fa-solid fa-graduation-cap"></i>
-        </div>
+    <div className={styles.card} onClick={() => handleStart()}>
+      <div 
+        className={styles.header} 
+        style={thumbnailUrl ? { backgroundImage: `url(${thumbnailUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundColor: 'transparent' } : {}}
+      >
+        {!thumbnailUrl && (
+          <div className={styles.iconContainer}>
+            <i className="fa-solid fa-graduation-cap"></i>
+          </div>
+        )}
         {isMandatory && <span className={styles.mandatoryBadge}>Mandatory</span>}
         {!isMandatory && <span className={styles.electiveBadge}>Elective</span>}
       </div>
@@ -61,7 +78,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
       </div>
       
       <div className={styles.footer}>
-        <button className={styles.actionBtn}>
+        <button className={styles.actionBtn} onClick={handleStart}>
           {progress && progress > 0 ? (
             <><i className="fa-solid fa-play"></i> Continue</>
           ) : (

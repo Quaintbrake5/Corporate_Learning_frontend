@@ -3,6 +3,7 @@ import { Provider } from 'react-redux';
 import { store } from './store/store';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Courses from './pages/Courses/Courses';
+import CoursePlayer from './pages/CoursePlayer/CoursePlayer';
 import Schedule from './pages/Schedule/Schedule';
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
@@ -42,6 +43,7 @@ function App() {
             {/* Learner/Manager Routes */}
             <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/courses" element={<ProtectedRoute><Courses /></ProtectedRoute>} />
+            <Route path="/course/:courseId" element={<ProtectedRoute><CoursePlayer /></ProtectedRoute>} />
             <Route path="/schedule" element={<ProtectedRoute><Schedule /></ProtectedRoute>} />
           </Routes>
         </Router>

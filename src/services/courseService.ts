@@ -1,6 +1,7 @@
 import api from './api';
 
 export interface Course {
+  thumbnail_url: string | undefined;
   id: string;
   title: string;
   description: string;

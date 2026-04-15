@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import CourseCard from '../../components/ui/CourseCard';
 import { getCourses, type Course } from '../../services/courseService';
+
+interface PaginatedCourses {
+  items: Course[];
+  total: number;
+}
 import styles from './Courses.module.css';
 
 const subdivisionMap: Record<string, string> = {
@@ -33,12 +38,14 @@ const Courses: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
+        
         const [mandatoryRes, electiveRes] = await Promise.all([
-          getCourses(1, 10, true) as any,
-          getCourses(1, 10, false) as any,
+          getCourses(1, 10, true) as Promise<Course[] | PaginatedCourses>,
+          getCourses(1, 10, false) as Promise<Course[] | PaginatedCourses>,
         ]);
-        setMandatoryCourses(mandatoryRes?.items || (Array.isArray(mandatoryRes) ? mandatoryRes : []));
-        setElectiveCourses(electiveRes?.items || (Array.isArray(electiveRes) ? electiveRes : []));
+
+        setMandatoryCourses(Array.isArray(mandatoryRes) ? mandatoryRes : (mandatoryRes?.items || []));
+        setElectiveCourses(Array.isArray(electiveRes) ? electiveRes : (electiveRes?.items || []));
       } catch (err) {
         console.error('Failed to fetch courses:', err);
         setError('Failed to load courses. Please try again later.');
@@ -83,10 +90,12 @@ const Courses: React.FC = () => {
                   mandatoryCourses.map((course) => (
                     <CourseCard
                       key={course.id}
+                      id={course.id}
                       title={course.title}
                       subdivision={mapSubdivision(course.subdivision_owner)}
                       duration={formatDuration(course.duration_in_minutes)}
                       isMandatory={course.is_mandatory}
+                      thumbnailUrl={course.thumbnail_url}
                     />
                   ))
                 ) : (
@@ -102,9 +111,11 @@ const Courses: React.FC = () => {
                   electiveCourses.map((course) => (
                     <CourseCard
                       key={course.id}
+                      id={course.id}
                       title={course.title}
                       subdivision={mapSubdivision(course.subdivision_owner)}
                       duration={formatDuration(course.duration_in_minutes)}
+                      thumbnailUrl={course.thumbnail_url}
                     />
                   ))
                 ) : (

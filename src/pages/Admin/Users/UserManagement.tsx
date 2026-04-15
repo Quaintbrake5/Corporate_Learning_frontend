@@ -19,7 +19,7 @@ const UserManagement: React.FC = () => {
       setLoading(true);
       setError(null);
       const data = await adminService.getUsers(1, 100);
-      setUsers(data.users);
+      setUsers(data.items);
     } catch (err: unknown) {
       let message = 'Failed to load users';
       if (err && typeof err === 'object' && 'response' in err) {

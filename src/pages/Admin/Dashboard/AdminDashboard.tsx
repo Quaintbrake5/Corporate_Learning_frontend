@@ -140,7 +140,7 @@ const AdminDashboard: React.FC = () => {
               <h3>User Verification Status</h3>
             </div>
             <div className={styles.chartWrapper}>
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                 <PieChart>
                   <Pie
                     data={verificationData}
@@ -170,7 +170,7 @@ const AdminDashboard: React.FC = () => {
               <h3>Course Types</h3>
             </div>
             <div className={styles.chartWrapper}>
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                 <PieChart>
                   <Pie
                     data={courseTypeData}
@@ -200,7 +200,7 @@ const AdminDashboard: React.FC = () => {
               <h3>Users by Subdivision</h3>
             </div>
             <div className={styles.chartWrapper}>
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                 <BarChart
                   data={subdivisionChartData}
                   margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
