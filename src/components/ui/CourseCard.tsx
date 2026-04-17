@@ -1,5 +1,4 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import styles from './CourseCard.module.css';
 
 interface CourseCardProps {
@@ -21,15 +20,26 @@ const CourseCard: React.FC<CourseCardProps> = ({
   isMandatory,
   thumbnailUrl
 }) => {
-  const navigate = useNavigate();
-
-  const handleStart = (e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    window.open(`/course/${id}`, '_blank');
-  };
+    const handleStart = (e?: React.MouseEvent | React.KeyboardEvent | React.TouchEvent) => {
+      if (e) e.stopPropagation();
+      window.open(`/course/${id}`, '_blank');
+    };
 
   return (
-    <div className={styles.card} onClick={() => handleStart()}>
+      <button 
+        className={styles.card} 
+        onClick={handleStart}
+        onTouchStart={(e) => {
+          e.preventDefault();
+          handleStart(e);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleStart(e);
+          }
+        }}
+      >
       <div 
         className={styles.header} 
         style={thumbnailUrl ? { backgroundImage: `url(${thumbnailUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundColor: 'transparent' } : {}}
@@ -77,16 +87,14 @@ const CourseCard: React.FC<CourseCardProps> = ({
         )}
       </div>
       
-      <div className={styles.footer}>
-        <button className={styles.actionBtn} onClick={handleStart}>
-          {progress && progress > 0 ? (
-            <><i className="fa-solid fa-play"></i> Continue</>
-          ) : (
-            <><i className="fa-solid fa-play"></i> Start</>
-          )}
-        </button>
-      </div>
-    </div>
+       <div className={`${styles.footer} ${styles.actionBtn}`}>
+         {progress && progress > 0 ? (
+           <><i className="fa-solid fa-play"></i> Continue</>
+         ) : (
+           <><i className="fa-solid fa-play"></i> Start</>
+           )}
+       </div>
+    </button>
   );
 };
 

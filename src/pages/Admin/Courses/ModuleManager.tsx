@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import adminService from '../../../services/adminService';
 import { getCourseModules } from '../../../services/courseService';
 import type { Module } from '../../../services/courseService';
+import { convertToEmbedUrl } from '../../../utils/videoUrlUtils';
 import styles from './ModuleManager.module.css';
 
 interface ModuleManagerProps {
@@ -13,7 +14,7 @@ const ModuleManager: React.FC<ModuleManagerProps> = ({ courseId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
-  
+   
   // New module form state
   const [newModule, setNewModule] = useState({
     title: '',
@@ -56,7 +57,12 @@ const ModuleManager: React.FC<ModuleManagerProps> = ({ courseId }) => {
     e.preventDefault();
     try {
       setError(null);
-      await adminService.createModule(courseId, newModule);
+      // Convert URL to embed format before saving
+      const convertedUrl = convertToEmbedUrl(newModule.content_url);
+      await adminService.createModule(courseId, {
+        ...newModule,
+        content_url: convertedUrl
+      });
       setNewModule({ title: '', content_type: 'video', content_url: '', order_index: modules.length + 1 });
       setShowAddForm(false);
       fetchModules();

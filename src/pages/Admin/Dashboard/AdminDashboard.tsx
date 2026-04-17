@@ -16,7 +16,6 @@ import {
   ResponsiveContainer,
   PieChart,
   Pie,
-  Cell,
   Legend
 } from 'recharts';
 
@@ -56,16 +55,16 @@ const AdminDashboard: React.FC = () => {
   const pendingUsers = users.length - verifiedUsers;
 
   const verificationData = [
-    { name: 'Verified', value: verifiedUsers },
-    { name: 'Pending', value: pendingUsers }
+    { name: 'Verified', value: verifiedUsers, fill: '#003366' },
+    { name: 'Pending', value: pendingUsers, fill: '#90ee90' }
   ];
 
   const mandatoryCourses = courses.filter(c => c.is_mandatory).length;
   const electiveCourses = courses.length - mandatoryCourses;
 
   const courseTypeData = [
-    { name: 'Mandatory', value: mandatoryCourses },
-    { name: 'Elective', value: electiveCourses }
+    { name: 'Mandatory', value: mandatoryCourses, fill: '#003366' },
+    { name: 'Elective', value: electiveCourses, fill: '#90ee90' }
   ];
 
   const subdivisionMap: Record<number, string> = {
@@ -151,8 +150,6 @@ const AdminDashboard: React.FC = () => {
                     paddingAngle={5}
                     dataKey="value"
                   >
-                    <Cell fill="#003366" />
-                    <Cell fill="#90ee90" />
                   </Pie>
                   <Tooltip 
                     contentStyle={{ backgroundColor: 'white', borderColor: '#e0e0e0', color: '#333' }} 
@@ -181,8 +178,6 @@ const AdminDashboard: React.FC = () => {
                     paddingAngle={5}
                     dataKey="value"
                   >
-                    <Cell fill="#003366" />
-                    <Cell fill="#90ee90" />
                   </Pie>
                   <Tooltip 
                     contentStyle={{ backgroundColor: 'white', borderColor: '#e0e0e0', color: '#333' }} 

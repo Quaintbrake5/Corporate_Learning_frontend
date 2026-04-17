@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import adminService from '../../../services/adminService';
 import type { Course } from '../../../services/courseService';
+import { convertToEmbedUrl } from '../../../utils/videoUrlUtils';
 import styles from './CourseForm.module.css';
 
 interface CourseFormProps {
@@ -54,14 +55,14 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onSuccess, onCancel }) 
     setError(null);
 
     try {
-      const payload = {
+      const payload: Partial<Course> = {
         title: formData.title,
         description: formData.description,
         subdivision_owner: String(formData.subdivision_owner),
         duration_in_minutes: formData.duration_in_minutes,
         is_mandatory: formData.is_mandatory,
         is_cross_subdivision: formData.is_cross_subdivision,
-        thumbnail_url: formData.thumbnail_url || null
+        thumbnail_url: formData.thumbnail_url || undefined
       };
 
       if (course) {
@@ -73,7 +74,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onSuccess, onCancel }) 
           await adminService.createModule(newCourse.id, {
             title: formData.title + ' - Primary Video',
             content_type: 'video',
-            content_url: formData.video_url,
+            content_url: convertToEmbedUrl(formData.video_url, true),
             order_index: 0
           });
         }
@@ -92,6 +93,8 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onSuccess, onCancel }) 
       setLoading(false);
     }
   };
+
+  const submitLabel = course ? 'Update Course' : 'Create Video Course';
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
@@ -217,7 +220,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onSuccess, onCancel }) 
           {loading ? (
             <><i className="fa-solid fa-circle-notch fa-spin"></i> Saving...</>
           ) : (
-            course ? 'Update Course' : 'Create Video Course'
+            submitLabel
           )}
         </button>
       </div>

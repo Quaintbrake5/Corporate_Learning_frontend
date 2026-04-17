@@ -66,8 +66,8 @@
 
 .table th {
   font-weight: 600;
-  background-color: rgba(0, 51, 102, 0.05); 
-  color: #003366;
+  background-color: rgba(0, 51, 102, 0.08);
+  color: #002244;
   text-transform: uppercase;
   font-size: 0.85rem;
   letter-spacing: 0.5px;
@@ -107,7 +107,7 @@
 
 .role_manager {
   background-color: rgba(0, 51, 102, 0.1);
-  color: #003366;
+  color: #002244;
 }
 
 .role_learner {
@@ -159,7 +159,7 @@
 
 .error {
   color: #d32f2f;
-  background-color: rgba(211, 47, 47, 0.1);
+  background-color: rgba(211, 47, 47, 0.12);
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 1rem;

@@ -19,7 +19,7 @@ const SubdivisionManagement: React.FC = () => {
       const subsData = await adminService.getSubdivisions();
       setSubdivisions(subsData);
       const usersData = await adminService.getUsers(1, 1000);
-      setAllUsers(usersData.users);
+      setAllUsers(usersData.items);
     } catch (err: unknown) {
       let message = 'Failed to load subdivisions or users';
       if (err && typeof err === 'object' && 'response' in err) {

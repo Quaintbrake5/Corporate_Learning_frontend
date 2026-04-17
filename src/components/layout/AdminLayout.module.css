@@ -62,8 +62,8 @@
 }
 
 .toggleButton:hover {
-  color: #90ee90;
-  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  background-color: #004d99;
   transform: scale(1.1);
 }
 
@@ -107,7 +107,7 @@
 .navLink:hover {
   text-decoration: none;
   color: #ffffff;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: #004d99;
 }
 
 .navLink.active {
