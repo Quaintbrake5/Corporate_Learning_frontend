@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import ReactPlayer from 'react-player';
 import { getCourse, getCourseModules, type Course, type Module } from '../../services/courseService';
 import styles from './CoursePlayer.module.css';
+
+interface ApiError {
+  response?: {
+    status?: number;
+    data?: { detail?: string };
+  };
+}
 
 const CoursePlayer: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
@@ -13,6 +21,16 @@ const CoursePlayer: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (activeModule) {
+      console.log('--- Course Player Debug ---');
+      console.log('Active Module:', activeModule.title);
+      console.log('Content Type:', activeModule.content_type);
+      console.log('Content URL:', activeModule.content_url);
+      console.log('---------------------------');
+    }
+  }, [activeModule]);
+
+  useEffect(() => {
     const fetchData = async () => {
       if (!courseId) return;
       try {
@@ -22,13 +40,21 @@ const CoursePlayer: React.FC = () => {
           getCourseModules(courseId)
         ]);
         setCourse(courseData);
-        setModules(modulesData);
-        if (modulesData.length > 0) {
+        if (Array.isArray(modulesData) && modulesData.length > 0) {
+          setModules(modulesData);
           setActiveModule(modulesData[0]);
+        } else {
+          setModules([]);
+          setError('No training modules found for this course. You might not have the required permissions.');
         }
-      } catch (err) {
+      } catch (err: unknown) {
+        const error = err as ApiError;
         console.error('Failed to load course data:', err);
-        setError('Failed to load course content.');
+        if (error.response?.status === 403) {
+          setError('Access Denied: You do not have permission to view this course content.');
+        } else {
+          setError('Failed to load course content. Please check your connection.');
+        }
       } finally {
         setLoading(false);
       }
@@ -48,18 +74,37 @@ const CoursePlayer: React.FC = () => {
      if (!activeModule) return null;
 
      switch (activeModule.content_type) {
-       case 'video':
-         return (
-           <div className={styles.videoWrapper}>
-              <iframe
-                src={activeModule.content_url || ''}
-                title={activeModule.title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className={styles.videoFrame}
-              ></iframe>
-           </div>
-         );
+        case 'video':
+          if (!activeModule.content_url) {
+            return (
+              <div className={styles.unsupported}>
+                <i className="fa-solid fa-video-slash"></i>
+                <p>No video URL provided for this module.</p>
+              </div>
+            );
+          }
+          return (
+            <div className={styles.videoWrapper}>
+                <ReactPlayer
+                  src={activeModule.content_url}
+                  controls
+                  width="100%"
+                  height="100%"
+                  className={styles.videoFrame}
+                  playing={true}
+                  onError={(e) => {
+                    console.error('ReactPlayer Error:', e);
+                    setError('Format not supported or link is broken. Check console for details.');
+                  }}
+                  config={{
+                    html: {
+                      controlsList: 'nodownload',
+                      style: { width: '100%', height: '100%', objectFit: 'contain' }
+                    }
+                  }}
+                />
+            </div>
+          );
        case 'pdf':
          return (
            <div className={styles.pdfWrapper}>

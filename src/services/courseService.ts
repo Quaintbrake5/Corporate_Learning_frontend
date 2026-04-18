@@ -49,7 +49,16 @@ export const getCourse = async (courseId: string): Promise<Course> => {
   return response.data;
 };
 
+export interface ModuleListResponse {
+  modules: Module[];
+}
+
 export const getCourseModules = async (courseId: string): Promise<Module[]> => {
-  const response = await api.get<Module[]>(`/courses/${courseId}/modules`);
+  const response = await api.get<ModuleListResponse>(`/courses/${courseId}/modules`);
+  return response.data.modules;
+};
+
+export const getModule = async (moduleId: string): Promise<Module> => {
+  const response = await api.get<Module>(`/modules/${moduleId}`);
   return response.data;
 };
