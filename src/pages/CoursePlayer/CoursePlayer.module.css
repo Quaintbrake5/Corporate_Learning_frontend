@@ -223,15 +223,121 @@
 }
 
 .loading, .error {
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #0a0a0a;
-  color: white;
-  font-size: 1.25rem;
+   height: 100vh;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   background-color: #0a0a0a;
+   color: white;
+   font-size: 1.25rem;
 }
 
 .error {
-  color: #ff4444;
+   color: #ff4444;
+}
+
+/* Quiz Styles */
+.quizContainer {
+   padding: 2rem;
+   max-width: 800px;
+   margin: 0 auto;
+   background-color: #111;
+   border-radius: 8px;
+   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.questionCard {
+   background-color: #1a1a1a;
+   border-radius: 6px;
+   padding: 1.5rem;
+   margin-bottom: 1.5rem;
+   border-left: 3px solid #0066cc;
+}
+
+.questionCard p {
+   margin: 0 0 1rem 0;
+   color: #eee;
+   font-size: 1.1rem;
+}
+
+.option {
+   display: flex;
+   align-items: center;
+   gap: 0.75rem;
+   margin-bottom: 0.75rem;
+   color: #ccc;
+   font-size: 1rem;
+}
+
+.option input {
+   width: 16px;
+   height: 16px;
+   cursor: pointer;
+}
+
+.option label {
+   cursor: pointer;
+   user-select: none;
+}
+
+.submitQuizButton, .retakeButton {
+   background-color: #0066cc;
+   color: white;
+   border: none;
+   padding: 0.75rem 1.5rem;
+   border-radius: 4px;
+   font-size: 1rem;
+   font-weight: 600;
+   cursor: pointer;
+   transition: background-color 0.2s;
+   margin-top: 1.5rem;
+}
+
+.submitQuizButton:hover, .retakeButton:hover {
+   background-color: #0052a3;
+}
+
+.submitQuizButton:disabled, .retakeButton:disabled {
+   background-color: #333;
+   cursor: not-allowed;
+}
+
+.quizResult {
+   padding: 2rem;
+   max-width: 500px;
+   margin: 2rem auto;
+   text-align: center;
+   background-color: #111;
+   border-radius: 8px;
+   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.quizResult h2 {
+   color: #4cc9f0;
+   margin-bottom: 1rem;
+}
+
+.quizResult p {
+   margin: 0.75rem 0;
+   color: #eee;
+   font-size: 1.1rem;
+}
+
+.quizResult .missedTopics {
+   margin-top: 1.5rem;
+   text-align: left;
+}
+
+.quizResult .missedTopics h3 {
+   color: #ff6b6b;
+   margin-bottom: 0.75rem;
+}
+
+.quizResult .missedTopics ul {
+   padding-left: 1.5rem;
+   color: #ccc;
+}
+
+.quizResult .missedTopics li {
+   margin-bottom: 0.5rem;
 }

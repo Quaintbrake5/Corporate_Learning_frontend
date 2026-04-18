@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import ReactPlayer from 'react-player';
 import { getCourse, getCourseModules, type Course, type Module } from '../../services/courseService';
+import { generateQuizForModule, getQuizForModule, submitQuizForModule, type QuizQuestion, type QuizSubmitResponse } from '../../services/quizService';
+import { sendHeartbeat } from '../../services/progressService';
 import styles from './CoursePlayer.module.css';
 
 interface ApiError {
@@ -11,6 +13,35 @@ interface ApiError {
   };
 }
 
+// Extracted component to reduce nesting depth in the quiz form
+interface QuestionCardProps {
+  question: QuizQuestion;
+  index: number;
+  selectedAnswer: string | undefined;
+  onSelectAnswer: (questionId: string, option: string) => void;
+}
+
+const QuestionCard: React.FC<QuestionCardProps> = ({ question, index, selectedAnswer, onSelectAnswer }) => (
+  <div className={styles.questionCard}>
+    <p>{index + 1}. {question.question}</p>
+    {question.options.map((option) => (
+      <div key={`${question.question_id}-${option}`} className={styles.option}>
+        <input
+          type="radio"
+          id={`q${question.question_id}-${option}`}
+          name={`q${question.question_id}`}
+          value={option}
+          checked={selectedAnswer === option}
+          onChange={() => onSelectAnswer(question.question_id, option)}
+        />
+        <label htmlFor={`q${question.question_id}-${option}`}>
+          {option}
+        </label>
+      </div>
+    ))}
+  </div>
+);
+
 const CoursePlayer: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
    
@@ -19,16 +50,93 @@ const CoursePlayer: React.FC = () => {
   const [activeModule, setActiveModule] = useState<Module | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Quiz states
+  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([]);
+  const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({});
+  const [quizLoading, setQuizLoading] = useState(false);
+  const [quizError, setQuizError] = useState<string | null>(null);
+  const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const [quizResult, setQuizResult] = useState<QuizSubmitResponse | null>(null);
+  const [videoCompleted, setVideoCompleted] = useState(false);
 
-  useEffect(() => {
-    if (activeModule) {
-      console.log('--- Course Player Debug ---');
-      console.log('Active Module:', activeModule.title);
-      console.log('Content Type:', activeModule.content_type);
-      console.log('Content URL:', activeModule.content_url);
-      console.log('---------------------------');
-    }
-  }, [activeModule]);
+  const handleSelectAnswer = (questionId: string, option: string) => {
+    setQuizAnswers(prev => ({ ...prev, [questionId]: option }));
+  };
+
+   // Reset videoCompleted when switching modules
+   useEffect(() => {
+     setVideoCompleted(false);
+   }, [activeModule]);
+ 
+      // Handle video completion for quiz generation
+      useEffect(() => {
+        // Early return conditions for better readability
+        if (!activeModule) return;
+        if (activeModule?.content_type !== 'video') return;
+        if (!videoCompleted) return;
+        
+        const handleVideoComplete = async () => {
+          try {
+            // Send heartbeat to mark module as 100% complete
+            // Generate a session ID for this heartbeat
+            const sessionId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+            
+            // Send heartbeat with 100% progress
+            await sendHeartbeat({
+              course_id: courseId || '',
+              module_id: activeModule.id,
+              progress_percentage: 100,
+              session_id: sessionId
+            });
+            
+            // Generate quiz for this module
+            await generateQuizForModule(activeModule.id);
+            
+            // Fetch the generated quiz
+            const quizResponse = await getQuizForModule(activeModule.id);
+            setQuizQuestions(quizResponse.questions);
+            
+          } catch (err) {
+            console.error('Error handling video completion:', err);
+            const message = err instanceof Error ? err.message : 'Failed to generate quiz';
+            setQuizError(message);
+          } finally {
+            setQuizLoading(false);
+          }
+        };
+        
+        setQuizLoading(true);
+        handleVideoComplete();
+      }, [activeModule, courseId, videoCompleted]);
+
+    // Handle quiz submission
+    const handleQuizSubmit = async () => {
+      try {
+        // Convert quizAnswers to the format expected by the API
+        const answers = Object.keys(quizAnswers).map(question_id => ({
+          question_id,
+          selected_option: quizAnswers[question_id]
+        }));
+        
+        const payload = {
+          answers,
+          time_spent: 0 // We're not tracking time spent for simplicity
+        };
+        
+        // Ensure activeModule is not null before accessing its id
+        if (!activeModule) {
+          throw new Error('Active module is required to submit quiz');
+        }
+        const result = await submitQuizForModule(activeModule.id, payload);
+        setQuizResult(result);
+        setQuizSubmitted(true);
+      } catch (err) {
+        console.error('Error submitting quiz:', err);
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        setQuizError(message || 'Failed to submit quiz');
+      }
+    };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,63 +170,146 @@ const CoursePlayer: React.FC = () => {
     fetchData();
   }, [courseId]);
 
-   if (loading) return <div className={styles.loading}>Loading training content...</div>;
-   if (error || !course) return <div className={styles.error}>{error || 'Course not found'}</div>;
+    if (loading) return <div className={styles.loading}>Loading training content...</div>;
+    if (error || !course) return <div className={styles.error}>{error || 'Course not found'}</div>;
 
-   // Calculate module index safely
-   const moduleIndex = Array.isArray(modules) && activeModule ? modules.indexOf(activeModule) : -1;
-   const moduleNumber = moduleIndex === -1 ? 0 : moduleIndex + 1;
-   const totalModules = Array.isArray(modules) ? modules.length : 0;
+    // Calculate module index safely
+    const moduleIndex = Array.isArray(modules) && activeModule ? modules.indexOf(activeModule) : -1;
+    const moduleNumber = moduleIndex === -1 ? 0 : moduleIndex + 1;
+    const totalModules = Array.isArray(modules) ? modules.length : 0;
 
-   const renderContent = () => {
-     if (!activeModule) return null;
+    const renderQuizResult = () => {
+      if (!quizResult) return null;
+      return (
+        <div className={styles.quizResult}>
+          <h2>Quiz Result</h2>
+          <p>Score: {quizResult.score}%</p>
+          <p>Status: {quizResult.pass_fail === 'pass' ? 'Passed' : 'Failed'}</p>
+          <p>{quizResult.message}</p>
+          {quizResult.pass_fail === 'fail' && quizResult.missed_topics && quizResult.missed_topics.length > 0 && (
+            <div>
+              <h3>Missed Topics:</h3>
+              <ul>
+                {quizResult.missed_topics.map((topic) => (
+                  <li key={topic}>{topic}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {quizResult.pass_fail === 'fail' && (
+            <button onClick={() => {
+              setQuizSubmitted(false);
+              setQuizResult(null);
+              setQuizAnswers({});
+            }} className={styles.retakeButton}>
+              Retake Quiz
+            </button>
+          )}
+          {quizResult.pass_fail === 'pass' && (
+            <p>
+              Congratulations! You have passed the quiz. A certificate will be generated for this module.
+            </p>
+          )}
+        </div>
+      );
+    };
 
-     switch (activeModule.content_type) {
-        case 'video':
-          if (!activeModule.content_url) {
+     const renderContent = () => {
+       if (!activeModule) return null;
+
+       // If quiz is submitted, show result
+       if (quizSubmitted && quizResult) {
+         return renderQuizResult();
+       }
+
+       // If we are loading the quiz or have quiz questions to show, render the quiz
+       if ((quizLoading || quizQuestions.length > 0) && !quizSubmitted) {
+         return renderQuiz();
+       }
+
+       return renderContentByType(activeModule.content_type);
+     };
+
+     const renderQuiz = () => {
+       return (
+         <div className={styles.quizContainer}>
+           <h2>Quiz</h2>
+           {quizLoading && <p>Loading quiz...</p>}
+            {quizError && <p className={styles.error}>{quizError}</p>}
+           {!quizLoading && quizQuestions.length > 0 && (
+                 <form onSubmit={(e) => {
+                   e.preventDefault();
+                   handleQuizSubmit();
+                 }}>
+                 {quizQuestions.map((question, index) => (
+                   <QuestionCard
+                     key={question.question_id}
+                     question={question}
+                     index={index}
+                     selectedAnswer={quizAnswers[question.question_id]}
+                     onSelectAnswer={handleSelectAnswer}
+                   />
+                 ))}
+                 <button type="submit" className={styles.submitQuizButton}>
+                   Submit Quiz
+                 </button>
+               </form>
+             )}
+           </div>
+       );
+     };
+
+     const renderContentByType = (contentType: string) => {
+       if (!activeModule) return null;
+       switch (contentType) {
+          case 'video':
+            if (!activeModule.content_url) {
+              return (
+                <div className={styles.unsupported}>
+                  <i className="fa-solid fa-video-slash"></i>
+                  <p>No video URL provided for this module.</p>
+                </div>
+              );
+            }
             return (
-              <div className={styles.unsupported}>
-                <i className="fa-solid fa-video-slash"></i>
-                <p>No video URL provided for this module.</p>
+              <div className={styles.videoWrapper}>
+                  <ReactPlayer
+                    src={activeModule.content_url}
+                    controls
+                    width="100%"
+                    height="100%"
+                    className={styles.videoFrame}
+                    playing={true}
+                    onError={(e) => {
+                      console.error('ReactPlayer Error:', e);
+                      setError('Format not supported or link is broken. Check console for details.');
+                    }}
+                     onEnded={() => {
+                       setVideoCompleted(true);
+                     }}
+                    config={{
+                      html: {
+                        controlsList: 'nodownload',
+                        style: { width: '100%', height: '100%', objectFit: 'contain' }
+                      }
+                    }}
+                  />
               </div>
             );
-          }
-          return (
-            <div className={styles.videoWrapper}>
-                <ReactPlayer
-                  src={activeModule.content_url}
-                  controls
-                  width="100%"
-                  height="100%"
-                  className={styles.videoFrame}
-                  playing={true}
-                  onError={(e) => {
-                    console.error('ReactPlayer Error:', e);
-                    setError('Format not supported or link is broken. Check console for details.');
-                  }}
-                  config={{
-                    html: {
-                      controlsList: 'nodownload',
-                      style: { width: '100%', height: '100%', objectFit: 'contain' }
-                    }
-                  }}
-                />
-            </div>
-          );
-       case 'pdf':
-         return (
-           <div className={styles.pdfWrapper}>
-             <iframe
-               src={activeModule.content_url || ''}
-               title={activeModule.title}
-               className={styles.pdfFrame}
-             ></iframe>
-           </div>
-         );
-       default:
-         return <div className={styles.unsupported}>Unsupported content type: {activeModule.content_type}</div>;
-     }
-   };
+         case 'pdf':
+           return (
+             <div className={styles.pdfWrapper}>
+               <iframe
+                 src={activeModule.content_url || ''}
+                 title={activeModule.title}
+                 className={styles.pdfFrame}
+               ></iframe>
+             </div>
+           );
+         default:
+           return <div className={styles.unsupported}>Unsupported content type: {contentType}</div>;
+       }
+     };
 
    return (
       <div className={styles.playerPage}>
