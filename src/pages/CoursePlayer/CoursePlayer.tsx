@@ -121,22 +121,25 @@ const CoursePlayer: React.FC = () => {
    };
 
    return (
-     <div className={styles.playerPage}>
-       <header className={styles.header}>
-         <div className={styles.headerLeft}>
-           <button onClick={() => window.close()} className={styles.backBtn}>
-             <i className="fa-solid fa-xmark"></i> Close Player
-           </button>
-           <div className={styles.divider}></div>
-           <h1 className={styles.courseTitle}>{course.title}</h1>
-         </div>
-         <div className={styles.headerRight}>
-            <span className={styles.moduleBadge}>Module {moduleNumber} of {totalModules}</span>
-         </div>
-       </header>
+      <div className={styles.playerPage}>
+        <header className={styles.header}>
+          <div className={styles.headerContainer}>
+            <div className={styles.headerLeft}>
+              <button onClick={() => window.close()} className={styles.backBtn}>
+                <i className="fa-solid fa-xmark"></i> Close Player
+              </button>
+              <div className={styles.divider}></div>
+              <h1 className={styles.courseTitle}>{course.title}</h1>
+            </div>
+            <div className={styles.headerRight}>
+               <span className={styles.moduleBadge}>Module {moduleNumber} of {totalModules}</span>
+            </div>
+          </div>
+        </header>
 
-       <main className={styles.main}>
-         <div className={styles.contentArea}>
+        <main className={styles.main}>
+          <div className={styles.layoutContainer}>
+            <div className={styles.contentArea}>
            {renderContent()}
            <div className={styles.contentInfo}>
               <h2>{activeModule?.title}</h2>
@@ -164,9 +167,10 @@ const CoursePlayer: React.FC = () => {
                 </button>
               )) : []}
             </div>
-          </aside>
-       </main>
-     </div>
+            </aside>
+          </div>
+        </main>
+      </div>
    );
 };
 

@@ -1,21 +1,32 @@
 .playerPage {
+  width: 100vw;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #0a0a0a;
+  background-color: #050505;
   color: white;
   overflow: hidden;
 }
 
 .header {
+  width: 100%;
   height: 64px;
   background-color: #1a1a1a;
   border-bottom: 1px solid #333;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding: 0 1.5rem;
   flex-shrink: 0;
+  z-index: 10;
+}
+
+.headerContainer {
+  width: 100%;
+  max-width: 1600px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .headerLeft {
@@ -66,8 +77,20 @@
 }
 
 .main {
+  width: 100%;
   flex: 1;
   display: flex;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.layoutContainer {
+  display: flex;
+  width: 100%;
+  max-width: 1600px;
+  height: 100%;
+  background-color: #0a0a0a;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
   overflow: hidden;
 }
 
