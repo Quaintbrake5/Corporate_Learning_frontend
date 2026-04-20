@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import ReactPlayer from 'react-player';
 import { getCourse, getCourseModules, type Course, type Module } from '../../services/courseService';
 import { getQuizForModule, submitQuizForModule, type QuizQuestion, type QuizSubmitResponse } from '../../services/quizService';
-import { sendHeartbeat } from '../../services/progressService';
+import { sendHeartbeat, getProgress } from '../../services/progressService';
 import styles from './CoursePlayer.module.css';
 
 interface ApiError {
@@ -60,67 +60,107 @@ const CoursePlayer: React.FC = () => {
   const [quizResult, setQuizResult] = useState<QuizSubmitResponse | null>(null);
   const [videoCompleted, setVideoCompleted] = useState(false);
 
-  const handleSelectAnswer = (questionId: string, option: string) => {
-    setQuizAnswers(prev => ({ ...prev, [questionId]: option }));
-  };
+   const handleSelectAnswer = (questionId: string, option: string) => {
+     setQuizAnswers(prev => ({ ...prev, [questionId]: option }));
+   };
 
-   // Reset videoCompleted when switching modules
-   useEffect(() => {
-     setVideoCompleted(false);
-   }, [activeModule]);
+     // Wait for enrollment progress to reach 100% with retry mechanism
+     const waitForEnrollmentCompletion = async (courseId: string): Promise<void> => {
+       const maxAttempts = 10;
+       const delayMs = 500; // 500ms between attempts
+       
+       for (let attempt = 0; attempt < maxAttempts; attempt++) {
+         try {
+           // Get user ID from localStorage
+           const userId = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') || '{}').id : '';
+           if (!userId) {
+             throw new Error('User ID not found');
+           }
+           
+           const progress = await getProgress(userId, courseId);
+           
+           if (progress && progress.progress_percentage >= 100) {
+             return; // Success - progress is complete
+           }
+           
+           // If not complete yet, wait and retry (unless this is the last attempt)
+           if (attempt < maxAttempts - 1) {
+             await new Promise(resolve => setTimeout(resolve, delayMs));
+           }
+         } catch (error) {
+           console.warn(`Attempt ${attempt + 1} failed to check progress:`, error);
+           if (attempt < maxAttempts - 1) {
+             await new Promise(resolve => setTimeout(resolve, delayMs));
+           }
+         }
+       }
+       
+       // If we've exhausted all attempts, throw an error
+       throw new Error('Enrollment progress did not reach 100% after multiple attempts');
+     };
+
+    // Reset videoCompleted when switching modules
+    useEffect(() => {
+      setVideoCompleted(false);
+    }, [activeModule]);
  
-      // Handle video completion for quiz generation
-      useEffect(() => {
-        // Early return conditions for better readability
-        if (!activeModule) return;
-        if (activeModule?.content_type !== 'video') return;
-        if (!videoCompleted) return;
-        
-        const handleVideoComplete = async () => {
-          try {
-            // Generate a UUID v4-compliant session ID for heartbeat
-            const sessionId = (typeof crypto !== 'undefined' && crypto.randomUUID)
-              ? crypto.randomUUID()
-              : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c: string) => {
-                  const r = Math.trunc(Math.random() * 16);
-                  const v = c === 'x' ? r : (r & 0x3 | 0x8);
-                  return v.toString(16);
-                });
-            
-            // Validate courseId before sending heartbeat
-            if (!courseId) {
-              throw new Error('Course ID is required to record progress');
-            }
-            
-            // Send heartbeat with 100% progress
-            await sendHeartbeat({
-              course_id: courseId,
-              module_id: activeModule.id,
-              progress_percentage: 100,
-              session_id: sessionId
-            });
-            
-            // Fetch the assessment for this module
-            const quizResponse = await getQuizForModule(activeModule.id);
-            setQuizQuestions(quizResponse.questions);
-            
-          } catch (err) {
-            console.error('Error handling video completion:', err);
-            const apiError = err as ApiError;
-            if (apiError.response?.status === 404) {
-              setQuizError('No assessment available for this module.');
-            } else {
-              const message = err instanceof Error ? err.message : 'Failed to load quiz';
-              setQuizError(message);
-            }
-          } finally {
-            setQuizLoading(false);
-          }
-        };
-        
-        setQuizLoading(true);
-        handleVideoComplete();
-      }, [activeModule, courseId, videoCompleted]);
+       // Handle video completion for quiz generation
+       useEffect(() => {
+         // Early return conditions for better readability
+         if (!activeModule) return;
+         if (activeModule?.content_type !== 'video') return;
+         if (!videoCompleted) return;
+         
+         const handleVideoComplete = async () => {
+           try {
+              // Generate a UUID v4-compliant session ID for heartbeat
+              const sessionId = (typeof crypto !== 'undefined' && crypto.randomUUID)
+                ? crypto.randomUUID()
+                : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replaceAll(/[xy]/g, (c: string) => {
+                    const r = Math.trunc(Math.random() * 16);
+                    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                  });
+             
+             // Validate courseId before sending heartbeat
+             if (!courseId) {
+               throw new Error('Course ID is required to record progress');
+             }
+             
+              // Send heartbeat with 100% progress
+              await sendHeartbeat({
+                course_id: courseId,
+                module_id: activeModule.id,
+                progress_percentage: 100,
+                session_id: sessionId
+              });
+             
+             // Wait for enrollment progress to update with retry mechanism
+             // This handles race condition where assessment fetch happens before 
+             // heartbeat updates enrollment progress in database
+             await waitForEnrollmentCompletion(courseId);
+             
+             // Fetch the assessment for this module
+             const quizResponse = await getQuizForModule(activeModule.id);
+             setQuizQuestions(quizResponse.questions);
+             
+           } catch (err) {
+             console.error('Error handling video completion:', err);
+             const apiError = err as ApiError;
+             if (apiError.response?.status === 404) {
+               setQuizError('No assessment available for this module.');
+             } else {
+               const message = err instanceof Error ? err.message : 'Failed to load quiz';
+               setQuizError(message);
+             }
+           } finally {
+             setQuizLoading(false);
+           }
+         };
+         
+         setQuizLoading(true);
+         handleVideoComplete();
+       }, [activeModule, courseId, videoCompleted]);
 
     // Handle quiz submission
     const handleQuizSubmit = async () => {
