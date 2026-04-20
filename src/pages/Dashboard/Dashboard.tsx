@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import AlertBanner from '../../components/ui/AlertBanner';
 import StatCard from '../../components/ui/StatCard';
-import AnalyticsPlaceholder from '../../components/ui/AnalyticsPlaceholder';
+import ProductivityChart from '../../components/ui/ProductivityChart';
 import CourseCard from '../../components/ui/CourseCard';
 import { useAppSelector } from '../../store/hooks';
 import { getCourses, type Course } from '../../services/courseService';
 import { getSubdivision, type Subdivision } from '../../services/userService';
-import { getDashboardStats, type DashboardStats } from '../../services/dashboardService';
+import { getDashboardStats, getProductivityData, type DashboardStats, type ProductivityData } from '../../services/dashboardService';
 import styles from './Dashboard.module.css';
 
 const formatDuration = (minutes: number): string => {
@@ -24,8 +24,10 @@ const Dashboard: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [subdivision, setSubdivision] = useState<Subdivision | null>(null);
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [productivityData, setProductivityData] = useState<ProductivityData | null>(null);
   
   const [isLoading, setIsLoading] = useState(true);
+  const [isProductivityLoading, setIsProductivityLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -51,7 +53,23 @@ const Dashboard: React.FC = () => {
         setIsLoading(false);
       }
     };
+
+    const fetchProductivityData = async () => {
+      try {
+        setIsProductivityLoading(true);
+        const data = await getProductivityData(30);
+        setProductivityData(data);
+      } catch (err) {
+        console.error('Productivity data fetch error:', err);
+        // Don't show error for productivity - just show empty state
+        setProductivityData(null);
+      } finally {
+        setIsProductivityLoading(false);
+      }
+    };
+
     fetchDashboardData();
+    fetchProductivityData();
   }, []);
 
   const subdivisionName = subdivision?.name || 'Your Division';
@@ -124,7 +142,10 @@ const Dashboard: React.FC = () => {
              />
           </div>
           <div className={styles.chartsColumn}>
-            <AnalyticsPlaceholder title="Working Productivity" type="line" height="230px" />
+            <ProductivityChart 
+              data={productivityData?.data ?? []} 
+              isLoading={isProductivityLoading}
+            />
           </div>
         </section>
 

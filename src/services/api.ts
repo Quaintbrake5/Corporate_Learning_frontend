@@ -11,18 +11,37 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('access_token');
+    if (import.meta.env.MODE === 'development') {
+      console.log('[API Request]', config.method, config.url, 'Token present:', !!token);
+    }
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    if (import.meta.env.MODE === 'development') {
+      console.log('[API Request Error]', error.message);
+    }
+    return Promise.reject(error);
+  }
 );
 
 // Response interceptor - handle 401 Unauthorized
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (import.meta.env.MODE === 'development') {
+      console.log('[API Response]', response.status, response.config.url);
+    }
+    return response;
+  },
   (error) => {
+    if (import.meta.env.MODE === 'development') {
+      console.log('[API Response Error]', error.response?.status || 'No response', error.config?.url);
+      if (error.response) {
+        console.log('[API Response Error Data]', error.response.data);
+      }
+    }
     if (error.response?.status === 401) {
       // Clear both localStorage and any stale auth state
       localStorage.removeItem('access_token');

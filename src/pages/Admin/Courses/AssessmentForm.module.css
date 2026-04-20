@@ -1,0 +1,267 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.form {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.formGroup {
+  margin-bottom: 1.25rem;
+}
+
+.label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.input, .select, .optionInput {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.input:focus, .select:focus, .optionInput:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.25);
+}
+
+.select {
+  cursor: pointer;
+}
+
+.submitBtn {
+  background-color: #90ee90;
+  color: #003366;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.submitBtn:hover {
+  background-color: #80d080;
+}
+
+.submitBtn:active {
+  background-color: #70c070;
+}
+
+.footer {
+  text-align: right;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.moduleList {
+  margin-top: 1.5rem;
+}
+
+.moduleItem {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.moduleInfo {
+  flex: 1;
+}
+
+.orderBadge {
+  background: #003366;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.875rem;
+  margin-right: 0.75rem;
+}
+
+.moduleMeta h4 {
+  margin: 0 0 0.25rem 0;
+  color: #333;
+}
+
+.contentType {
+  background: #e9ecef;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.875rem;
+  color: #495057;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.deleteBtn {
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.deleteBtn:hover {
+  background: #ff5252;
+}
+
+.emptyState {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.questionCard {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.questionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.questionHeader h4 {
+  margin: 0;
+  color: #003366;
+}
+
+.removeQuestionBtn {
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.removeQuestionBtn:hover {
+  background: #ff5252;
+}
+
+.removeQuestionBtn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.optionsContainer {
+  margin-top: 1rem;
+}
+
+.optionsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.optionsHeader h5 {
+  margin: 0;
+  color: #333;
+}
+
+.addOptionBtn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.addOptionBtn:hover {
+  background: #218838;
+}
+
+.optionRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.optionInput {
+  flex: 1;
+  min-width: 80px;
+}
+
+.removeOptionBtn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.removeOptionBtn:hover {
+  background: #c82333;
+}
+
+.addQuestionBtn {
+  background: #0066cc;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.addQuestionBtn:hover {
+  background: #0052a3;
+}
+
+.assessmentInfo {
+  background: #e9ecef;
+  padding: 1.25rem;
+  border-radius: 6px;
+  margin-top: 1.5rem;
+}
+
+.assessmentInfo h4 {
+  margin-top: 0;
+  color: #333;
+}
+
+.assessmentInfo p {
+  margin: 0.5rem 0;
+  color: #495057;
+}

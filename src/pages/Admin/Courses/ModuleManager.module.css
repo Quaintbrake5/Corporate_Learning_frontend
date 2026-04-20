@@ -134,8 +134,22 @@
 }
 
 .emptyState {
-  text-align: center;
-  padding: 2rem;
-  color: #999;
-  font-style: italic;
-}
+   text-align: center;
+   padding: 2rem;
+   color: #999;
+   font-style: italic;
+ }
+
+.assessmentBtn {
+   background: transparent;
+   border: none;
+   color: #28a745;
+   cursor: pointer;
+   padding: 0.5rem;
+   border-radius: 4px;
+   margin-left: 0.5rem;
+ }
+
+.assessmentBtn:hover {
+   background-color: rgba(40, 167, 69, 0.05);
+ }

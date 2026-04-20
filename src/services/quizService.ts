@@ -28,13 +28,22 @@ export interface QuizSubmitResponse {
   missed_topics?: string[];
 }
 
-export const generateQuizForModule = async (moduleId: string): Promise<void> => {
-  await api.post(`/modules/${moduleId}/quiz/generate`);
-};
-
 export const getQuizForModule = async (moduleId: string): Promise<QuizResponse> => {
-  const response = await api.get<QuizResponse>(`/modules/${moduleId}/quiz`);
-  return response.data;
+  try {
+    const token = localStorage.getItem('access_token');
+    console.log('Fetching quiz for module:', moduleId, 'Token present:', !!token);
+    const response = await api.get<QuizResponse>(`/assessments/${moduleId}`);
+    console.log('Quiz response:', response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error in getQuizForModule:', error);
+    if (error.response) {
+      console.error('Error response data:', error.response.data);
+      console.error('Error response status:', error.response.status);
+      console.error('Error response headers:', error.response.headers);
+    }
+    throw error;
+  }
 };
 
 export const submitQuizForModule = async (
@@ -42,7 +51,7 @@ export const submitQuizForModule = async (
   payload: QuizSubmitRequest
 ): Promise<QuizSubmitResponse> => {
   const response = await api.post<QuizSubmitResponse>(
-    `/modules/${moduleId}/quiz/submit`,
+    `/assessments/${moduleId}/submit`,
     payload
   );
   return response.data;

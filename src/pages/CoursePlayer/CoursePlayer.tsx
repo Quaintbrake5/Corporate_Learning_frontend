@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import ReactPlayer from 'react-player';
 import { getCourse, getCourseModules, type Course, type Module } from '../../services/courseService';
-import { generateQuizForModule, getQuizForModule, submitQuizForModule, type QuizQuestion, type QuizSubmitResponse } from '../../services/quizService';
+import { getQuizForModule, submitQuizForModule, type QuizQuestion, type QuizSubmitResponse } from '../../services/quizService';
 import { sendHeartbeat } from '../../services/progressService';
 import styles from './CoursePlayer.module.css';
 
@@ -78,29 +78,41 @@ const CoursePlayer: React.FC = () => {
         
         const handleVideoComplete = async () => {
           try {
-            // Send heartbeat to mark module as 100% complete
-            // Generate a session ID for this heartbeat
-            const sessionId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+            // Generate a UUID v4-compliant session ID for heartbeat
+            const sessionId = (typeof crypto !== 'undefined' && crypto.randomUUID)
+              ? crypto.randomUUID()
+              : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c: string) => {
+                  const r = Math.trunc(Math.random() * 16);
+                  const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                  return v.toString(16);
+                });
+            
+            // Validate courseId before sending heartbeat
+            if (!courseId) {
+              throw new Error('Course ID is required to record progress');
+            }
             
             // Send heartbeat with 100% progress
             await sendHeartbeat({
-              course_id: courseId || '',
+              course_id: courseId,
               module_id: activeModule.id,
               progress_percentage: 100,
               session_id: sessionId
             });
             
-            // Generate quiz for this module
-            await generateQuizForModule(activeModule.id);
-            
-            // Fetch the generated quiz
+            // Fetch the assessment for this module
             const quizResponse = await getQuizForModule(activeModule.id);
             setQuizQuestions(quizResponse.questions);
             
           } catch (err) {
             console.error('Error handling video completion:', err);
-            const message = err instanceof Error ? err.message : 'Failed to generate quiz';
-            setQuizError(message);
+            const apiError = err as ApiError;
+            if (apiError.response?.status === 404) {
+              setQuizError('No assessment available for this module.');
+            } else {
+              const message = err instanceof Error ? err.message : 'Failed to load quiz';
+              setQuizError(message);
+            }
           } finally {
             setQuizLoading(false);
           }

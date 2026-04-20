@@ -3,6 +3,7 @@ import adminService from '../../../services/adminService';
 import { getCourseModules } from '../../../services/courseService';
 import type { Module } from '../../../services/courseService';
 import { convertToEmbedUrl } from '../../../utils/videoUrlUtils';
+import AssessmentForm from './AssessmentForm';
 import styles from './ModuleManager.module.css';
 
 interface ModuleManagerProps {
@@ -14,6 +15,8 @@ const ModuleManager: React.FC<ModuleManagerProps> = ({ courseId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showAssessmentForm, setShowAssessmentForm] = useState(false);
+  const [selectedModuleForAssessment, setSelectedModuleForAssessment] = useState<Module | null>(null);
    
   // New module form state
   const [newModule, setNewModule] = useState({
@@ -164,33 +167,58 @@ const ModuleManager: React.FC<ModuleManagerProps> = ({ courseId }) => {
 
       {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
 
-      {loading ? <p>Loading modules...</p> : (
-        <div className={styles.moduleList}>
-          {modules.map((m) => (
-            <div key={m.id} className={styles.moduleItem}>
-              <div className={styles.moduleInfo}>
-                <div className={styles.orderBadge}>{m.order_index}</div>
-                <div className={styles.moduleMeta}>
-                  <h4>{m.title} <span className={styles.contentType}>{m.content_type}</span></h4>
-                  <p>{m.content_url || 'No URL specified'}</p>
-                </div>
-              </div>
-              <div className={styles.actions}>
-                <button 
-                  className={styles.deleteBtn}
-                  onClick={() => handleDeleteModule(m.id)}
-                  title="Delete Module"
-                >
-                  <i className="fa-solid fa-trash-can"></i>
-                </button>
-              </div>
-            </div>
-          ))}
-          {modules.length === 0 && !showAddForm && (
-            <div className={styles.emptyState}>No modules added yet for this course.</div>
-          )}
-        </div>
-      )}
+       {loading ? <p>Loading modules...</p> : (
+         <div className={styles.moduleList}>
+           {modules.map((m) => (
+             <div key={m.id} className={styles.moduleItem}>
+               <div className={styles.moduleInfo}>
+                 <div className={styles.orderBadge}>{m.order_index}</div>
+                 <div className={styles.moduleMeta}>
+                   <h4>{m.title} <span className={styles.contentType}>{m.content_type}</span></h4>
+                   <p>{m.content_url || 'No URL specified'}</p>
+                 </div>
+               </div>
+               <div className={styles.actions}>
+                 <button 
+                   className={styles.deleteBtn}
+                   onClick={() => handleDeleteModule(m.id)}
+                   title="Delete Module"
+                 >
+                   <i className="fa-solid fa-trash-can"></i>
+                 </button>
+                 <button 
+                   className={styles.assessmentBtn}
+                   onClick={() => {
+                     setSelectedModuleForAssessment(m);
+                     setShowAssessmentForm(true);
+                   }}
+                   title="Manage Assessment"
+                 >
+                   <i className="fa-solid fa-list-check"></i>
+                 </button>
+               </div>
+             </div>
+           ))}
+           {modules.length === 0 && !showAddForm && (
+             <div className={styles.emptyState}>No modules added yet for this course.</div>
+           )}
+         </div>
+       )}
+       
+       {/* Assessment Form Modal */}
+       {showAssessmentForm && selectedModuleForAssessment && (
+         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
+           <div style={{ background: 'white', borderRadius: '8px', maxWidth: '900px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
+             <AssessmentForm 
+               module={selectedModuleForAssessment} 
+               onAssessmentSaved={() => {
+                 setShowAssessmentForm(false);
+                 setSelectedModuleForAssessment(null);
+               }}
+             />
+           </div>
+         </div>
+       )}
     </div>
   );
 };

@@ -56,6 +56,32 @@ export interface Enrollment {
   enrolled_at: string;
 }
 
+// Assessment interfaces
+export interface AssessmentQuestion {
+  question_id: string;
+  question: string;
+  options: string[];
+  correct_option: string;
+  topic?: string;
+}
+
+export interface AdminCreateAssessmentData {
+  questions: AssessmentQuestion[];
+  passing_score?: number;
+}
+
+export interface AdminUpdateAssessmentData {
+  questions?: AssessmentQuestion[];
+  passing_score?: number;
+}
+
+export interface AssessmentResponse {
+   assessment_id: string;
+   module_id: string;
+   questions: AssessmentQuestion[];
+   passing_score: number;
+ }
+
 const adminService = {
   // Users
   getUsers: async (page = 1, pageSize = 20): Promise<PaginatedUsers> => {
@@ -141,11 +167,31 @@ const adminService = {
     await api.delete(`/admin/enrollments/${enrollmentId}`);
   },
 
-  // Jobs
-  getJobStatus: async (): Promise<JobStatus[]> => {
-    const response = await api.get('/admin/jobs/status');
-    return response.data;
-  }
-};
+   // Jobs
+   getJobStatus: async (): Promise<JobStatus[]> => {
+     const response = await api.get('/admin/jobs/status');
+     return response.data;
+   },
+
+   // Assessments
+   createAssessment: async (moduleId: string, data: AdminCreateAssessmentData): Promise<AssessmentResponse> => {
+     const response = await api.post(`/admin/modules/${moduleId}/assessment`, data);
+     return response.data;
+   },
+
+   updateAssessment: async (assessmentId: string, data: AdminUpdateAssessmentData): Promise<AssessmentResponse> => {
+     const response = await api.put(`/admin/assessments/${assessmentId}`, data);
+     return response.data;
+   },
+
+   deleteAssessment: async (assessmentId: string): Promise<void> => {
+     await api.delete(`/admin/assessments/${assessmentId}`);
+   },
+
+   getAssessmentByModule: async (moduleId: string): Promise<AssessmentResponse> => {
+     const response = await api.get(`/admin/modules/${moduleId}/assessment`);
+     return response.data;
+   }
+ };
 
 export default adminService;

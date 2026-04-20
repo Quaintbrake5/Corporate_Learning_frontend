@@ -6,16 +6,13 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAuthenticated, user: reduxUser } = useAppSelector((state) => state.auth);
-  const location = useLocation();
-  
-  // Fallback: Check localStorage to handle timing issues where 
-  // Redux state hasn't fully propagated yet
-  const hasToken = !!localStorage.getItem('access_token');
-  const storageUser = JSON.parse(localStorage.getItem('user') || 'null');
-  
-  const user = reduxUser || storageUser;
-  const authenticated = isAuthenticated || hasToken;
+   const { isAuthenticated } = useAppSelector((state) => state.auth);
+   const location = useLocation();
+   
+   // Fallback: Check localStorage to handle timing issues where 
+   // Redux state hasn't fully propagated yet
+   const hasToken = !!localStorage.getItem('access_token');
+   const authenticated = isAuthenticated || hasToken;
 
   if (!authenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;

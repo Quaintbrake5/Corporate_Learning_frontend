@@ -65,19 +65,22 @@ const Login: React.FC = () => {
       dispatch(setCredentials({ token: response.access_token, user: response.user }));
       
       const userRole = response.user.role?.toLowerCase() || '';
-      const defaultPath = userRole === 'admin' ? '/admin' : '/';
+      
+      // Admins always go to admin dashboard, ignore any saved "return to" URL
+      if (userRole === 'admin') {
+        navigate('/admin', { replace: true });
+        return;
+      }
+      
+      // Non-admins: use default path or saved stateFrom
+      const defaultPath = '/';
       const stateFrom = (location.state as { from?: { pathname?: string } | string })?.from;
 
       let finalPath = defaultPath;
       if (stateFrom) {
         const path = typeof stateFrom === 'object' ? stateFrom.pathname : String(stateFrom);
         if (path && path !== '/' && path !== '/login') {
-          // Prevent non-admins from trying to redirect to admin routes
-          if (path.startsWith('/admin') && userRole !== 'admin') {
-            finalPath = '/';
-          } else {
-            finalPath = path;
-          }
+          finalPath = path;
         }
       }
 

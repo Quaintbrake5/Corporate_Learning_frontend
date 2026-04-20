@@ -32,8 +32,8 @@ const EnrollmentManagement: React.FC = () => {
       setLoading(true);
       const coursesData = await getCourses(1, 100);
       setCourses(coursesData.items);
-      const usersData = await adminService.getUsers(1, 1000); // Fetch all users for picking
-      setAllUsers(usersData.users);
+       const usersData = await adminService.getUsers(1, 1000); // Fetch all users for picking
+       setAllUsers(usersData.items);
       if (coursesData.items.length > 0) {
         setSelectedCourseId(coursesData.items[0].id);
       }
