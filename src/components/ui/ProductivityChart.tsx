@@ -13,8 +13,19 @@ import type { ProductivityDataPoint } from '../../services/dashboardService';
 import styles from './ProductivityChart.module.css';
 
 // Custom tooltip declared outside of the main component to prevent re-creation on every render
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (!active || !payload || !payload.length) {
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    value: number;
+    name: string;
+    dataKey: string;
+    payload: ProductivityDataPoint;
+  }>;
+  label?: string;
+}
+
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+  if (!active || !payload?.length) {
     return null;
   }
 

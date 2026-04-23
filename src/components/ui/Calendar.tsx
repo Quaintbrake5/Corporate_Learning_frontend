@@ -94,20 +94,29 @@ const Calendar: React.FC<CalendarProps> = ({
     const hasUser = hasUserEvents(dayEvents);
     const hasAdmin = hasAdminEvents(dayEvents);
     
+    const handleDayKeyDown = (e: React.KeyboardEvent, day: number) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleDayClick(day);
+      }
+    };
+
     gridDays.push(
-      <div 
+      <button 
         key={`day-${d}`} 
         className={`${styles.day} ${isToday ? styles.today : ''} ${dayEvents.length > 0 ? styles.hasEvents : ''}`}
         onClick={() => handleDayClick(d)}
         onDoubleClick={(e) => handleAddEventClick(e, d)}
+        onKeyDown={(e) => handleDayKeyDown(e, d)}
         title="Double-click to add event"
+        aria-label={`${d} ${monthNames[month]} ${year}${dayEvents.length > 0 ? ', has events' : ''}`}
       >
         <span className={styles.dayNumber}>{d}</span>
         <div className={styles.eventDots}>
           {hasUser && <span className={`${styles.eventDot} ${styles.userEvent}`}></span>}
           {hasAdmin && <span className={`${styles.eventDot} ${styles.adminEvent}`}></span>}
         </div>
-      </div>
+      </button>
     );
   }
 

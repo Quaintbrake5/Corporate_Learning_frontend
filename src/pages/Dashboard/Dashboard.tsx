@@ -190,11 +190,11 @@ const Dashboard: React.FC = () => {
             <div className={styles.calendarLegend}>
               <span className={styles.legendItem}>
                 <span className={`${styles.legendDot} ${styles.userLegend}`}></span>
-                Personal
+                {" "}Personal
               </span>
               <span className={styles.legendItem}>
                 <span className={`${styles.legendDot} ${styles.adminLegend}`}></span>
-                Organization
+                {" "}Organization
               </span>
             </div>
           </div>

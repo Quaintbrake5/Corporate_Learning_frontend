@@ -66,8 +66,8 @@
 
 .table th {
   font-weight: 600;
-  background-color: rgba(0, 51, 102, 0.08);
-  color: #002244;
+  background-color: #f0f4f8;
+  color: #001a33;
   text-transform: uppercase;
   font-size: 0.85rem;
   letter-spacing: 0.5px;
@@ -97,8 +97,8 @@
   border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 600;
-  background-color: rgba(211, 47, 47, 0.1);
-  color: #8b1a1a;
+  background-color: #fef2f2;
+  color: #991b1b;
 }
 
 .electiveBadge {
@@ -106,8 +106,8 @@
   border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 600;
-  background-color: rgba(0, 51, 102, 0.1);
-  color: #002244;
+  background-color: #f0f7ff;
+  color: #001a33;
 }
 
 .actions {
@@ -160,8 +160,8 @@
 }
 
 .error {
-  color: #d32f2f;
-  background-color: rgba(211, 47, 47, 0.12);
+  color: #b91c1c;
+  background-color: #fef2f2;
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 1rem;
