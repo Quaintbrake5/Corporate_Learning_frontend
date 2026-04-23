@@ -1,7 +1,5 @@
 import React from 'react';
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -10,8 +8,32 @@ import {
   Area,
   AreaChart,
 } from 'recharts';
+
 import type { ProductivityDataPoint } from '../../services/dashboardService';
 import styles from './ProductivityChart.module.css';
+
+// Custom tooltip declared outside of the main component to prevent re-creation on every render
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (!active || !payload || !payload.length) {
+    return null;
+  }
+
+  // We assume the first payload item is learning_hours and the second is progress_percentage
+  const learningHours = payload[0]?.value ?? 0;
+  const progress = payload[1]?.value ?? 0;
+
+  return (
+    <div className={styles.tooltip}>
+      <p className={styles.tooltipDate}>{label}</p>
+      <p className={styles.tooltipHours}>
+        {learningHours.toFixed(2)}h learning
+      </p>
+      <p className={styles.tooltipProgress}>
+        {progress.toFixed(1)}% progress
+      </p>
+    </div>
+  );
+};
 
 interface ProductivityChartProps {
   data: ProductivityDataPoint[];
@@ -33,24 +55,6 @@ const ProductivityChart: React.FC<ProductivityChartProps> = ({
       day: 'numeric',
     }),
   }));
-
-  // Custom tooltip
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className={styles.tooltip}>
-          <p className={styles.tooltipDate}>{label}</p>
-          <p className={styles.tooltipHours}>
-            {payload[0].value.toFixed(2)}h learning
-          </p>
-          <p className={styles.tooltipProgress}>
-            {payload[1]?.value.toFixed(1)}% progress
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
 
   if (isLoading) {
     return (

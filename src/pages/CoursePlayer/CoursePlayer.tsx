@@ -60,9 +60,18 @@ const CoursePlayer: React.FC = () => {
   const [quizResult, setQuizResult] = useState<QuizSubmitResponse | null>(null);
   const [videoCompleted, setVideoCompleted] = useState(false);
 
-   const handleSelectAnswer = (questionId: string, option: string) => {
-     setQuizAnswers(prev => ({ ...prev, [questionId]: option }));
-   };
+    const handleSelectAnswer = (questionId: string, option: string) => {
+      setQuizAnswers(prev => ({ ...prev, [questionId]: option }));
+    };
+
+    const handleLoadQuiz = () => {
+      setQuizLoading(true);
+      setQuizError(null);
+      setQuizQuestions([]);
+      setQuizAnswers({});
+      setQuizSubmitted(false);
+      setQuizResult(null);
+    };
 
      // Wait for enrollment progress to reach 100% with retry mechanism
      const waitForEnrollmentCompletion = async (courseId: string): Promise<void> => {
@@ -336,9 +345,9 @@ const CoursePlayer: React.FC = () => {
                       console.error('ReactPlayer Error:', e);
                       setError('Format not supported or link is broken. Check console for details.');
                     }}
-                     onEnded={() => {
-                       setVideoCompleted(true);
-                     }}
+                    onEnded={() => {
+                      setVideoCompleted(true);
+                    }}
                     config={{
                       html: {
                         controlsList: 'nodownload',
@@ -346,6 +355,13 @@ const CoursePlayer: React.FC = () => {
                       }
                     }}
                   />
+                  {videoCompleted && (
+                    <div className={styles.videoCompletedActions}>
+                      <button onClick={handleLoadQuiz} className={styles.takeQuizButton}>
+                        Take Quiz
+                      </button>
+                    </div>
+                  )}
               </div>
             );
          case 'pdf':

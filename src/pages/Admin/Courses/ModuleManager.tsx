@@ -30,8 +30,9 @@ const ModuleManager: React.FC<ModuleManagerProps> = ({ courseId }) => {
     try {
       setLoading(true);
       const data = await getCourseModules(courseId);
-      // Sort by order_index
-      setModules(data.toSorted((a, b) => a.order_index - b.order_index));
+      // Safely sort by order_index in case data is undefined or empty
+      const safeData = Array.isArray(data) ? data : [];
+      setModules([...safeData].sort((a, b) => (a.order_index || 0) - (b.order_index || 0)));
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'response' in err) {
         const response = (err as { response: { data?: { detail?: string } } }).response;
@@ -53,8 +54,8 @@ const ModuleManager: React.FC<ModuleManagerProps> = ({ courseId }) => {
   }, [fetchModules]);
 
   useEffect(() => {
-    setNewModule(prev => ({ ...prev, order_index: modules.length }));
-  }, [modules.length]);
+    setNewModule(prev => ({ ...prev, order_index: (modules || []).length }));
+  }, [modules]);
 
   const handleAddModule = async (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -66,7 +67,7 @@ const ModuleManager: React.FC<ModuleManagerProps> = ({ courseId }) => {
         ...newModule,
         content_url: convertedUrl
       });
-      setNewModule({ title: '', content_type: 'video', content_url: '', order_index: modules.length + 1 });
+      setNewModule({ title: '', content_type: 'video', content_url: '', order_index: (modules || []).length + 1 });
       setShowAddForm(false);
       fetchModules();
     } catch (err: unknown) {
@@ -136,17 +137,20 @@ const ModuleManager: React.FC<ModuleManagerProps> = ({ courseId }) => {
               </select>
             </div>
             <div className={styles.formGroup}>
-              <label htmlFor="module_order" className={styles.label}>Order Index</label>
-              <input 
-                id="module_order"
-                type="number"
-                className={styles.input}
-                value={newModule.order_index}
-                onChange={e => setNewModule({...newModule, order_index: Number.parseInt(e.target.value)})}
-                required
-                aria-label="Module Order Index"
-              />
-            </div>
+               <label htmlFor="module_order" className={styles.label}>Order Index</label>
+               <input 
+                 id="module_order"
+                 type="number"
+                 className={styles.input}
+                 value={newModule.order_index}
+                 onChange={e => {
+                   const value = e.target.value;
+                   setNewModule({...newModule, order_index: value === '' ? 0 : Number.parseInt(value) || 0});
+                 }}
+                 required
+                 aria-label="Module Order Index"
+               />
+             </div>
           </div>
           <div className={styles.formGroup}>
             <label htmlFor="module_url" className={styles.label}>Content URL</label>
@@ -169,7 +173,7 @@ const ModuleManager: React.FC<ModuleManagerProps> = ({ courseId }) => {
 
        {loading ? <p>Loading modules...</p> : (
          <div className={styles.moduleList}>
-           {modules.map((m) => (
+           {(modules || []).map((m) => (
              <div key={m.id} className={styles.moduleItem}>
                <div className={styles.moduleInfo}>
                  <div className={styles.orderBadge}>{m.order_index}</div>
@@ -199,7 +203,7 @@ const ModuleManager: React.FC<ModuleManagerProps> = ({ courseId }) => {
                </div>
              </div>
            ))}
-           {modules.length === 0 && !showAddForm && (
+           {(modules || []).length === 0 && !showAddForm && (
              <div className={styles.emptyState}>No modules added yet for this course.</div>
            )}
          </div>

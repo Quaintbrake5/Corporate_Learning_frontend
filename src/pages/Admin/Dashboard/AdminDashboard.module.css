@@ -200,3 +200,56 @@
   text-align: center;
   font-weight: 500;
 }
+
+.calendarSection {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.sectionHeader h3 {
+  margin: 0;
+  color: #003366;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.calendarLegend {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: #666666;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.legendDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.userLegend {
+  background-color: #22c55e;
+}
+
+.adminLegend {
+  background-color: #003366;
+}
+
+.calendarWrapper {
+  min-height: 400px;
+}

@@ -13,7 +13,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSuccess, onCancel }) => {
     name: '',
     email: '',
     password: '',
-    subdivision_id: 1,
+    department_id: 1,
     role: 'learner',
     is_verified: false
   });
@@ -26,7 +26,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSuccess, onCancel }) => {
         name: user.name,
         email: user.email,
         password: '', // Password is never sent back from API
-        subdivision_id: user.subdivision_id,
+        department_id: user.department_id,
         role: user.role,
         is_verified: user.is_verified
       });
@@ -39,7 +39,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSuccess, onCancel }) => {
     
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'subdivision_id' ? Number.parseInt(value, 10) : val
+      [name]: name === 'department_id' ? Number.parseInt(value, 10) : val
     }));
   };
 
@@ -53,7 +53,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSuccess, onCancel }) => {
          // Update
          const updateData: AdminUpdateUserData = {
            name: formData.name,
-           subdivision_id: formData.subdivision_id,
+           department_id: formData.department_id,
            role: formData.role as 'learner' | 'manager' | 'admin',
            is_verified: formData.is_verified,
            password: ''
@@ -68,7 +68,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSuccess, onCancel }) => {
          const createData: AdminCreateUserData = {
            name: formData.name,
            email: formData.email,
-           subdivision_id: formData.subdivision_id,
+           department_id: formData.department_id,
            role: formData.role as 'learner' | 'manager' | 'admin'
          };
          // Only include password if it was entered
@@ -137,11 +137,11 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSuccess, onCancel }) => {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
         <div className={styles.formGroup}>
-          <label htmlFor="user-subdivision" className={styles.label}>Subdivision</label>
+          <label htmlFor="user-department" className={styles.label}>Department</label>
           <select
-            id="user-subdivision"
-            name="subdivision_id"
-            value={formData.subdivision_id}
+            id="user-department"
+            name="department_id"
+            value={formData.department_id}
             onChange={handleChange}
             className={styles.select}
           >

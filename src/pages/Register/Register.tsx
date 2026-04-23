@@ -15,7 +15,7 @@ const RegisterStep = {
 
 type RegisterStep = typeof RegisterStep[keyof typeof RegisterStep];
 
-interface Subdivision {
+interface Department {
   id: number;
   name: string;
   division_id: number;
@@ -25,7 +25,7 @@ interface Division {
   id: number;
   code: string;
   name: string | null;
-  subdivisions: Subdivision[];
+  departments: Department[];
 }
 
 const VALIDATION_MESSAGES = {
@@ -93,7 +93,7 @@ const Register: React.FC = () => {
   const navigate = useNavigate();
 
   const [divisions, setDivisions] = useState<Division[]>([]);
-  const [departments, setDepartments] = useState<Subdivision[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [divisionsLoading, setDivisionsLoading] = useState(true);
 
   const [formData, setFormData] = useState({
@@ -133,7 +133,7 @@ const Register: React.FC = () => {
 
     if (name === 'division') {
       const selectedDivision = divisions.find(d => d.id === Number(value));
-      setDepartments(selectedDivision?.subdivisions ?? []);
+      setDepartments(selectedDivision?.departments ?? []);
       setFormData(prev => ({ ...prev, department: '' }));
     }
   };
@@ -199,7 +199,7 @@ const Register: React.FC = () => {
         email: formData.email,
         password: formData.password,
         name: formData.fullName,
-        subdivision_id: Number(formData.department),
+        department_id: Number(formData.department),
       });
       navigate('/login', { state: { message: 'Registration successful! Please sign in.' } });
     } catch (error: unknown) {

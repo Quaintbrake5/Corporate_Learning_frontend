@@ -5,10 +5,10 @@ export interface Course {
   id: string;
   title: string;
   description: string;
-  subdivision_owner: string;
+  department_owner: string;
   duration_in_minutes: number;
   is_mandatory: boolean;
-  is_cross_subdivision: boolean;
+  is_cross_department: boolean;
 }
 
 export interface Module {
@@ -54,8 +54,9 @@ export interface ModuleListResponse {
 }
 
 export const getCourseModules = async (courseId: string): Promise<Module[]> => {
-  const response = await api.get<ModuleListResponse>(`/courses/${courseId}/modules`);
-  return response.data.modules;
+  const response = await api.get<any>(`/courses/${courseId}/modules`);
+  const modules = response.data?.modules || (Array.isArray(response.data) ? response.data : []);
+  return modules;
 };
 
 export const getModule = async (moduleId: string): Promise<Module> => {

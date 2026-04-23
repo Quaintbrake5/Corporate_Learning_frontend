@@ -4,7 +4,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  subdivision_id: number;
+  department_id: number;
   role: string;
   is_verified: boolean;
   phone?: string;

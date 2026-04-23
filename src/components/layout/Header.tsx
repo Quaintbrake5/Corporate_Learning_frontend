@@ -5,7 +5,7 @@ import { useAppSelector } from '../../store/hooks';
 import { useState } from 'react';
 import ProfileModal from './ProfileModal';
 
-const subdivisionMap: Record<number, string> = {
+const departmentMap: Record<number, string> = {
   1: 'CS',
   2: 'ENG',
   3: 'OPS',
@@ -15,7 +15,7 @@ const subdivisionMap: Record<number, string> = {
 
 const Header: React.FC = () => {
   const user = useAppSelector((state) => state.auth.user);
-  const subdivision = user?.subdivision_id ? subdivisionMap[user.subdivision_id] || 'N/A' : 'N/A';
+  const department = user?.department_id ? departmentMap[user.department_id] || 'N/A' : 'N/A';
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   return (
@@ -42,7 +42,7 @@ const Header: React.FC = () => {
         >
           <div className={styles.avatarInfo}>
             <span className={styles.name}>{user?.name || 'User'}</span>
-            <span className={styles.role}>{subdivision}</span>
+            <span className={styles.role}>{department}</span>
           </div>
           <div className={styles.avatar}>
             <FontAwesomeIcon icon={faUser} className={styles.avatarIcon} />

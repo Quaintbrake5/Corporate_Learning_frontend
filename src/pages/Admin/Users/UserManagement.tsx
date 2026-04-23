@@ -70,7 +70,7 @@ const UserManagement: React.FC = () => {
     fetchUsers(); // Refresh list
   };
 
-  const getSubdivisionName = (id: number) => {
+  const getDepartmentName = (id: number) => {
     const map: Record<number, string> = {
       1: 'CSS (Security)',
       2: 'CSI (IMT/IT)',
@@ -104,7 +104,7 @@ const UserManagement: React.FC = () => {
               <tr>
                 <th>Name</th>
                 <th>Email</th>
-                <th>Subdivision</th>
+                <th>Department</th>
                 <th>Role</th>
                 <th>Status</th>
                 <th>Actions</th>
@@ -115,7 +115,7 @@ const UserManagement: React.FC = () => {
                 <tr key={user.id}>
                   <td><strong>{user.name}</strong></td>
                   <td>{user.email}</td>
-                  <td>{getSubdivisionName(user.subdivision_id)}</td>
+                  <td>{getDepartmentName(user.department_id)}</td>
                   <td>
                     <span className={[styles.roleBadge, styles['role_' + user.role]].join(' ')}>
                       {user.role}

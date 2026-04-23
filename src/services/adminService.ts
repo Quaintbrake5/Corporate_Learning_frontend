@@ -5,7 +5,7 @@ export interface AdminUser {
   id: string;
   name: string;
   email: string;
-  subdivision_id: number;
+  department_id: number;
   role: string;
   is_verified: boolean;
   created_at: string;
@@ -22,20 +22,20 @@ export interface AdminCreateUserData {
   name: string;
   email: string;
   password?: string;
-  subdivision_id: number;
+  department_id: number;
   role: 'learner' | 'manager' | 'admin';
 }
 
 export interface AdminUpdateUserData {
   password: string;
   name?: string;
-  subdivision_id?: number;
+  department_id?: number;
   role?: 'learner' | 'manager' | 'admin';
   is_verified?: boolean;
 }
 
-// Subdivisions
-export interface Subdivision {
+// Departments
+export interface Department {
   id: number;
   name: string;
   lead_id: string | null;
@@ -108,14 +108,14 @@ const adminService = {
     await api.delete(`/admin/users/${userId}`);
   },
 
-  // Subdivisions
-  getSubdivisions: async (): Promise<Subdivision[]> => {
-    const response = await api.get('/admin/subdivisions');
+  // Departments
+  getDepartments: async (): Promise<Department[]> => {
+    const response = await api.get('/admin/departments');
     return response.data;
   },
 
-  updateSubdivision: async (subdivisionId: number, data: { name?: string; lead_id?: string }): Promise<Subdivision> => {
-    const response = await api.put(`/admin/subdivisions/${subdivisionId}`, data);
+  updateDepartment: async (departmentId: number, data: { name?: string; lead_id?: string }): Promise<Department> => {
+    const response = await api.put(`/admin/departments/${departmentId}`, data);
     return response.data;
   },
   

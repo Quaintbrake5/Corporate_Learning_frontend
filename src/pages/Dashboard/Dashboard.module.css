@@ -130,3 +130,38 @@
     padding: 1.5rem;
   }
 }
+
+.calendarLegend {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: var(--text-color);
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.legendDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.userLegend {
+  background-color: var(--accent-green);
+}
+
+.adminLegend {
+  background-color: var(--primary-blue);
+}
+
+.calendarWrapper {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  min-height: 400px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}

@@ -79,7 +79,7 @@ const CourseManagement: React.FC = () => {
     fetchCourses();
   };
 
-  const getSubdivisionName = (id: string | number) => {
+  const getDepartmentName = (id: string | number) => {
     const parsedId = typeof id === 'string' ? Number.parseInt(id, 10) : id;
     const map: Record<number, string> = {
       1: 'CSS (Security)',
@@ -125,7 +125,7 @@ const CourseManagement: React.FC = () => {
                   <td>
                     <strong>{course.title}</strong>
                   </td>
-                  <td>{getSubdivisionName(course.subdivision_owner)}</td>
+                  <td>{getDepartmentName(course.department_owner)}</td>
                   <td>{course.duration_in_minutes}</td>
                   <td>
                     {course.is_mandatory ? (

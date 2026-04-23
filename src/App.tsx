@@ -18,7 +18,7 @@ import AdminDashboard from './pages/Admin/Dashboard/AdminDashboard';
 import UserManagement from './pages/Admin/Users/UserManagement';
 import CourseManagement from './pages/Admin/Courses/CourseManagement';
 import EnrollmentManagement from './pages/Admin/Enrollments/EnrollmentManagement';
-import SubdivisionManagement from './pages/Admin/Subdivisions/SubdivisionManagement';
+import DepartmentManagement from './pages/Admin/Departments/DepartmentManagement';
 
 function App() {
   return (
@@ -37,7 +37,7 @@ function App() {
               <Route path="users" element={<UserManagement />} />
               <Route path="courses" element={<CourseManagement />} />
               <Route path="enrollments" element={<EnrollmentManagement />} />
-              <Route path="subdivisions" element={<SubdivisionManagement />} />
+              <Route path="departments" element={<DepartmentManagement />} />
             </Route>
 
             {/* Learner/Manager Routes */}

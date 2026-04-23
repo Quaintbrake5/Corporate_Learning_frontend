@@ -9,7 +9,7 @@ interface PaginatedCourses {
 }
 import styles from './Courses.module.css';
 
-const subdivisionMap: Record<string, string> = {
+const departmentMap: Record<string, string> = {
   '1': 'CS',
   '2': 'ENG',
   '3': 'OPS',
@@ -23,8 +23,8 @@ const formatDuration = (minutes: number): string => {
   return `${hours}h ${mins.toString().padStart(2, '0')}m`;
 };
 
-const mapSubdivision = (value: string): string => {
-  return subdivisionMap[value] || value;
+const mapDepartment = (value: string): string => {
+  return departmentMap[value] || value;
 };
 
 const Courses: React.FC = () => {
@@ -92,7 +92,7 @@ const Courses: React.FC = () => {
                       key={course.id}
                       id={course.id}
                       title={course.title}
-                      subdivision={mapSubdivision(course.subdivision_owner)}
+                      department={mapDepartment(course.department_owner)}
                       duration={formatDuration(course.duration_in_minutes)}
                       isMandatory={course.is_mandatory}
                       thumbnailUrl={course.thumbnail_url}
@@ -113,7 +113,7 @@ const Courses: React.FC = () => {
                       key={course.id}
                       id={course.id}
                       title={course.title}
-                      subdivision={mapSubdivision(course.subdivision_owner)}
+                      department={mapDepartment(course.department_owner)}
                       duration={formatDuration(course.duration_in_minutes)}
                       thumbnailUrl={course.thumbnail_url}
                     />

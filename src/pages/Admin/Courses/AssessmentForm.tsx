@@ -139,12 +139,13 @@ const handleRemoveOption = (questionIndex: number, optionIndex: number) => {
      }
  };
 
-   const handlePassingScoreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-     setFormData((prev: FormData) => ({
-       ...prev,
-       passing_score: Number.parseInt(e.target.value) || 0
-     }));
-   };
+    const handlePassingScoreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setFormData((prev: FormData) => ({
+        ...prev,
+        passing_score: value === '' ? 0 : Number.parseInt(value) || 0
+      }));
+    };
 
    const validateForm = (data: FormData): string | null => {
      if (!data.questions || data.questions.length === 0) {

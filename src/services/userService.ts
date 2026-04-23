@@ -4,13 +4,13 @@ export interface UserProfile {
   id: string;
   name: string;
   email: string;
-  subdivision_id: number;
+  department_id: number;
   role: string;
   is_verified: boolean;
   phone?: string;
 }
 
-export interface Subdivision {
+export interface Department {
   id: number;
   name: string;
   lead_id: string | null;
@@ -21,7 +21,7 @@ export const getUserProfile = async (): Promise<UserProfile> => {
   return response.data;
 };
 
-export const getSubdivision = async (): Promise<Subdivision> => {
-  const response = await api.get<Subdivision>('/users/subdivision');
+export const getDepartment = async (): Promise<Department> => {
+  const response = await api.get<Department>('/users/department');
   return response.data;
 };

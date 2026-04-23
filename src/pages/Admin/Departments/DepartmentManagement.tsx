@@ -1,27 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import type { Subdivision, AdminUser } from '../../../services/adminService';
+import type { Department, AdminUser } from '../../../services/adminService';
 import adminService from '../../../services/adminService';
 import Modal from '../../../components/ui/Modal';
-import styles from './SubdivisionManagement.module.css';
+import styles from './DepartmentManagement.module.css';
 
-const SubdivisionManagement: React.FC = () => {
-  const [subdivisions, setSubdivisions] = useState<Subdivision[]>([]);
+const DepartmentManagement: React.FC = () => {
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [allUsers, setAllUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedSub, setSelectedSub] = useState<Subdivision | null>(null);
+  const [selectedSub, setSelectedSub] = useState<Department | null>(null);
   const [newLeadId, setNewLeadId] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      const subsData = await adminService.getSubdivisions();
-      setSubdivisions(subsData);
+      const subsData = await adminService.getDepartments();
+      setDepartments(subsData);
       const usersData = await adminService.getUsers(1, 1000);
       setAllUsers(usersData.items);
     } catch (err: unknown) {
-      let message = 'Failed to load subdivisions or users';
+      let message = 'Failed to load departments or users';
       if (err && typeof err === 'object' && 'response' in err) {
         const response = (err as { response: { data?: { detail?: string } } }).response;
         if (response?.data?.detail) message = response.data.detail;
@@ -36,7 +36,7 @@ const SubdivisionManagement: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleEditLead = (sub: Subdivision) => {
+  const handleEditLead = (sub: Department) => {
     setSelectedSub(sub);
     setNewLeadId(sub.lead_id || '');
     setIsModalOpen(true);
@@ -47,13 +47,13 @@ const SubdivisionManagement: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      await adminService.updateSubdivision(selectedSub.id, {
+      await adminService.updateDepartment(selectedSub.id, {
         lead_id: newLeadId || undefined
       });
       setIsModalOpen(false);
       fetchData();
     } catch (err: unknown) {
-      let message = 'Failed to update subdivision lead';
+      let message = 'Failed to update department lead';
       if (err && typeof err === 'object' && 'response' in err) {
         const response = (err as { response: { data?: { detail?: string } } }).response;
         if (response?.data?.detail) message = response.data.detail;
@@ -73,7 +73,7 @@ const SubdivisionManagement: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h2>Subdivision Management</h2>
+        <h2>Department Management</h2>
       </div>
 
       {error && (
@@ -82,14 +82,14 @@ const SubdivisionManagement: React.FC = () => {
         </div>
       )}
 
-      {loading && subdivisions.length === 0 ? (
+      {loading && departments.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '2rem' }}>
           <i className="fa-solid fa-circle-notch fa-spin fa-2x"></i>
-          <p>Loading subdivisions...</p>
+          <p>Loading departments...</p>
         </div>
       ) : (
         <div className={styles.grid}>
-          {subdivisions.map(sub => (
+          {departments.map(sub => (
             <div key={sub.id} className={styles.card}>
               <div className={styles.cardHeader}>
                 <h3>{sub.name}</h3>
@@ -128,7 +128,7 @@ const SubdivisionManagement: React.FC = () => {
               style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid #ddd', backgroundColor: '#f9fafc' }}
               value={newLeadId}
               onChange={(e) => setNewLeadId(e.target.value)}
-              aria-label="Select Subdivision Lead"
+              aria-label="Select Department Lead"
             >
               <option value="">-- No Lead Assigned --</option>
               {allUsers
@@ -161,4 +161,4 @@ const SubdivisionManagement: React.FC = () => {
   );
 };
 
-export default SubdivisionManagement;
+export default DepartmentManagement;

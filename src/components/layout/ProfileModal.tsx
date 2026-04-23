@@ -3,8 +3,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSave, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { updateUser } from '../../store/authSlice';
-import { getUserProfile, getSubdivision } from '../../services/userService';
-import type { UserProfile, Subdivision } from '../../services/userService';
+import { getUserProfile, getDepartment } from '../../services/userService';
+import type { UserProfile, Department } from '../../services/userService';
 import api from '../../services/api';
 import Modal from '../ui/Modal';
 import styles from './ProfileModal.module.css';
@@ -30,7 +30,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
   const dispatch = useAppDispatch();
   const user = useAppSelector(state => state.auth.user);
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [subdivision, setSubdivision] = useState<Subdivision | null>(null);
+  const [department, setDepartment] = useState<Department | null>(null);
   const [divisions, setDivisions] = useState<DivisionOption[]>([]);
   const [departments, setDepartments] = useState<DepartmentOption[]>([]);
   const [divisionsLoading, setDivisionsLoading] = useState(true);
@@ -71,14 +71,14 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
     const loadProfileData = async () => {
       try {
         setLoading(true);
-        const [profileData, subdivisionData, divisionsData] = await Promise.all([
+        const [profileData, departmentData, divisionsData] = await Promise.all([
           getUserProfile(),
-          getSubdivision(),
+          getDepartment(),
           api.get<DivisionOption[]>('/divisions')
         ]);
         
         setProfile(profileData);
-        setSubdivision(subdivisionData);
+        setDepartment(departmentData);
         setDivisions(divisionsData.data);
         
         // Initialize form data
@@ -86,8 +86,8 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
           name: profileData.name,
           email: profileData.email,
           phone: '', // Phone field doesn't exist in UserProfile, defaulting to empty string
-          division: String(profileData.subdivision_id),
-          department: String(subdivisionData.id),
+          division: String(profileData.department_id),
+          department: String(departmentData.id),
         });
         
         // Load departments for the user's division
@@ -187,7 +187,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        subdivision_id: Number(formData.department)
+        department_id: Number(formData.department)
       });
       
       // Update Redux store
@@ -196,7 +196,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        subdivision_id: Number(formData.department)
+        department_id: Number(formData.department)
       }));
       
       setSuccessMessage('Profile updated successfully!');
@@ -215,13 +215,13 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
 
   const handleCancel = () => {
     // Reset form to current profile data
-    if (profile && subdivision) {
+    if (profile && department) {
       setFormData({
         name: profile.name,
         email: profile.email,
         phone: profile.phone || '',
-        division: String(profile.subdivision_id),
-        department: String(subdivision.id),
+        division: String(profile.department_id),
+        department: String(department.id),
       });
     }
     setIsEditMode(false);
@@ -245,10 +245,10 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
     const selectedDivision = divisions.find(d => d.id === divisionId);
     if (selectedDivision) {
       // In a real app, we'd fetch departments for this division
-      // For now, we'll use the subdivisions from the division data if available
+      // For now, we'll use the departments from the division data if available
       // Since we don't have that data readily available, we'll simulate it
       setDepartmentsLoading(true);
-      // This would normally be an API call like: api.get(`/divisions/${divisionId}/subdivisions`)
+      // This would normally be an API call like: api.get(`/divisions/${divisionId}/departments`)
       // For demo purposes, we'll use a timeout to simulate loading
       setTimeout(() => {
         // In a real implementation, this would come from the API
@@ -272,15 +272,15 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
       setChangeError(null);
       setChangeSuccess(null);
       
-      // Update user's subdivision/department
+      // Update user's department/department
       await api.put('/users/profile', {
-        subdivision_id: selectedDepartmentForChange
+        department_id: selectedDepartmentForChange
       });
       
       // Update Redux store
       dispatch(updateUser({
         ...user!,
-        subdivision_id: selectedDepartmentForChange
+        department_id: selectedDepartmentForChange
       }));
       
       // Update local state
@@ -288,16 +288,16 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
       
       // Refresh profile data after successful change
       setTimeout(async () => {
-        const [profileData, subdivisionData] = await Promise.all([
+        const [profileData, departmentData] = await Promise.all([
           getUserProfile(),
-          getSubdivision()
+          getDepartment()
         ]);
         setProfile(profileData);
-        setSubdivision(subdivisionData);
+        setDepartment(departmentData);
         setFormData(prev => ({
           ...prev,
-          division: String(profileData.subdivision_id),
-          department: String(subdivisionData.id)
+          division: String(profileData.department_id),
+          department: String(departmentData.id)
         }));
         
         // Close the division change modal after a brief delay
@@ -319,7 +319,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
       <Modal isOpen={isOpen} onClose={onClose} title="User Profile" width="500px">
         {loading && <div className={styles.loading}>Loading profile data...</div>}
         
-         {!loading && profile && subdivision && (
+         {!loading && profile && department && (
            <>
               <div className={styles.profileSection}>
                 {isEditMode ? (
@@ -451,14 +451,14 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
                     <div className={styles.infoGroup}>
                       <div className={styles.infoLabel}>Division</div>
                       <div className={styles.infoValue}>
-                        {subdivision.name}
+                        {department.name}
                       </div>
                     </div>
                     
                     <div className={styles.infoGroup}>
                       <div className={styles.infoLabel}>Department</div>
                       <div className={styles.infoValue}>
-                        {subdivision.name}
+                        {department.name}
                       </div>
                     </div>
                     

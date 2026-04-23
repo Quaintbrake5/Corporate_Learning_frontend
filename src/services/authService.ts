@@ -4,7 +4,7 @@ export interface RegisterPayload {
   email: string;
   password: string;
   name: string;
-  subdivision_id: number;
+  department_id: number;
 }
 
 export interface LoginPayload {
@@ -33,7 +33,7 @@ export interface LoginResponse {
     id: string;
     name: string;
     email: string;
-    subdivision_id: number;
+    department_id: number;
     role: string;
     is_verified: boolean;
   };

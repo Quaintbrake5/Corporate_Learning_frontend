@@ -4,10 +4,13 @@ import AlertBanner from '../../components/ui/AlertBanner';
 import StatCard from '../../components/ui/StatCard';
 import ProductivityChart from '../../components/ui/ProductivityChart';
 import CourseCard from '../../components/ui/CourseCard';
+import Calendar from '../../components/ui/Calendar';
+import EventModal from '../../components/ui/EventModal';
 import { useAppSelector } from '../../store/hooks';
 import { getCourses, type Course } from '../../services/courseService';
-import { getSubdivision, type Subdivision } from '../../services/userService';
+import { getDepartment, type Department } from '../../services/userService';
 import { getDashboardStats, getProductivityData, type DashboardStats, type ProductivityData } from '../../services/dashboardService';
+import { type Event } from '../../services/eventService';
 import styles from './Dashboard.module.css';
 
 const formatDuration = (minutes: number): string => {
@@ -22,13 +25,19 @@ const Dashboard: React.FC = () => {
   const user = useAppSelector(state => state.auth.user);
   
   const [courses, setCourses] = useState<Course[]>([]);
-  const [subdivision, setSubdivision] = useState<Subdivision | null>(null);
+  const [department, setDepartment] = useState<Department | null>(null);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [productivityData, setProductivityData] = useState<ProductivityData | null>(null);
   
   const [isLoading, setIsLoading] = useState(true);
   const [isProductivityLoading, setIsProductivityLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Calendar state
+  const [calendarRefresh, setCalendarRefresh] = useState(0);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedEvents, setSelectedEvents] = useState<Event[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -38,13 +47,13 @@ const Dashboard: React.FC = () => {
         
         const [courseDataResponse, subData, statsData] = await Promise.all([
           getCourses(1, 40),
-          getSubdivision(),
+          getDepartment(),
           getDashboardStats()
         ]);
         
         const courseData = Array.isArray(courseDataResponse) ? courseDataResponse : (courseDataResponse?.items || []);
         setCourses(courseData);
-        setSubdivision(subData);
+        setDepartment(subData);
         setStats(statsData);
       } catch (err) {
         console.error('Dashboard data fetch error:', err);
@@ -72,14 +81,39 @@ const Dashboard: React.FC = () => {
     fetchProductivityData();
   }, []);
 
-  const subdivisionName = subdivision?.name || 'Your Division';
+  // Calendar handlers
+  const handleDateClick = (date: Date, events: Event[]) => {
+    if (events.length > 0) {
+      setSelectedDate(date);
+      setSelectedEvents(events);
+      setIsModalOpen(true);
+    }
+  };
+
+  const handleAddEvent = (date: Date) => {
+    setSelectedDate(date);
+    setSelectedEvents([]);
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedDate(null);
+    setSelectedEvents([]);
+  };
+
+  const handleEventCreated = () => {
+    setCalendarRefresh(prev => prev + 1);
+  };
+
+  const departmentName = department?.name || 'Your Division';
 
    const learningPathCourses = courses
-     .filter(c => subdivision?.id !== undefined && (Number(c.subdivision_owner) === subdivision.id || c.is_cross_subdivision))
+     .filter(c => department?.id !== undefined && (Number(c.department_owner) === department.id || c.is_cross_department))
      .slice(0, 6);
 
    const recommendedElectives = courses
-     .filter(c => subdivision?.id !== undefined && Number(c.subdivision_owner) !== subdivision.id && !c.is_cross_subdivision)
+     .filter(c => department?.id !== undefined && Number(c.department_owner) !== department.id && !c.is_cross_department)
      .slice(0, 3);
 
   const renderCourses = (courseList: Course[]) => {
@@ -92,7 +126,7 @@ const Dashboard: React.FC = () => {
         key={course.id}
         id={course.id}
         title={course.title}
-        subdivision={course.subdivision_owner}
+        department={course.department_owner}
         duration={formatDuration(course.duration_in_minutes)}
         isMandatory={course.is_mandatory}
         thumbnailUrl={course.thumbnail_url}
@@ -149,10 +183,34 @@ const Dashboard: React.FC = () => {
           </div>
         </section>
 
-        {/* Priority 2: Subdivision-specific Learning Path */}
+        {/* Calendar Section */}
         <section className={styles.dashboardSection}>
           <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>Upcoming Schedule: {subdivisionName}</h2>
+            <h2 className={styles.sectionTitle}>Calendar</h2>
+            <div className={styles.calendarLegend}>
+              <span className={styles.legendItem}>
+                <span className={`${styles.legendDot} ${styles.userLegend}`}></span>
+                Personal
+              </span>
+              <span className={styles.legendItem}>
+                <span className={`${styles.legendDot} ${styles.adminLegend}`}></span>
+                Organization
+              </span>
+            </div>
+          </div>
+          <div className={styles.calendarWrapper}>
+            <Calendar 
+              onDateClick={handleDateClick}
+              onAddEvent={handleAddEvent}
+              refreshTrigger={calendarRefresh}
+            />
+          </div>
+        </section>
+
+        {/* Priority 2: Department-specific Learning Path */}
+        <section className={styles.dashboardSection}>
+          <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>Upcoming Schedule: {departmentName}</h2>
             <button className={styles.btnLink}>View All</button>
           </div>
           <div className={styles.coursesGrid}>
@@ -170,6 +228,15 @@ const Dashboard: React.FC = () => {
             {renderCourses(recommendedElectives)}
           </div>
         </section>
+
+        {/* Event Modal */}
+        <EventModal 
+          isOpen={isModalOpen}
+          onClose={handleModalClose}
+          selectedDate={selectedDate}
+          events={selectedEvents}
+          onEventCreated={handleEventCreated}
+        />
 
       </div>
     </DashboardLayout>

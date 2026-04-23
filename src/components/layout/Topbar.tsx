@@ -22,7 +22,7 @@ const Topbar: React.FC = () => {
           <span className="notification-badge"></span>
         </button>
         <button className="btn-primary" type="button">
-          Select Subdivision Path
+          Select Department Path
         </button>
         <div className="user-profile">
           <img src="https://ui-avatars.com/api/?name=John+Doe&background=random" alt="User Profile" />

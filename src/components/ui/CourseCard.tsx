@@ -4,7 +4,7 @@ import styles from './CourseCard.module.css';
 interface CourseCardProps {
   id: string;
   title: string;
-  subdivision?: string;
+  department?: string;
   duration?: string;
   progress?: number;
   isMandatory?: boolean;
@@ -14,7 +14,7 @@ interface CourseCardProps {
 const CourseCard: React.FC<CourseCardProps> = ({ 
   id,
   title, 
-  subdivision, 
+  department, 
   duration, 
   progress, 
   isMandatory,
@@ -57,10 +57,10 @@ const CourseCard: React.FC<CourseCardProps> = ({
         <h4 className={styles.title}>{title}</h4>
         
         <div className={styles.meta}>
-          {subdivision && (
+          {department && (
             <span className={styles.metaItem}>
               <i className="fa-solid fa-building"></i>
-              {subdivision}
+              {department}
             </span>
           )}
           {duration && (

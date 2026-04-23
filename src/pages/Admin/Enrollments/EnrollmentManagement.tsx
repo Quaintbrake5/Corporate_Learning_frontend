@@ -12,7 +12,7 @@ interface AdminEnrollment {
   course_id: string;
   user_name: string;
   user_email: string;
-  user_subdivision: string;
+  user_department: string;
   progress_percentage: number;
   created_at: string;
 }
@@ -148,7 +148,7 @@ const EnrollmentManagement: React.FC = () => {
               <tr>
                 <th>User Name</th>
                 <th>Email</th>
-                <th>Subdivision</th>
+                <th>Department</th>
                 <th>Status</th>
                 <th>Enrolled On</th>
                 <th>Actions</th>
@@ -159,7 +159,7 @@ const EnrollmentManagement: React.FC = () => {
                 <tr key={e.id}>
                   <td><strong>{e.user_name}</strong></td>
                   <td>{e.user_email}</td>
-                  <td>{e.user_subdivision}</td>
+                  <td>{e.user_department}</td>
                   <td>{e.progress_percentage}% Done</td>
                   <td>{new Date(e.created_at).toLocaleDateString()}</td>
                   <td>

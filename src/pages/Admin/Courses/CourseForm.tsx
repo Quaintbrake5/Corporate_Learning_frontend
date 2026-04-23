@@ -14,10 +14,10 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onSuccess, onCancel }) 
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    subdivision_owner: 1,
+    department_owner: 1,
     duration_in_minutes: 60,
     is_mandatory: false,
-    is_cross_subdivision: false,
+    is_cross_department: false,
     video_url: '',
     thumbnail_url: ''
   });
@@ -29,10 +29,10 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onSuccess, onCancel }) 
       setFormData({
         title: course.title,
         description: course.description || '',
-        subdivision_owner: typeof course.subdivision_owner === 'string' ? Number.parseInt(course.subdivision_owner, 10) : course.subdivision_owner,
+        department_owner: typeof course.department_owner === 'string' ? Number.parseInt(course.department_owner, 10) : course.department_owner,
         duration_in_minutes: course.duration_in_minutes,
         is_mandatory: course.is_mandatory,
-        is_cross_subdivision: course.is_cross_subdivision,
+        is_cross_department: course.is_cross_department,
         video_url: '',
         thumbnail_url: course.thumbnail_url || ''
       });
@@ -45,7 +45,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onSuccess, onCancel }) 
     
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'subdivision_owner' || name === 'duration_in_minutes' ? Number.parseInt(value, 10) : val
+      [name]: name === 'department_owner' || name === 'duration_in_minutes' ? Number.parseInt(value, 10) : val
     }));
   };
 
@@ -58,10 +58,10 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onSuccess, onCancel }) 
       const payload: Partial<Course> = {
         title: formData.title,
         description: formData.description,
-        subdivision_owner: String(formData.subdivision_owner),
+        department_owner: String(formData.department_owner),
         duration_in_minutes: formData.duration_in_minutes,
         is_mandatory: formData.is_mandatory,
-        is_cross_subdivision: formData.is_cross_subdivision,
+        is_cross_department: formData.is_cross_department,
         thumbnail_url: formData.thumbnail_url || undefined
       };
 
@@ -157,11 +157,11 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onSuccess, onCancel }) 
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
         <div className={styles.formGroup}>
-          <label htmlFor="course-subowner" className={styles.label}>Subdivision Owner</label>
+          <label htmlFor="course-subowner" className={styles.label}>Department Owner</label>
           <select
             id="course-subowner"
-            name="subdivision_owner"
-            value={formData.subdivision_owner}
+            name="department_owner"
+            value={formData.department_owner}
             onChange={handleChange}
             className={styles.select}
           >
@@ -203,12 +203,12 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onSuccess, onCancel }) 
         <label className={styles.checkboxGroup}>
           <input
             type="checkbox"
-            name="is_cross_subdivision"
-            checked={formData.is_cross_subdivision}
+            name="is_cross_department"
+            checked={formData.is_cross_department}
             onChange={handleChange}
             className={styles.checkbox}
           />
-          <span className={styles.label}>Available Across All Subdivisions</span>
+          <span className={styles.label}>Available Across All Departments</span>
         </label>
       </div>
 

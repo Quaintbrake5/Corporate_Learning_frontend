@@ -4,6 +4,9 @@ import adminService from '../../../services/adminService';
 import type { AdminUser } from '../../../services/adminService';
 import { getCourses } from '../../../services/courseService';
 import type { Course } from '../../../services/courseService';
+import Calendar from '../../../components/ui/Calendar';
+import EventModal from '../../../components/ui/EventModal';
+import { type Event } from '../../../services/eventService';
 import styles from './AdminDashboard.module.css';
 import { useAppSelector } from '../../../store/hooks';
 import {
@@ -28,15 +31,21 @@ const AdminDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Calendar state
+  const [calendarRefresh, setCalendarRefresh] = useState(0);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedEvents, setSelectedEvents] = useState<Event[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const fetchData = async () => {
     try {
       setLoading(true);
       setError(null);
-      const [usersData, coursesData] = await Promise.all([
+      const [usersResponse, coursesData] = await Promise.all([
         adminService.getUsers(1, 100),
         getCourses(1, 100)
       ]);
-      setUsers((usersData as any).users || (Array.isArray(usersData) ? usersData : []));
+      setUsers((usersResponse as unknown as { items: AdminUser[] }).items || (Array.isArray(usersResponse) ? usersResponse : []));
       setCourses(coursesData?.items || (Array.isArray(coursesData) ? coursesData : []));
     } catch (err: unknown) {
       const error = err as { response?: { data?: { detail?: string } } };
@@ -49,6 +58,29 @@ const AdminDashboard: React.FC = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Calendar handlers
+  const handleDateClick = (date: Date, events: Event[]) => {
+    setSelectedDate(date);
+    setSelectedEvents(events);
+    setIsModalOpen(true);
+  };
+
+  const handleAddEvent = (date: Date) => {
+    setSelectedDate(date);
+    setSelectedEvents([]);
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedDate(null);
+    setSelectedEvents([]);
+  };
+
+  const handleEventCreated = () => {
+    setCalendarRefresh(prev => prev + 1);
+  };
 
   // Analytics Data Preparation
   const verifiedUsers = users.filter(u => u.is_verified).length;
@@ -67,7 +99,7 @@ const AdminDashboard: React.FC = () => {
     { name: 'Elective', value: electiveCourses, fill: '#90ee90' }
   ];
 
-  const subdivisionMap: Record<number, string> = {
+  const departmentMap: Record<number, string> = {
     1: 'CSS',
     2: 'CSI',
     3: 'CSD',
@@ -75,15 +107,15 @@ const AdminDashboard: React.FC = () => {
     5: 'CSE',
   };
 
-  const usersBySubdivision = users.reduce((acc, user) => {
-    const sub = subdivisionMap[user.subdivision_id] || 'Other';
+  const usersByDepartment = users.reduce((acc, user) => {
+    const sub = departmentMap[user.department_id] || 'Other';
     acc[sub] = (acc[sub] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
-  const subdivisionChartData = Object.keys(usersBySubdivision).map(key => ({
+  const departmentChartData = Object.keys(usersByDepartment).map(key => ({
     name: key,
-    Users: usersBySubdivision[key]
+    Users: usersByDepartment[key]
   }));
 
   return (
@@ -189,15 +221,15 @@ const AdminDashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Users by Subdivision Bar Chart */}
+          {/* Users by Department Bar Chart */}
           <div className={`${styles.chartCard} ${styles.fullWidth}`}>
             <div className={styles.chartHeader}>
-              <h3>Users by Subdivision</h3>
+              <h3>Users by Department</h3>
             </div>
             <div className={styles.chartWrapper}>
               <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                 <BarChart
-                  data={subdivisionChartData}
+                  data={departmentChartData}
                   margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
@@ -212,8 +244,42 @@ const AdminDashboard: React.FC = () => {
               </ResponsiveContainer>
             </div>
           </div>
+
         </div>
       )}
+
+      {/* Calendar Section */}
+      <div className={styles.calendarSection}>
+        <div className={styles.sectionHeader}>
+          <h3>Event Calendar</h3>
+          <div className={styles.calendarLegend}>
+            <span className={styles.legendItem}>
+              <span className={`${styles.legendDot} ${styles.userLegend}`}></span>
+              Personal
+            </span>
+            <span className={styles.legendItem}>
+              <span className={`${styles.legendDot} ${styles.adminLegend}`}></span>
+              Organization
+            </span>
+          </div>
+        </div>
+        <div className={styles.calendarWrapper}>
+          <Calendar 
+            onDateClick={handleDateClick}
+            onAddEvent={handleAddEvent}
+            refreshTrigger={calendarRefresh}
+          />
+        </div>
+      </div>
+
+      {/* Event Modal */}
+      <EventModal 
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        selectedDate={selectedDate}
+        events={selectedEvents}
+        onEventCreated={handleEventCreated}
+      />
     </div>
   );
 };
