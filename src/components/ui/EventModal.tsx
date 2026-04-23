@@ -128,22 +128,27 @@ const EventModal: React.FC<EventModalProps> = ({
       setLoading(true);
       setError(null);
       
-      await updateEvent(editingEvent!.id, {
-        title: formData.title,
-        description: formData.description || undefined,
-        start_time: formData.start_time,
-        end_time: formData.end_time,
-        is_all_day: formData.is_all_day
-      });
+       await updateEvent(editingEvent!.id, {
+         title: formData.title,
+         description: formData.description || undefined,
+         start_time: formData.start_time + ":00",
+         end_time: formData.end_time + ":00",
+         is_all_day: formData.is_all_day
+       });
       
       onEventCreated?.();
       setEditingEvent(null);
-    } catch (err) {
-      setError('Failed to update event');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+     } catch (err: unknown) {
+       setError('Failed to update event');
+       console.error('Update event error:', err);
+       if (err && typeof err === 'object' && 'response' in err) {
+         const response = (err as { response: { status: number; data: unknown } }).response;
+         console.error('Response status:', response.status);
+         console.error('Response data:', response.data);
+       }
+     } finally {
+       setLoading(false);
+     }
   };
 
   const handleAddEvent = async (e: React.SyntheticEvent<HTMLFormElement>) => {
@@ -153,28 +158,53 @@ const EventModal: React.FC<EventModalProps> = ({
       return;
     }
 
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const { createEvent } = await import('../../services/eventService');
-      await createEvent({
-        title: formData.title,
-        description: formData.description || undefined,
-        start_time: formData.start_time,
-        end_time: formData.end_time,
-        is_all_day: formData.is_all_day,
-        event_type: formData.event_type
-      });
+     try {
+       setLoading(true);
+       setError(null);
+       
+       console.log('Creating event with data:', {
+         title: formData.title,
+         description: formData.description || undefined,
+         start_time: formData.start_time,
+         end_time: formData.end_time,
+         is_all_day: formData.is_all_day,
+         event_type: formData.event_type
+       });
+       
+       // Validate datetime format
+       const startTime = formData.start_time;
+       const endTime = formData.end_time;
+       console.log('Start time format check:', startTime, typeof startTime);
+       console.log('End time format check:', endTime, typeof endTime);
+       
+        // Check if strings are in expected ISO format (simplified)
+        const isoRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/;
+        console.log('Start time matches ISO regex:', isoRegex.test(startTime));
+        console.log('End time matches ISO regex:', isoRegex.test(endTime));
+       
+       const { createEvent } = await import('../../services/eventService');
+       await createEvent({
+         title: formData.title,
+         description: formData.description || undefined,
+         start_time: formData.start_time + ":00",
+         end_time: formData.end_time + ":00",
+         is_all_day: formData.is_all_day,
+         event_type: formData.event_type
+       });
       
       onEventCreated?.();
       onClose();
-    } catch (err) {
-      setError('Failed to create event');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+      } catch (err: unknown) {
+        setError('Failed to create event');
+        console.error('Create event error:', err);
+        if (err && typeof err === 'object' && 'response' in err) {
+          const response = (err as { response: { status: number; data: unknown } }).response;
+          console.error('Response status:', response.status);
+          console.error('Response data:', response.data);
+        }
+     } finally {
+       setLoading(false);
+     }
   };
 
   const isOwnEvent = (event: Event): boolean => {
@@ -444,8 +474,7 @@ const EventModal: React.FC<EventModalProps> = ({
       ref={dialogRef}
       className={styles.modalContent} 
       aria-modal="true"
-      onCancel={(e) => {
-        e.preventDefault();
+      onCancel={() => {
         onClose();
       }}
     >
@@ -471,6 +500,3 @@ const EventModal: React.FC<EventModalProps> = ({
 };
 
 export default EventModal;
-
-
-

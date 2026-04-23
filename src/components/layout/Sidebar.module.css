@@ -1,6 +1,6 @@
 .sidebar {
   width: 220px;
-  background-color: var(--primary-blue);
+  background: radial-gradient(circle at top center, #0B3149, #134B36);
   color: #ffffff;
   display: flex;
   flex-direction: column;
@@ -103,9 +103,9 @@
 }
 
 .navLink.active {
-  background-color: var(--accent-green);
-  color: var(--primary-blue);
-  box-shadow: 0 4px 12px rgba(144, 238, 144, 0.2);
+  background: linear-gradient(90deg, #12B8D9, #20D071);
+  color: #0B3149;
+  box-shadow: 0 4px 12px rgba(18, 184, 217, 0.2);
 }
 
 .navIcon {

@@ -11,8 +11,6 @@
   max-width: 500px;
   max-height: 80vh;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
   padding: 0;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
@@ -25,6 +23,8 @@
 }
 
 .modalContent[open] {
+  display: flex;
+  flex-direction: column;
   animation: slideUp 0.3s ease;
 }
 
@@ -115,7 +115,7 @@
 }
 
 .addButton:hover {
-  background: var(--primary-blue-dark, #003366);
+  background: var(--primary-blue-dark, #0B3149);
 }
 
 .emptyState {

@@ -34,7 +34,7 @@
 
 .welcomeCard h1 {
   margin: 0 0 0.5rem 0;
-  color: #003366;
+  color: #0B3149;
   font-size: 1.8rem;
   font-weight: 700;
 }
@@ -57,19 +57,19 @@
   padding: 1rem 1.5rem;
   border-radius: 8px;
   border: none;
-  background: #003366;
-  color: white;
+  background: linear-gradient(90deg, #12B8D9, #20D071);
+  color: #0B3149;
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 10px rgba(0, 51, 102, 0.2);
+  box-shadow: 0 4px 10px rgba(18, 184, 217, 0.2);
 }
 
 .actionBtn:hover {
-  background: #002244;
+  opacity: 0.9;
   transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(0, 51, 102, 0.3);
+  box-shadow: 0 6px 15px rgba(18, 184, 217, 0.3);
 }
 
 .actionBtn i {
@@ -96,7 +96,7 @@
 
 .statCard:hover {
   transform: translateY(-3px);
-  border-color: #90ee90;
+  border-color: #12B8D9;
 }
 
 .iconWrapper {
@@ -107,8 +107,8 @@
   align-items: center;
   justify-content: center;
   font-size: 1.75rem;
-  background: rgba(144, 238, 144, 0.2);
-  color: #003366;
+  background: rgba(32, 208, 113, 0.2);
+  color: #0B3149;
 }
 
 .statInfo {
@@ -125,7 +125,7 @@
 }
 
 .statValue {
-  color: #003366;
+  color: #0B3149;
   font-size: 2rem;
   font-weight: 700;
   margin-top: 0.25rem;
@@ -150,7 +150,7 @@
 }
 
 .chartCard:hover {
-  border-color: #90ee90;
+  border-color: #12B8D9;
 }
 
 .chartCard.fullWidth {
@@ -164,7 +164,7 @@
 
 .chartHeader h3 {
   margin: 0;
-  color: #003366;
+  color: #0B3149;
   font-size: 1.1rem;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -183,12 +183,12 @@
   align-items: center;
   justify-content: center;
   min-height: 300px;
-  color: #003366;
+  color: #0B3149;
   gap: 1rem;
 }
 
 .loadingState i {
-  color: #003366;
+  color: #0B3149;
 }
 
 .errorBanner {
@@ -218,7 +218,7 @@
 
 .sectionHeader h3 {
   margin: 0;
-  color: #003366;
+  color: #0B3149;
   font-size: 1.1rem;
   font-weight: 600;
 }
@@ -247,7 +247,7 @@
 }
 
 .adminLegend {
-  background-color: #003366;
+  background-color: #0B3149;
 }
 
 .calendarWrapper {

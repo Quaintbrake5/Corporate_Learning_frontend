@@ -8,7 +8,7 @@
 
 .sidebar {
   width: 220px;
-  background-color: #003366;
+  background: radial-gradient(circle at top center, #0B3149, #134B36);
   color: #ffffff;
   display: flex;
   flex-direction: column;
@@ -63,13 +63,13 @@
 
 .toggleButton:hover {
   color: #ffffff;
-  background-color: #004d99;
+  background-color: rgba(255, 255, 255, 0.1);
   transform: scale(1.1);
 }
 
 .logoContainer i {
   font-size: 1.5rem;
-  color: #90ee90;
+  color: #00B4DB;
 }
 
 .logoContainer h2 {
@@ -107,13 +107,13 @@
 .navLink:hover {
   text-decoration: none;
   color: #ffffff;
-  background-color: #004d99;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .navLink.active {
-  background-color: #90ee90;
-  color: #003366;
-  box-shadow: 0 4px 12px rgba(144, 238, 144, 0.2);
+  background: linear-gradient(90deg, #12B8D9, #20D071);
+  color: #0B3149;
+  box-shadow: 0 4px 12px rgba(18, 184, 217, 0.2);
 }
 
 .navIcon {
