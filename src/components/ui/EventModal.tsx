@@ -171,16 +171,16 @@ const EventModal: React.FC<EventModalProps> = ({
          event_type: formData.event_type
        });
        
-       // Validate datetime format
-       const startTime = formData.start_time;
-       const endTime = formData.end_time;
-       console.log('Start time format check:', startTime, typeof startTime);
-       console.log('End time format check:', endTime, typeof endTime);
-       
-        // Check if strings are in expected ISO format (simplified)
-        const isoRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/;
-        console.log('Start time matches ISO regex:', isoRegex.test(startTime));
-        console.log('End time matches ISO regex:', isoRegex.test(endTime));
+        // Validate datetime format
+        const startTime = formData.start_time;
+        const endTime = formData.end_time;
+        console.log('Start time format check:', startTime, typeof startTime);
+        console.log('End time format check:', endTime, typeof endTime);
+        
+         // Check if strings are in expected format (YYYY-MM-DDTHH:MM)
+         const isoRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
+         console.log('Start time matches ISO regex:', isoRegex.test(startTime));
+         console.log('End time matches ISO regex:', isoRegex.test(endTime));
        
        const { createEvent } = await import('../../services/eventService');
        await createEvent({
