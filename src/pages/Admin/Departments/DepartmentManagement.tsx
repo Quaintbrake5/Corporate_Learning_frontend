@@ -13,24 +13,34 @@ const DepartmentManagement: React.FC = () => {
   const [newLeadId, setNewLeadId] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const subsData = await adminService.getDepartments();
-      setDepartments(subsData);
-      const usersData = await adminService.getUsers(1, 1000);
-      setAllUsers(usersData.items);
-    } catch (err: unknown) {
-      let message = 'Failed to load departments or users';
-      if (err && typeof err === 'object' && 'response' in err) {
-        const response = (err as { response: { data?: { detail?: string } } }).response;
-        if (response?.data?.detail) message = response.data.detail;
-      }
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  };
+   const fetchData = async () => {
+     try {
+       setLoading(true);
+       const subsData = await adminService.getDepartments();
+       setDepartments(subsData);
+       const usersData = await adminService.getUsers(1, 1000);
+       setAllUsers(usersData.items);
+     } catch (err: unknown) {
+       let message = 'Failed to load departments or users';
+       if (err && typeof err === 'object' && 'response' in err) {
+         const response = (err as { response: { data?: any } }).response;
+         if (response?.data) {
+           // Handle detail as either string or array
+           if (response.data.detail) {
+             if (Array.isArray(response.data.detail)) {
+               // Join array elements into a single string
+               message = response.data.detail.join(' ');
+             } else {
+               message = String(response.data.detail);
+             }
+           }
+         }
+       }
+       setError(message);
+     } finally {
+       setLoading(false);
+     }
+   };
 
   useEffect(() => {
     fetchData();
@@ -42,27 +52,37 @@ const DepartmentManagement: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleUpdateLead = async () => {
-    if (!selectedSub) return;
-    try {
-      setLoading(true);
-      setError(null);
-      await adminService.updateDepartment(selectedSub.id, {
-        lead_id: newLeadId || undefined
-      });
-      setIsModalOpen(false);
-      fetchData();
-    } catch (err: unknown) {
-      let message = 'Failed to update department lead';
-      if (err && typeof err === 'object' && 'response' in err) {
-        const response = (err as { response: { data?: { detail?: string } } }).response;
-        if (response?.data?.detail) message = response.data.detail;
-      }
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  };
+   const handleUpdateLead = async () => {
+     if (!selectedSub) return;
+     try {
+       setLoading(true);
+       setError(null);
+       await adminService.updateDepartment(selectedSub.id, {
+         lead_id: newLeadId || undefined
+       });
+       setIsModalOpen(false);
+       fetchData();
+     } catch (err: unknown) {
+       let message = 'Failed to update department lead';
+       if (err && typeof err === 'object' && 'response' in err) {
+         const response = (err as { response: { data?: any } }).response;
+         if (response?.data) {
+           // Handle detail as either string or array
+           if (response.data.detail) {
+             if (Array.isArray(response.data.detail)) {
+               // Join array elements into a single string
+               message = response.data.detail.join(' ');
+             } else {
+               message = String(response.data.detail);
+             }
+           }
+         }
+       }
+       setError(message);
+     } finally {
+       setLoading(false);
+     }
+   };
 
   const getUserName = (userId: string | null) => {
     if (!userId) return 'No Lead Assigned';

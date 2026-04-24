@@ -26,28 +26,34 @@ const ModuleManager: React.FC<ModuleManagerProps> = ({ courseId }) => {
     order_index: 0
   });
 
-  const fetchModules = React.useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await getCourseModules(courseId);
-      // Safely sort by order_index in case data is undefined or empty
-      const safeData = Array.isArray(data) ? data : [];
-      setModules([...safeData].sort((a, b) => (a.order_index || 0) - (b.order_index || 0)));
-    } catch (err: unknown) {
-      if (err && typeof err === 'object' && 'response' in err) {
-        const response = (err as { response: { data?: { detail?: string } } }).response;
-        if (response?.data?.detail) {
-          setError(response.data.detail);
-        } else {
-          setError('Failed to load modules');
-        }
-      } else {
-        setError('Failed to load modules');
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [courseId]);
+   const fetchModules = React.useCallback(async () => {
+     try {
+       setLoading(true);
+       const data = await getCourseModules(courseId);
+       // Safely sort by order_index in case data is undefined or empty
+       const safeData = Array.isArray(data) ? data : [];
+       setModules([...safeData].sort((a, b) => (a.order_index || 0) - (b.order_index || 0)));
+     } catch (err: unknown) {
+       let errorMessage = 'Failed to load modules';
+       if (err && typeof err === 'object' && 'response' in err) {
+         const response = (err as { response: { data?: any } }).response;
+         if (response?.data) {
+           // Handle detail as either string or array
+           if (response.data.detail) {
+             if (Array.isArray(response.data.detail)) {
+               // Join array elements into a single string
+               errorMessage = response.data.detail.join(' ');
+             } else {
+               errorMessage = String(response.data.detail);
+             }
+           }
+         }
+       }
+       setError(errorMessage);
+     } finally {
+       setLoading(false);
+     }
+   }, [courseId]);
 
   useEffect(() => {
     fetchModules();

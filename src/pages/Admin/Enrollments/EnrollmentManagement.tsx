@@ -27,38 +27,66 @@ const EnrollmentManagement: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  const fetchInitialData = async () => {
-    try {
-      setLoading(true);
-      const coursesData = await getCourses(1, 100);
-      setCourses(coursesData.items);
-       const usersData = await adminService.getUsers(1, 1000); // Fetch all users for picking
-       setAllUsers(usersData.items);
-      if (coursesData.items.length > 0) {
-        setSelectedCourseId(coursesData.items[0].id);
-      }
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { detail?: string } } };
-      setError(error?.response?.data?.detail || 'Failed to load courses or users');
-    } finally {
-      setLoading(false);
-    }
-  };
+   const fetchInitialData = async () => {
+     try {
+       setLoading(true);
+       const coursesData = await getCourses(1, 100);
+       setCourses(coursesData.items);
+        const usersData = await adminService.getUsers(1, 1000); // Fetch all users for picking
+        setAllUsers(usersData.items);
+       if (coursesData.items.length > 0) {
+         setSelectedCourseId(coursesData.items[0].id);
+       }
+     } catch (err: unknown) {
+       let errorMessage = 'Failed to load courses or users';
+       if (err && typeof err === 'object' && 'response' in err) {
+         const response = (err as { response: { data?: any } }).response;
+         if (response?.data) {
+           // Handle detail as either string or array
+           if (response.data.detail) {
+             if (Array.isArray(response.data.detail)) {
+               // Join array elements into a single string
+               errorMessage = response.data.detail.join(' ');
+             } else {
+               errorMessage = String(response.data.detail);
+             }
+           }
+         }
+       }
+       setError(errorMessage);
+     } finally {
+       setLoading(false);
+     }
+   };
 
-  const fetchEnrollments = async (courseId: string) => {
-    if (!courseId) return;
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await adminService.getEnrollments(1, 100, undefined, courseId);
-      setEnrollments((data.items as unknown as AdminEnrollment[]) || []);
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { detail?: string } } };
-      setError(error?.response?.data?.detail || 'Failed to load current enrollments');
-    } finally {
-      setLoading(false);
-    }
-  };
+   const fetchEnrollments = async (courseId: string) => {
+     if (!courseId) return;
+     try {
+       setLoading(true);
+       setError(null);
+       const data = await adminService.getEnrollments(1, 100, undefined, courseId);
+       setEnrollments((data.items as unknown as AdminEnrollment[]) || []);
+     } catch (err: unknown) {
+       let errorMessage = 'Failed to load current enrollments';
+       if (err && typeof err === 'object' && 'response' in err) {
+         const response = (err as { response: { data?: any } }).response;
+         if (response?.data) {
+           // Handle detail as either string or array
+           if (response.data.detail) {
+             if (Array.isArray(response.data.detail)) {
+               // Join array elements into a single string
+               errorMessage = response.data.detail.join(' ');
+             } else {
+               errorMessage = String(response.data.detail);
+             }
+           }
+         }
+       }
+       setError(errorMessage);
+     } finally {
+       setLoading(false);
+     }
+   };
 
   useEffect(() => {
     fetchInitialData();
@@ -70,33 +98,61 @@ const EnrollmentManagement: React.FC = () => {
     }
   }, [selectedCourseId]);
 
-  const handleEnrollUser = async (userId: string) => {
-    try {
-      setError(null);
-      await adminService.createEnrollment({
-        user_id: userId,
-        course_id: selectedCourseId
-      });
-      setIsModalOpen(false);
-      fetchEnrollments(selectedCourseId);
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { detail?: string } } };
-      setError(error?.response?.data?.detail || 'Failed to enroll user');
-    }
-  };
+   const handleEnrollUser = async (userId: string) => {
+     try {
+       setError(null);
+       await adminService.createEnrollment({
+         user_id: userId,
+         course_id: selectedCourseId
+       });
+       setIsModalOpen(false);
+       fetchEnrollments(selectedCourseId);
+     } catch (err: unknown) {
+       let errorMessage = 'Failed to enroll user';
+       if (err && typeof err === 'object' && 'response' in err) {
+         const response = (err as { response: { data?: any } }).response;
+         if (response?.data) {
+           // Handle detail as either string or array
+           if (response.data.detail) {
+             if (Array.isArray(response.data.detail)) {
+               // Join array elements into a single string
+               errorMessage = response.data.detail.join(' ');
+             } else {
+               errorMessage = String(response.data.detail);
+             }
+           }
+         }
+       }
+       setError(errorMessage);
+     }
+   };
 
-  const handleUnenroll = async (enrollmentId: string) => {
-    if (!globalThis.confirm('Are you sure you want to remove this user from the course?')) return;
-    
-    try {
-      setError(null);
-      await adminService.deleteEnrollment(enrollmentId);
-      fetchEnrollments(selectedCourseId);
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { detail?: string } } };
-      setError(error?.response?.data?.detail || 'Failed to remove enrollment');
-    }
-  };
+   const handleUnenroll = async (enrollmentId: string) => {
+     if (!globalThis.confirm('Are you sure you want to remove this user from the course?')) return;
+     
+     try {
+       setError(null);
+       await adminService.deleteEnrollment(enrollmentId);
+       fetchEnrollments(selectedCourseId);
+     } catch (err: unknown) {
+       let errorMessage = 'Failed to remove enrollment';
+       if (err && typeof err === 'object' && 'response' in err) {
+         const response = (err as { response: { data?: any } }).response;
+         if (response?.data) {
+           // Handle detail as either string or array
+           if (response.data.detail) {
+             if (Array.isArray(response.data.detail)) {
+               // Join array elements into a single string
+               errorMessage = response.data.detail.join(' ');
+             } else {
+               errorMessage = String(response.data.detail);
+             }
+           }
+         }
+       }
+       setError(errorMessage);
+     }
+   };
 
   const enrolledUserIds = new Set(enrollments.map(e => e.user_id));
 

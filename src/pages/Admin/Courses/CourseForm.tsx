@@ -39,60 +39,165 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onSuccess, onCancel }) 
     }
   }, [course]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     const val = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
     
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'department_owner' || name === 'duration_in_minutes' ? Number.parseInt(value, 10) : val
+      [name]: name === 'department_owner' || name === 'duration_in_minutes' ? 
+        value === '' ? prev[name] : Number.parseInt(value, 10) : val
     }));
   };
 
-  const handleSubmit = async (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+    const handleSubmit = async (e: React.SyntheticEvent) => {
+      e.preventDefault();
+      setLoading(true);
+      setError(null);
 
-    try {
-      const payload: Partial<Course> = {
-        title: formData.title,
-        description: formData.description,
-        department_owner: String(formData.department_owner),
-        duration_in_minutes: formData.duration_in_minutes,
-        is_mandatory: formData.is_mandatory,
-        is_cross_department: formData.is_cross_department,
-        thumbnail_url: formData.thumbnail_url || undefined
-      };
+      try {
+        const payload: Partial<Course> = {
+          title: formData.title,
+          description: formData.description,
+          department_owner: String(formData.department_owner),
+          duration_in_minutes: formData.duration_in_minutes,
+          is_mandatory: formData.is_mandatory,
+          is_cross_department: formData.is_cross_department,
+          thumbnail_url: formData.thumbnail_url || undefined
+        };
 
-      if (course) {
-        await adminService.updateCourse(course.id, payload);
-      } else {
-        const newCourse = await adminService.createCourse(payload);
-        // Automatically create a video module if a URL is provided
-        if (formData.video_url.trim() !== '') {
-          await adminService.createModule(newCourse.id, {
-            title: formData.title + ' - Primary Video',
-            content_type: 'video',
-            content_url: convertToEmbedUrl(formData.video_url, true),
-            order_index: 0
-          });
+        if (course) {
+          await adminService.updateCourse(course.id, payload);
+        } else {
+          const newCourse = await adminService.createCourse(payload);
+          // Automatically create a video module if a URL is provided
+          if (formData.video_url.trim() !== '') {
+            await adminService.createModule(newCourse.id, {
+              title: formData.title + ' - Primary Video',
+              content_type: 'video',
+              content_url: convertToEmbedUrl(formData.video_url, true),
+              order_index: 0
+            });
+          }
         }
-      }
-      onSuccess();
-    } catch (err: unknown) {
-      let errorMessage = 'An error occurred while saving the course';
-      if (err && typeof err === 'object' && 'response' in err) {
-        const response = (err as { response: { data?: { detail?: string } } }).response;
-        if (response?.data?.detail) {
-          errorMessage = response.data.detail;
+        onSuccess();
+      } catch (err: unknown) {
+        let errorMessage = 'An error occurred while saving the course';
+        if (err && typeof err === 'object' && 'response' in err) {
+          const response = (err as { response: { data?: any } }).response;
+          if (response?.data) {
+            // Handle detail as either string, array, or validation error object
+            if (response.data.detail) {
+              if (Array.isArray(response.data.detail)) {
+                // Join array elements into a single string
+                errorMessage = response.data.detail.map((error: any) => 
+                  error.msg || error.message || String(error)
+                ).join(' ');
+              } else if (typeof response.data.detail === 'object' && response.data.detail !== null) {
+                // Handle validation error objects (like from Pydantic)
+                try {
+                  // Try to extract a meaningful message from the validation error
+                  if ('msg' in response.data.detail) {
+                    errorMessage = String(response.data.detail.msg);
+                  } else if ('message' in response.data.detail) {
+                    errorMessage = String(response.data.detail.message);
+                  } else {
+                    // Fallback to extracting common fields
+                    const fields = Object.keys(response.data.detail);
+                    if (fields.length > 0) {
+                      errorMessage = fields.map(field => 
+                        `${field}: ${String((response.data.detail as any)[field])}`
+                      ).join('; ');
+                    } else {
+                      errorMessage = 'Validation error occurred';
+                    }
+                  }
+                } catch (e) {
+                  errorMessage = 'Validation error occurred';
+                }
+              } else {
+                errorMessage = String(response.data.detail);
+              }
+            }
+          }
         }
+        setError(errorMessage);
+      } finally {
+        setLoading(false);
       }
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+       if (course) {
+         await adminService.updateCourse(course.id, payload);
+       } else {
+         const newCourse = await adminService.createCourse(payload);
+         // Automatically create a video module if a URL is provided
+         if (formData.video_url.trim() !== '') {
+           await adminService.createModule(newCourse.id, {
+             title: formData.title + ' - Primary Video',
+             content_type: 'video',
+             content_url: convertToEmbedUrl(formData.video_url, true),
+             order_index: 0
+           });
+         }
+       }
+       onSuccess();
+       } catch (err: unknown) {
+         let errorMessage = 'An error occurred while saving the course';
+         if (err && typeof err === 'object' && 'response' in err) {
+           const response = (err as { response: { data?: any } }).response;
+           if (response?.data) {
+             // Handle detail as either string, array, or validation error object
+             if (response.data.detail) {
+               if (Array.isArray(response.data.detail)) {
+                 // Join array elements into a single string
+                 errorMessage = response.data.detail.map((error: any) => 
+                   error.msg || error.message || String(error)
+                 ).join(' ');
+               } else if (typeof response.data.detail === 'object' && response.data.detail !== null) {
+                 // Handle validation error objects (like from Pydantic)
+                 try {
+                   // Try to extract a meaningful message from the validation error
+                   if ('msg' in response.data.detail) {
+                     errorMessage = String(response.data.detail.msg);
+                   } else if ('message' in response.data.detail) {
+                     errorMessage = String(response.data.detail.message);
+                   } else {
+                     // Fallback to extracting common fields
+                     const fields = Object.keys(response.data.detail);
+                     if (fields.length > 0) {
+                       errorMessage = fields.map(field => 
+                         `${field}: ${String((response.data.detail as any)[field])}`
+                       ).join('; ');
+                     } else {
+                       errorMessage = 'Validation error occurred';
+                     }
+                   }
+                 } catch (e) {
+                   errorMessage = 'Validation error occurred';
+                 }
+               } else {
+                 errorMessage = String(response.data.detail);
+               }
+             }
+           }
+         }
+         setError(errorMessage);
+       }
+                } catch (e) {
+                  errorMessage = 'Validation error occurred';
+                }
+              } else {
+                errorMessage = String(response.data.detail);
+              }
+            }
+          }
+        }
+        setError(errorMessage);
+     } finally {
+       setLoading(false);
+     }
+   };
 
   const submitLabel = course ? 'Update Course' : 'Create Video Course';
 

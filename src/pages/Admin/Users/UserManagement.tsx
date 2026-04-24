@@ -14,23 +14,33 @@ const UserManagement: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
 
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await adminService.getUsers(1, 100);
-      setUsers(data.items);
-    } catch (err: unknown) {
-      let message = 'Failed to load users';
-      if (err && typeof err === 'object' && 'response' in err) {
-        const response = (err as { response: { data?: { detail?: string } } }).response;
-        if (response?.data?.detail) message = response.data.detail;
-      }
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  };
+   const fetchUsers = async () => {
+     try {
+       setLoading(true);
+       setError(null);
+       const data = await adminService.getUsers(1, 100);
+       setUsers(data.items);
+     } catch (err: unknown) {
+       let message = 'Failed to load users';
+       if (err && typeof err === 'object' && 'response' in err) {
+         const response = (err as { response: { data?: any } }).response;
+         if (response?.data) {
+           // Handle detail as either string or array
+           if (response.data.detail) {
+             if (Array.isArray(response.data.detail)) {
+               // Join array elements into a single string
+               message = response.data.detail.join(' ');
+             } else {
+               message = String(response.data.detail);
+             }
+           }
+         }
+       }
+       setError(message);
+     } finally {
+       setLoading(false);
+     }
+   };
 
   useEffect(() => {
     fetchUsers();

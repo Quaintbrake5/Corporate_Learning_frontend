@@ -37,23 +37,37 @@ const AdminDashboard: React.FC = () => {
   const [selectedEvents, setSelectedEvents] = useState<Event[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const [usersResponse, coursesData] = await Promise.all([
-        adminService.getUsers(1, 100),
-        getCourses(1, 100)
-      ]);
-      setUsers((usersResponse as unknown as { items: AdminUser[] }).items || (Array.isArray(usersResponse) ? usersResponse : []));
-      setCourses(coursesData?.items || (Array.isArray(coursesData) ? coursesData : []));
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { detail?: string } } };
-      setError(error?.response?.data?.detail || 'Failed to load dashboard data');
-    } finally {
-      setLoading(false);
-    }
-  };
+   const fetchData = async () => {
+     try {
+       setLoading(true);
+       setError(null);
+       const [usersResponse, coursesData] = await Promise.all([
+         adminService.getUsers(1, 100),
+         getCourses(1, 100)
+       ]);
+       setUsers((usersResponse as unknown as { items: AdminUser[] }).items || (Array.isArray(usersResponse) ? usersResponse : []));
+       setCourses(coursesData?.items || (Array.isArray(coursesData) ? coursesData : []));
+     } catch (err: unknown) {
+       let errorMessage = 'Failed to load dashboard data';
+       if (err && typeof err === 'object' && 'response' in err) {
+         const response = (err as { response: { data?: any } }).response;
+         if (response?.data) {
+           // Handle detail as either string or array
+           if (response.data.detail) {
+             if (Array.isArray(response.data.detail)) {
+               // Join array elements into a single string
+               errorMessage = response.data.detail.join(' ');
+             } else {
+               errorMessage = String(response.data.detail);
+             }
+           }
+         }
+       }
+       setError(errorMessage);
+     } finally {
+       setLoading(false);
+     }
+   };
 
   useEffect(() => {
     fetchData();
@@ -158,92 +172,92 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {loading ? (
-        <div className={styles.loadingState}>
-          <i className="fa-solid fa-circle-notch fa-spin fa-3x"></i>
-          <p>Analyzing platform data...</p>
-        </div>
-      ) : (
-        <div className={styles.chartsGrid}>
-          {/* User Verification Chart */}
-          <div className={styles.chartCard}>
-            <div className={styles.chartHeader}>
-              <h3>User Verification Status</h3>
-            </div>
-            <div className={styles.chartWrapper}>
-              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-                <PieChart>
-                  <Pie
-                    data={verificationData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={90}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                  </Pie>
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: 'white', borderColor: '#e0e0e0', color: '#333' }} 
-                    itemStyle={{ color: '#003366' }}
-                  />
-                  <Legend verticalAlign="bottom" height={36} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+       {loading ? (
+         <div className={styles.loadingState}>
+           <i className="fa-solid fa-circle-notch fa-spin fa-3x"></i>
+           <p>Analyzing platform data...</p>
+         </div>
+       ) : (
+         <div className={styles.chartsGrid}>
+           {/* User Verification Chart */}
+           <div className={styles.chartCard}>
+             <div className={styles.chartHeader}>
+               <h3>User Verification Status</h3>
+             </div>
+              <div className={styles.chartWrapper} style={{ height: '250px', width: '100%' }}>
+                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                  <PieChart>
+                    <Pie
+                      data={verificationData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={90}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                    </Pie>
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: 'white', borderColor: '#e0e0e0', color: '#333' }} 
+                      itemStyle={{ color: '#003366' }}
+                    />
+                    <Legend verticalAlign="bottom" height={36} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+           </div>
 
-          {/* Course Distribution Chart */}
-          <div className={styles.chartCard}>
-            <div className={styles.chartHeader}>
-              <h3>Course Types</h3>
-            </div>
-            <div className={styles.chartWrapper}>
-              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-                <PieChart>
-                  <Pie
-                    data={courseTypeData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={90}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                  </Pie>
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: 'white', borderColor: '#e0e0e0', color: '#333' }} 
-                    itemStyle={{ color: '#003366' }}
-                  />
-                  <Legend verticalAlign="bottom" height={36} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+           {/* Course Distribution Chart */}
+           <div className={styles.chartCard}>
+             <div className={styles.chartHeader}>
+               <h3>Course Types</h3>
+             </div>
+              <div className={styles.chartWrapper} style={{ height: '250px', width: '100%' }}>
+                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                  <PieChart>
+                    <Pie
+                      data={courseTypeData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={90}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                    </Pie>
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: 'white', borderColor: '#e0e0e0', color: '#333' }} 
+                      itemStyle={{ color: '#003366' }}
+                    />
+                    <Legend verticalAlign="bottom" height={36} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+           </div>
 
-          {/* Users by Department Bar Chart */}
-          <div className={`${styles.chartCard} ${styles.fullWidth}`}>
-            <div className={styles.chartHeader}>
-              <h3>Users by Department</h3>
-            </div>
-            <div className={styles.chartWrapper}>
-              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-                <BarChart
-                  data={departmentChartData}
-                  margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                  <XAxis dataKey="name" stroke="#666" />
-                  <YAxis stroke="#666" />
-                  <Tooltip 
-                    cursor={{ fill: 'rgba(0, 51, 102, 0.05)' }} 
-                    contentStyle={{ backgroundColor: 'white', borderColor: '#e0e0e0', color: '#333' }} 
-                  />
-                  <Bar dataKey="Users" fill="#003366" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+           {/* Users by Department Bar Chart */}
+           <div className={`${styles.chartCard} ${styles.fullWidth}`}>
+             <div className={styles.chartHeader}>
+               <h3>Users by Department</h3>
+             </div>
+              <div className={styles.chartWrapper} style={{ height: '300px', width: '100%' }}>
+                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                  <BarChart
+                    data={departmentChartData}
+                    margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                    <XAxis dataKey="name" stroke="#666" />
+                    <YAxis stroke="#666" />
+                    <Tooltip 
+                      cursor={{ fill: 'rgba(0, 51, 102, 0.05)' }} 
+                      contentStyle={{ backgroundColor: 'white', borderColor: '#e0e0e0', color: '#333' }} 
+                    />
+                    <Bar dataKey="Users" fill="#003366" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+           </div>
 
         </div>
       )}

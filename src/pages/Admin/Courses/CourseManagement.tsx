@@ -18,23 +18,33 @@ const CourseManagement: React.FC = () => {
   const [isModuleManagerOpen, setIsModuleManagerOpen] = useState(false);
   const [moduleCourseId, setModuleCourseId] = useState<string | null>(null);
 
-  const fetchCourses = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await getCourses(1, 100) as any;
-      setCourses(data?.items || (Array.isArray(data) ? data : []));
-    } catch (err: unknown) {
-      let message = 'Failed to load courses';
-      if (err && typeof err === 'object' && 'response' in err) {
-        const response = (err as { response: { data?: { detail?: string } } }).response;
-        if (response?.data?.detail) message = response.data.detail;
-      }
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  };
+   const fetchCourses = async () => {
+     try {
+       setLoading(true);
+       setError(null);
+       const data = await getCourses(1, 100) as any;
+       setCourses(data?.items || (Array.isArray(data) ? data : []));
+     } catch (err: unknown) {
+       let message = 'Failed to load courses';
+       if (err && typeof err === 'object' && 'response' in err) {
+         const response = (err as { response: { data?: any } }).response;
+         if (response?.data) {
+           // Handle detail as either string or array
+           if (response.data.detail) {
+             if (Array.isArray(response.data.detail)) {
+               // Join array elements into a single string
+               message = response.data.detail.join(' ');
+             } else {
+               message = String(response.data.detail);
+             }
+           }
+         }
+       }
+       setError(message);
+     } finally {
+       setLoading(false);
+     }
+   };
 
   useEffect(() => {
     fetchCourses();
@@ -55,24 +65,34 @@ const CourseManagement: React.FC = () => {
     setIsModuleManagerOpen(true);
   };
 
-  const handleDelete = async (course: Course) => {
-    if (!globalThis.confirm(`Are you sure you want to delete course "${course.title}"? This will also remove any associated modules.`)) {
-      return;
-    }
+   const handleDelete = async (course: Course) => {
+     if (!globalThis.confirm(`Are you sure you want to delete course "${course.title}"? This will also remove any associated modules.`)) {
+       return;
+     }
 
-    try {
-      setError(null);
-      await adminService.deleteCourse(course.id);
-      setCourses(courses.filter(c => c.id !== course.id));
-    } catch (err: unknown) {
-      let message = 'Failed to delete course';
-      if (err && typeof err === 'object' && 'response' in err) {
-        const response = (err as { response: { data?: { detail?: string } } }).response;
-        if (response?.data?.detail) message = response.data.detail;
-      }
-      setError(message);
-    }
-  };
+     try {
+       setError(null);
+       await adminService.deleteCourse(course.id);
+       setCourses(courses.filter(c => c.id !== course.id));
+     } catch (err: unknown) {
+       let message = 'Failed to delete course';
+       if (err && typeof err === 'object' && 'response' in err) {
+         const response = (err as { response: { data?: any } }).response;
+         if (response?.data) {
+           // Handle detail as either string or array
+           if (response.data.detail) {
+             if (Array.isArray(response.data.detail)) {
+               // Join array elements into a single string
+               message = response.data.detail.join(' ');
+             } else {
+               message = String(response.data.detail);
+             }
+           }
+         }
+       }
+       setError(message);
+     }
+   };
 
   const handleFormSuccess = () => {
     setIsModalOpen(false);

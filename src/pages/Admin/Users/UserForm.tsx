@@ -43,52 +43,62 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSuccess, onCancel }) => {
     }));
   };
 
-  const handleSubmit = async (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    try {
-       if (user) {
-         // Update
-         const updateData: AdminUpdateUserData = {
-           name: formData.name,
-           department_id: formData.department_id,
-           role: formData.role as 'learner' | 'manager' | 'admin',
-           is_verified: formData.is_verified,
-           password: ''
-         };
-         // Only include password if it was entered
-         if (formData.password) {
-           updateData.password = formData.password;
+   const handleSubmit = async (e: React.SyntheticEvent) => {
+     e.preventDefault();
+     setLoading(true);
+     setError(null);
+ 
+     try {
+        if (user) {
+          // Update
+          const updateData: AdminUpdateUserData = {
+            name: formData.name,
+            department_id: formData.department_id,
+            role: formData.role as 'learner' | 'manager' | 'admin',
+            is_verified: formData.is_verified,
+            password: ''
+          };
+          // Only include password if it was entered
+          if (formData.password) {
+            updateData.password = formData.password;
+          }
+          await adminService.updateUser(user.id, updateData);
+        } else {
+          // Create
+          const createData: AdminCreateUserData = {
+            name: formData.name,
+            email: formData.email,
+            department_id: formData.department_id,
+            role: formData.role as 'learner' | 'manager' | 'admin'
+          };
+          // Only include password if it was entered
+          if (formData.password) {
+            createData.password = formData.password;
+          }
+          await adminService.createUser(createData);
+        }
+       onSuccess();
+     } catch (err: unknown) {
+       let message = 'An error occurred while saving the user';
+       if (err && typeof err === 'object' && 'response' in err) {
+         const response = (err as { response: { data?: any } }).response;
+         if (response?.data) {
+           // Handle detail as either string or array
+           if (response.data.detail) {
+             if (Array.isArray(response.data.detail)) {
+               // Join array elements into a single string
+               message = response.data.detail.join(' ');
+             } else {
+               message = String(response.data.detail);
+             }
+           }
          }
-         await adminService.updateUser(user.id, updateData);
-       } else {
-         // Create
-         const createData: AdminCreateUserData = {
-           name: formData.name,
-           email: formData.email,
-           department_id: formData.department_id,
-           role: formData.role as 'learner' | 'manager' | 'admin'
-         };
-         // Only include password if it was entered
-         if (formData.password) {
-           createData.password = formData.password;
-         }
-         await adminService.createUser(createData);
        }
-      onSuccess();
-    } catch (err: unknown) {
-      let message = 'An error occurred while saving the user';
-      if (err && typeof err === 'object' && 'response' in err) {
-        const response = (err as { response: { data?: { detail?: string } } }).response;
-        if (response?.data?.detail) message = response.data.detail;
-      }
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  };
+       setError(message);
+     } finally {
+       setLoading(false);
+     }
+   };
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>

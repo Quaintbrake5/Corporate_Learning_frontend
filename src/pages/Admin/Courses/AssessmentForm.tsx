@@ -175,52 +175,62 @@ const handleRemoveOption = (questionIndex: number, optionIndex: number) => {
      return null;
    };
  
-   const handleSubmit = async (e: React.SyntheticEvent) => {
-     e.preventDefault();
-     setError(null);
-      
-     const validationError = validateForm(formData);
-     if (validationError) {
-       setError(validationError);
-       return;
+    const handleSubmit = async (e: React.SyntheticEvent) => {
+      e.preventDefault();
+      setError(null);
+       
+      const validationError = validateForm(formData);
+      if (validationError) {
+        setError(validationError);
+        return;
+      }
+  
+      try {
+        const assessmentData = {
+          questions: formData.questions.map(q => ({
+            question_id: q.question_id || crypto.randomUUID(),
+            question: q.question,
+            options: q.options,
+            correct_option: q.correct_option,
+            topic: q.topic
+          })),
+          passing_score: formData.passing_score
+        };
+  
+        if (assessment) {
+          // Update existing assessment
+          await adminService.updateAssessment(assessment.assessment_id, {
+            questions: assessmentData.questions,
+            passing_score: assessmentData.passing_score
+          });
+        } else {
+          // Create new assessment
+          await adminService.createAssessment(module.id, assessmentData);
+        }
+  
+        setShowForm(false);
+        if (onAssessmentSaved) {
+          onAssessmentSaved();
+        }
+     } catch (err: unknown) {
+       let errorMessage = 'Failed to save assessment';
+       if (err && typeof err === 'object' && 'response' in err) {
+         const response = (err as { response: { data?: any } }).response;
+         if (response?.data) {
+           // Handle detail as either string or array
+           if (response.data.detail) {
+             if (Array.isArray(response.data.detail)) {
+               // Join array elements into a single string
+               errorMessage = response.data.detail.join(' ');
+             } else {
+               errorMessage = String(response.data.detail);
+             }
+           }
+         }
+       }
+       setError(errorMessage);
      }
- 
-     try {
-       const assessmentData = {
-         questions: formData.questions.map(q => ({
-           question_id: q.question_id || crypto.randomUUID(),
-           question: q.question,
-           options: q.options,
-           correct_option: q.correct_option,
-           topic: q.topic
-         })),
-         passing_score: formData.passing_score
-       };
- 
-       if (assessment) {
-         // Update existing assessment
-         await adminService.updateAssessment(assessment.assessment_id, {
-           questions: assessmentData.questions,
-           passing_score: assessmentData.passing_score
-         });
-       } else {
-         // Create new assessment
-         await adminService.createAssessment(module.id, assessmentData);
-       }
- 
-       setShowForm(false);
-       if (onAssessmentSaved) {
-         onAssessmentSaved();
-       }
- } catch (err: unknown) {
-      const error = err as { response?: { data?: { detail?: string } } };
-       if (error.response?.data?.detail) {
-         setError(error.response.data.detail);
-       } else {
-         setError('Failed to save assessment');
-       }
- }
-  };
+   };
 
   const renderActionButton = () => {
     if (!showForm && !assessment) {
