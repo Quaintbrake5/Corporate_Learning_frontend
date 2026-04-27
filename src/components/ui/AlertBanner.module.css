@@ -1,0 +1,88 @@
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  background-color: white;
+  border-left: 4px solid var(--text-color);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-bottom: 1rem;
+}
+
+.danger {
+  border-left-color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.05);
+}
+
+.danger .iconContainer {
+  color: #ef4444;
+}
+
+.warning {
+  border-left-color: #f59e0b;
+  background-color: rgba(245, 158, 11, 0.05);
+}
+
+.warning .iconContainer {
+  color: #f59e0b;
+}
+
+.info {
+  border-left-color: var(--primary-blue);
+  background-color: rgba(0, 51, 102, 0.05);
+}
+
+.info .iconContainer {
+  color: var(--primary-blue);
+}
+
+.success {
+  border-left-color: #1b5e20;
+  background-color: rgba(27, 94, 32, 0.05);
+}
+
+.success .iconContainer {
+  color: #1b5e20;
+}
+
+.iconContainer {
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.content {
+  flex: 1;
+}
+
+.title {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.message {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-color);
+}
+
+.actionBtn {
+  padding: 0.5rem 1rem;
+  background-color: white;
+  border: 1px solid var(--primary-blue);
+  color: var(--primary-blue);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.actionBtn:hover {
+  background-color: var(--primary-blue);
+  color: white;
+}

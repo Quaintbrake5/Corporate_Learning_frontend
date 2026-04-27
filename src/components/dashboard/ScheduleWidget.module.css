@@ -1,0 +1,151 @@
+.widgetCard {
+  background-color: var(--bg-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+.viewAll {
+  background: transparent;
+  border: none;
+  color: var(--primary-blue);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.viewAll:hover {
+  text-decoration: underline;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.timelineItem {
+  display: flex;
+  gap: 1rem;
+  min-height: 70px;
+}
+
+.timeCol {
+  width: 60px;
+  text-align: right;
+  padding-top: 0.5rem;
+}
+
+.time {
+  font-size: 0.75rem;
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+.dividerCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 20px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-top: 0.35rem;
+  box-shadow: 0 0 0 3px var(--bg-color);
+  z-index: 1;
+}
+
+.line {
+  width: 2px;
+  flex: 1;
+  background-color: var(--border-color);
+  margin-top: 4px;
+  margin-bottom: -4px;
+}
+
+.contentCol {
+  flex: 1;
+  padding-bottom: 1.5rem;
+}
+
+.eventCard {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-color);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.eventCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.eventIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.eventDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.eventTitle {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.eventStatus {
+  font-size: 0.75rem;
+  color: var(--text-color);
+}
+
+.actionBtn {
+  width: 100%;
+  padding: 0.875rem;
+  border-radius: 20px;
+  background-color: var(--primary-blue);
+  color: white;
+  border: none;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.actionBtn:hover {
+  background-color: #002244;
+}
+
+.actionBtn:active {
+  transform: scale(0.98);
+}

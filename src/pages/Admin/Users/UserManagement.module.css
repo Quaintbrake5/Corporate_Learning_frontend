@@ -1,0 +1,166 @@
+.container {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
+  margin-top: 1rem;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 1rem;
+}
+
+.header h2 {
+  color: #003366; 
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.addButton {
+  background-color: #90ee90;
+  color: #003366;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.addButton:hover {
+  background-color: #7ccc7c;
+  transform: translateY(-1px);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table th,
+.table td {
+  padding: 1.25rem 1rem;
+  text-align: left;
+  color: #666666; 
+}
+
+.table th {
+  font-weight: 600;
+  background-color: #f0f4f8;
+  color: #001a33;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
+.table th:first-child {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+.table th:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.table tr {
+  border-bottom: 1px solid #eeeeee;
+  transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(144, 238, 144, 0.1);
+}
+
+.roleBadge {
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.role_admin {
+  background-color: #003366;
+  color: #ffffff;
+}
+
+.role_manager {
+  background-color: #f0f7ff;
+  color: #001a33;
+}
+
+.role_learner {
+  background-color: #f0f0f0;
+  color: #333333;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actionButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.editButton {
+  color: #003366;
+}
+
+.editButton:hover {
+  background-color: rgba(0, 51, 102, 0.1);
+  transform: translateY(-2px);
+}
+
+.deleteButton {
+  color: #b71c1c;
+}
+
+.deleteButton:hover {
+  background-color: rgba(211, 47, 47, 0.1);
+  transform: translateY(-2px);
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: #003366;
+}
+
+.error {
+  color: #b91c1c;
+  background-color: #fef2f2;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}

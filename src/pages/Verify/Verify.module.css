@@ -1,0 +1,162 @@
+.verifyContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  background: radial-gradient(circle at top center, #0B3149, #134B36);
+  padding: 2rem;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.verifyCard {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.verifyHeader {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.logoWrapper {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  width: 64px;
+  height: 64px;
+}
+
+.verifyLogo {
+  width: 100%;
+  height: auto;
+}
+
+.companyName {
+  color: #00B4DB;
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.companySub {
+  color: #00C853;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 200, 83, 0.4), transparent);
+  margin: 1.5rem 0;
+}
+
+.appTitle {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+}
+
+.appSub {
+  color: #9ab0a6;
+  font-size: 0.75rem;
+  margin: 0;
+}
+
+.verifyForm {
+  background-color: #1A3E31;
+  border-radius: 12px;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  text-align: center;
+}
+
+.statusSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.statusIcon {
+  font-size: 3.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.formTitle {
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0;
+  text-align: center;
+}
+
+.statusMessage {
+  color: #d1e0d9;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0 0 1rem 0;
+}
+
+.submitButton {
+  background: linear-gradient(90deg, #12B8D9, #20D071);
+  color: #0B3149;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.submitButton:hover {
+  opacity: 0.9;
+}
+
+.backButton {
+  background: transparent;
+  color: #d1e0d9;
+  border: 1px solid #d1e0d9;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  text-align: center;
+}
+
+.backButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.systemFooter {
+  margin-top: 1rem;
+  color: #799a8b;
+  font-size: 0.65rem;
+  text-align: center;
+}
