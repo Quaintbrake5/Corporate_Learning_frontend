@@ -31,7 +31,9 @@ const ModuleManager: React.FC<ModuleManagerProps> = ({ courseId }) => {
     try {
       setLoading(true);
       const data = await getCourseModules(courseId);
+      console.log('[ModuleManager] Raw modules data:', data);
       const safeData = Array.isArray(data) ? data : [];
+      console.log('[ModuleManager] Processed modules:', safeData);
       setModules([...safeData].sort((a, b) => (a.order_index || 0) - (b.order_index || 0)));
     } catch (err: unknown) {
       const errorObj = err as { response?: { data?: { detail?: string | Array<{ msg: string }> } } };
@@ -72,12 +74,19 @@ const ModuleManager: React.FC<ModuleManagerProps> = ({ courseId }) => {
       setShowAddForm(false);
       fetchModules();
     } catch (err: unknown) {
-      const errorObj = err as { response?: { data?: { detail?: string | Array<{ msg?: string; type?: string; loc?: unknown[] }> } } };
+      const errorObj = err as { response?: { data?: { detail?: string | Array<{ msg?: string; type?: string; loc?: unknown[] }> } }; request?: unknown; message?: string };
       const detail = errorObj.response?.data?.detail;
-      // Log the full detail for debugging
-      console.log('[Module Creation Error] Full error detail:', detail);
+      // Log the full error for debugging
+      console.log('[Module Creation Error] Full error:', err);
+
       let message = 'Failed to create module';
-      if (Array.isArray(detail)) {
+
+      // Check for CORS or network errors (no response)
+      if (!errorObj.response && errorObj.request) {
+        message = 'Network/CORS Error: Cannot connect to server. Check backend CORS configuration.';
+      } else if (errorObj.message?.includes('Network Error')) {
+        message = 'Network Error: Cannot connect to server. Check if backend is running and CORS is configured.';
+      } else if (Array.isArray(detail)) {
         message = detail.map(d => d.msg || JSON.stringify(d)).join(', ');
       } else if (typeof detail === 'string') {
         message = detail;
@@ -107,14 +116,25 @@ const ModuleManager: React.FC<ModuleManagerProps> = ({ courseId }) => {
   return (
     <div className={styles.container}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h3>Course Content</h3>
-        <button 
-          onClick={() => setShowAddForm(!showAddForm)}
-          className={styles.submitBtn}
-          style={{ backgroundColor: showAddForm ? '#666' : '#90ee90', color: '#003366' }}
-        >
-          {showAddForm ? 'Cancel' : 'Add Module'}
-        </button>
+        <h3>Course Content ({modules.length} modules)</h3>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button 
+            onClick={fetchModules}
+            className={styles.submitBtn}
+            style={{ backgroundColor: '#e0e0e0', color: '#333' }}
+            disabled={loading}
+            title="Refresh modules"
+          >
+            <i className="fa-solid fa-rotate"></i>
+          </button>
+          <button 
+            onClick={() => setShowAddForm(!showAddForm)}
+            className={styles.submitBtn}
+            style={{ backgroundColor: showAddForm ? '#666' : '#90ee90', color: '#003366' }}
+          >
+            {showAddForm ? 'Cancel' : 'Add Module'}
+          </button>
+        </div>
       </div>
 
       {showAddForm && (
@@ -213,7 +233,16 @@ const ModuleManager: React.FC<ModuleManagerProps> = ({ courseId }) => {
              </div>
            ))}
            {(modules || []).length === 0 && !showAddForm && (
-             <div className={styles.emptyState}>No modules added yet for this course.</div>
+             <div className={styles.emptyState}>
+               <p>No modules added yet for this course.</p>
+               <button
+                 onClick={() => setShowAddForm(true)}
+                 className={styles.submitBtn}
+                 style={{ backgroundColor: '#90ee90', color: '#003366', marginTop: '1rem' }}
+               >
+                 <i className="fa-solid fa-plus"></i> Add First Module
+               </button>
+             </div>
            )}
          </div>
        )}

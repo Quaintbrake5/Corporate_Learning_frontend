@@ -4,6 +4,7 @@ import ReactPlayer from 'react-player';
 import { getCourse, getCourseModules, type Course, type Module } from '../../services/courseService';
 import { getQuizForModule, submitQuizForModule, type QuizQuestion, type QuizSubmitResponse } from '../../services/quizService';
 import { sendHeartbeat, getProgress } from '../../services/progressService';
+import { enrollInCourse } from '../../services/enrollmentService';
 import styles from './CoursePlayer.module.css';
 
 interface ApiError {
@@ -213,14 +214,58 @@ const CoursePlayer: React.FC = () => {
           setModules(modulesData);
           setActiveModule(modulesData[0]);
         } else {
-          setModules([]);
-          setError('No training modules found for this course. You might not have the required permissions.');
+          // No modules - try to auto-enroll and reload
+          console.log('[CoursePlayer] No modules found, attempting auto-enrollment...');
+          try {
+            await enrollInCourse(courseId);
+            console.log('[CoursePlayer] Auto-enrolled successfully, reloading modules...');
+            // Re-fetch modules after enrollment
+            const reloadedModules = await getCourseModules(courseId);
+            if (Array.isArray(reloadedModules) && reloadedModules.length > 0) {
+              setModules(reloadedModules);
+              setActiveModule(reloadedModules[0]);
+            } else {
+              setModules([]);
+              setError('No training modules found for this course. Please contact your administrator.');
+            }
+          } catch (enrollErr: unknown) {
+            const enrollError = enrollErr as ApiError;
+            console.error('[CoursePlayer] Auto-enrollment failed:', enrollErr);
+            if (enrollError.response?.status === 403) {
+              setError('Access Denied: You do not have permission to enroll in this course.');
+            } else if (enrollError.response?.status === 409) {
+              // Already enrolled but still no modules - real error
+              setError('No training modules found for this course. Please contact your administrator.');
+            } else {
+              setError('Failed to enroll in course. Please try again or contact support.');
+            }
+          }
         }
       } catch (err: unknown) {
         const error = err as ApiError;
         console.error('Failed to load course data:', err);
         if (error.response?.status === 403) {
-          setError('Access Denied: You do not have permission to view this course content.');
+          // 403 on load - try enrolling first
+          console.log('[CoursePlayer] Access denied on load, attempting enrollment...');
+          try {
+            await enrollInCourse(courseId);
+            // Re-fetch everything after enrollment
+            const [courseData, modulesData] = await Promise.all([
+              getCourse(courseId),
+              getCourseModules(courseId)
+            ]);
+            setCourse(courseData);
+            if (Array.isArray(modulesData) && modulesData.length > 0) {
+              setModules(modulesData);
+              setActiveModule(modulesData[0]);
+            } else {
+              setModules([]);
+              setError('No training modules found for this course. Please contact your administrator.');
+            }
+          } catch (enrollErr) {
+            console.error('[CoursePlayer] Enrollment failed after 403:', enrollErr);
+            setError('Access Denied: You do not have permission to view this course content.');
+          }
         } else {
           setError('Failed to load course content. Please check your connection.');
         }
@@ -334,27 +379,28 @@ const CoursePlayer: React.FC = () => {
             }
             return (
               <div className={styles.videoWrapper}>
-                  <ReactPlayer
-                    src={activeModule.content_url}
-                    controls
-                    width="100%"
-                    height="100%"
-                    className={styles.videoFrame}
-                    playing={true}
-                    onError={(e) => {
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  {(ReactPlayer as any)({
+                    url: activeModule.content_url,
+                    controls: true,
+                    width: '100%',
+                    height: '100%',
+                    className: styles.videoFrame,
+                    playing: true,
+                    onError: (e: Error) => {
                       console.error('ReactPlayer Error:', e);
                       setError('Format not supported or link is broken. Check console for details.');
-                    }}
-                    onEnded={() => {
+                    },
+                    onEnded: () => {
                       setVideoCompleted(true);
-                    }}
-                    config={{
+                    },
+                    config: {
                       html: {
                         controlsList: 'nodownload',
                         style: { width: '100%', height: '100%', objectFit: 'contain' }
                       }
-                    }}
-                  />
+                    }
+                  })}
                   {videoCompleted && (
                     <div className={styles.videoCompletedActions}>
                       <button onClick={handleLoadQuiz} className={styles.takeQuizButton}>
