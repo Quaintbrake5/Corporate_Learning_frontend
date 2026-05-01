@@ -30,7 +30,11 @@
 
 ## 🎯 Overview
 
-The Corporate Learning Platform (CLP) is a comprehensive frontend application designed to facilitate employee training and development within organizations. Built with modern web technologies, it provides an intuitive interface for learners, managers, and administrators to manage courses, track progress, and analyze learning outcomes.
+The Corporate Learning Platform (CLP) is a comprehensive frontend application designed to facilitate employee training and development within organizations. Built with modern web technologies, it provides distinct interfaces for learners, managers, and administrators to manage courses, track progress, and facilitate organizational learning.
+
+### Related Repositories
+
+- **Backend**: [Corporate_Learning_backend](https://github.com/Quaintbrake5/Corporate_Learning_backend/)
 
 ### Key Capabilities
 
