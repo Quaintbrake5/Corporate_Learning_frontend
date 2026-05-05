@@ -12,6 +12,7 @@
 ## 📋 Table of Contents
 
 - [Overview](#overview)
+-
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
@@ -164,7 +165,7 @@ clp/
 
 - **Node.js** >= 18.0.0
 - **npm** >= 9.0.0 or **yarn** >= 1.22.0
-- Backend API running (default: `http://localhost:8001`)
+- Backend API running (default: `http://localhost:8002`)
 
 ### Installation
 
@@ -212,7 +213,7 @@ Create a `.env` file in the root directory:
 
 ```env
 # API Configuration
-VITE_API_URL=http://localhost:8001/api/v1
+VITE_API_URL=http://localhost:8002/api/v1
 
 # Clerk Authentication (Optional)
 VITE_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
@@ -280,7 +281,7 @@ npm run preview      # Preview production build locally
 The application uses Axios for HTTP requests with automatic JWT token injection:
 
 ```typescript
-// Base URL: http://localhost:8001/api/v1
+// Base URL: http://localhost:8002/api/v1
 // Authentication: Bearer token in Authorization header
 ```
 

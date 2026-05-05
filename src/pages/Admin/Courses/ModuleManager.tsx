@@ -5,6 +5,7 @@ import type { Module } from '../../../services/courseService';
 import { convertToEmbedUrl } from '../../../utils/videoUrlUtils';
 
 import AssessmentForm from './AssessmentForm';
+import Modal from '../../../components/ui/Modal';
 import styles from './ModuleManager.module.css';
 
 interface ModuleManagerProps {
@@ -248,19 +249,25 @@ const ModuleManager: React.FC<ModuleManagerProps> = ({ courseId }) => {
        )}
        
        {/* Assessment Form Modal */}
-       {showAssessmentForm && selectedModuleForAssessment && (
-         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
-           <div style={{ background: 'white', borderRadius: '8px', maxWidth: '900px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
-             <AssessmentForm 
-               module={selectedModuleForAssessment} 
-               onAssessmentSaved={() => {
-                 setShowAssessmentForm(false);
-                 setSelectedModuleForAssessment(null);
-               }}
-             />
-           </div>
-         </div>
-       )}
+       <Modal
+         isOpen={showAssessmentForm && selectedModuleForAssessment !== null}
+         onClose={() => {
+           setShowAssessmentForm(false);
+           setSelectedModuleForAssessment(null);
+         }}
+         title={selectedModuleForAssessment ? `Assessment for ${selectedModuleForAssessment.title}` : 'Assessment'}
+         width="900px"
+       >
+         {selectedModuleForAssessment && (
+           <AssessmentForm 
+             module={selectedModuleForAssessment} 
+             onAssessmentSaved={() => {
+               setShowAssessmentForm(false);
+               setSelectedModuleForAssessment(null);
+             }}
+           />
+         )}
+       </Modal>
     </div>
   );
 };

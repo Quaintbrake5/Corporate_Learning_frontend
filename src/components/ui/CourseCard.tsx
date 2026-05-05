@@ -58,10 +58,6 @@ const CourseCard: React.FC<CourseCardProps> = ({
         className={styles.card}
         disabled={enrolling}
         onClick={handleStart}
-        onTouchStart={(e) => {
-          e.preventDefault();
-          handleStart(e);
-        }}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
