@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import adminService from '../../../services/adminService';
 import type { Course } from '../../../services/courseService';
-import { convertToEmbedUrl } from '../../../utils/videoUrlUtils';
 
 import styles from './CourseForm.module.css';
 
@@ -79,7 +78,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, onSuccess, onCancel }) 
             await adminService.createModule(newCourse.id, {
               title: `${formData.title} - Primary Video`,
               content_type: 'video',
-              content_url: convertToEmbedUrl(formData.video_url, true),
+              content_url: formData.video_url,
               order_index: 0
             });
           } catch (moduleErr: unknown) {

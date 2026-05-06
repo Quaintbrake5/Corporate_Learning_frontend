@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import adminService from '../../../services/adminService';
 import { getCourseModules } from '../../../services/courseService';
 import type { Module } from '../../../services/courseService';
-import { convertToEmbedUrl } from '../../../utils/videoUrlUtils';
 
 import AssessmentForm from './AssessmentForm';
 import Modal from '../../../components/ui/Modal';
@@ -63,10 +62,11 @@ const ModuleManager: React.FC<ModuleManagerProps> = ({ courseId }) => {
     e.preventDefault();
     try {
       setError(null);
-      // Convert empty string to null for content_url when it's empty
+      // Store the original URL without conversion - ReactPlayer needs the original format
+      // (e.g., https://www.youtube.com/watch?v=... not the embed URL)
       const contentUrlToSend = newModule.content_url.trim() === ''
         ? undefined
-        : convertToEmbedUrl(newModule.content_url);
+        : newModule.content_url;
       await adminService.createModule(courseId, {
         ...newModule,
         content_url: contentUrlToSend

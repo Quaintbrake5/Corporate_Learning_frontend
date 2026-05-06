@@ -379,27 +379,40 @@ const CoursePlayer: React.FC = () => {
             }
             return (
               <div className={styles.videoWrapper}>
-                  <ReactPlayer
-                    url={activeModule.content_url}
-                    controls={true}
-                    width="100%"
-                    height="100%"
-                    className={styles.videoFrame}
-                    playing={true}
-                    onError={(e: Error) => {
-                      console.error('ReactPlayer Error:', e);
-                      setError('Format not supported or link is broken. Check console for details.');
-                    }}
-                    onEnded={() => {
-                      setVideoCompleted(true);
-                    }}
-                    config={{
-                      html: {
-                        controlsList: 'nodownload',
-                        style: { width: '100%', height: '100%', objectFit: 'contain' }
-                      }
-                    }}
-                  />
+                  {activeModule.content_url.includes('youtube.com') || activeModule.content_url.includes('youtu.be') ? (
+                    <iframe
+                      width="100%"
+                      height="100%"
+                      src={`https://www.youtube.com/embed/${activeModule.content_url.split('v=')[1]}`}
+                      title={activeModule.title}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      style={{ display: 'block' }}
+                    />
+                  ) : (
+                    <ReactPlayer
+                      url={activeModule.content_url}
+                      controls={true}
+                      width="100%"
+                      height="100%"
+                      className={styles.videoFrame}
+                      playing={false}
+                      onError={(e: Error) => {
+                        console.error('ReactPlayer Error:', e);
+                        setError('Format not supported or link is broken. Check console for details.');
+                      }}
+                      onEnded={() => {
+                        setVideoCompleted(true);
+                      }}
+                      config={{
+                        html: {
+                          controlsList: 'nodownload',
+                          style: { width: '100%', height: '100%', objectFit: 'contain' }
+                        }
+                      }}
+                    />
+                  )}
                   {videoCompleted && (
                     <div className={styles.videoCompletedActions}>
                       <button onClick={handleLoadQuiz} className={styles.takeQuizButton}>
