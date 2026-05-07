@@ -45,6 +45,7 @@ The Corporate Learning Platform (CLP) is a comprehensive frontend application de
 - **Department-based Learning**: Department-specific and cross-departmental course assignments
 - **Responsive Design**: Optimized for desktop, tablet, and mobile devices
 - **Secure Authentication**: JWT-based authentication with email verification
+- **Multi-Format Video Support**: YouTube and direct video file playback with optimized iframe rendering
 
 ---
 
@@ -95,7 +96,7 @@ The Corporate Learning Platform (CLP) is a comprehensive frontend application de
 ### Additional Libraries
 
 - **Axios 1.14.0** - HTTP client
-- **React Player 3.4.0** - Video playback
+- **React Player 3.4.0** - Video playback (fallback for non-YouTube formats)
 - **Clerk React 6.1.3** - Authentication (optional)
 
 ### Development Tools
@@ -448,6 +449,66 @@ export const getExamples = async (): Promise<ExampleData[]> => {
 4. **Loading States**: Show loading indicators during async operations
 5. **Accessibility**: Use semantic HTML and ARIA attributes
 6. **Performance**: Lazy load routes and components where appropriate
+
+---
+
+## 🎥 Video Playback Implementation
+
+### Overview
+
+The CoursePlayer component supports multiple video formats with optimized rendering:
+
+- **YouTube Videos**: Direct iframe embedding with proper sandbox attributes
+- **Other Formats**: ReactPlayer fallback for MP4, Vimeo, and other formats
+
+### How It Works
+
+1. **URL Detection**: The component checks if the URL contains `youtube.com` or `youtu.be`
+2. **YouTube Rendering**: Uses direct iframe with YouTube embed URL
+3. **Other Formats**: Falls back to ReactPlayer for non-YouTube videos
+
+### Implementation Details
+
+**File**: `clp/src/pages/CoursePlayer/CoursePlayer.tsx`
+
+```typescript
+// YouTube videos use direct iframe
+{activeModule.content_url.includes('youtube.com') || activeModule.content_url.includes('youtu.be') ? (
+  <iframe
+    width="100%"
+    height="100%"
+    src={`https://www.youtube.com/embed/${activeModule.content_url.split('v=')[1]}`}
+    title={activeModule.title}
+    frameBorder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+    style={{ display: 'block' }}
+  />
+) : (
+  // Other formats use ReactPlayer
+  <ReactPlayer
+    url={activeModule.content_url}
+    controls={true}
+    width="100%"
+    height="100%"
+    // ... configuration
+  />
+)}
+```
+
+### URL Format Requirements
+
+- **YouTube Watch URLs**: `https://www.youtube.com/watch?v=VIDEO_ID` ✅
+- **YouTube Short URLs**: `https://youtu.be/VIDEO_ID` ✅
+- **Direct Video Files**: `https://example.com/video.mp4` ✅
+- **Vimeo URLs**: `https://vimeo.com/VIDEO_ID` ✅
+
+### Important Notes
+
+- YouTube URLs are stored in **watch format** (not embed format) in the database
+- The frontend extracts the video ID and constructs the embed URL dynamically
+- Iframe sandbox attributes allow YouTube player functionality while maintaining security
+- ReactPlayer handles fallback for non-YouTube formats
 
 ---
 
