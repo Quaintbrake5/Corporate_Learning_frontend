@@ -22,7 +22,7 @@
 .title {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #004d00;
+  color: #006400;
   margin: 0 0 0.25rem 0;
 }
 
@@ -57,7 +57,7 @@
 }
 
 .btnLink {
-  background: #004d00;
+  background: #228B22;
   border: none;
   color: white;
   font-weight: 500;
@@ -69,7 +69,7 @@
 }
 
 .btnLink:hover {
-  background: #003300;
+  background: #006400;
   transform: translateY(-1px);
 }
 

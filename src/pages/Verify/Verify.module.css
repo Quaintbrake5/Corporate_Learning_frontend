@@ -4,7 +4,7 @@
   align-items: center;
   min-height: 100vh;
   width: 100%;
-  background: radial-gradient(circle at top center, #0B3149, #134B36);
+  background: linear-gradient(135deg, #006400 0%, #228B22 50%, #32CD32 100%);
   padding: 2rem;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
@@ -44,7 +44,7 @@
 }
 
 .companyName {
-  color: #00B4DB;
+  color: #4ade80;
   font-size: 1.25rem;
   font-weight: 800;
   margin: 0;
@@ -52,7 +52,7 @@
 }
 
 .companySub {
-  color: #00C853;
+  color: #22c55e;
   font-size: 0.7rem;
   font-weight: 700;
   margin: 0;
@@ -62,7 +62,7 @@
 .divider {
   width: 100%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0, 200, 83, 0.4), transparent);
+  background: linear-gradient(135deg, #0d3328 0%, #1a4d3a 50%, #0f3d2e 100%);
   margin: 1.5rem 0;
 }
 
@@ -80,7 +80,7 @@
 }
 
 .verifyForm {
-  background-color: #1A3E31;
+  background-color: rgba(255, 255, 255, 0.95);
   border-radius: 12px;
   padding: 2.5rem 2rem;
   width: 100%;
@@ -112,15 +112,15 @@
 }
 
 .statusMessage {
-  color: #d1e0d9;
+  color: #666666;
   font-size: 0.9rem;
   line-height: 1.5;
   margin: 0 0 1rem 0;
 }
 
 .submitButton {
-  background: linear-gradient(90deg, #12B8D9, #20D071);
-  color: #0B3149;
+  background: linear-gradient(90deg, #16a34a, #22c55e);
+  color: white;
   border: none;
   padding: 0.75rem;
   border-radius: 8px;
@@ -138,7 +138,7 @@
 
 .backButton {
   background: transparent;
-  color: #d1e0d9;
+  color: #666666;
   border: 1px solid #d1e0d9;
   padding: 0.75rem;
   border-radius: 8px;
@@ -156,7 +156,7 @@
 
 .systemFooter {
   margin-top: 1rem;
-  color: #799a8b;
+  color: #888888;
   font-size: 0.65rem;
   text-align: center;
 }

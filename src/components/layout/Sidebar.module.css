@@ -1,6 +1,6 @@
 .sidebar {
   width: 260px;
-  background: linear-gradient(180deg, #004d00 0%, #003300 100%);
+  background: linear-gradient(180deg, #0d3328 0%, #164d3a 100%);
   color: #ffffff;
   display: flex;
   flex-direction: column;
@@ -67,7 +67,7 @@
 }
 
 .toggleButton:hover {
-  color: #FFD700;
+  color: #4ade80;
   background-color: rgba(255, 255, 255, 0.1);
   transform: scale(1.1);
 }
@@ -105,9 +105,9 @@
 }
 
 .navLink.active {
-  background: linear-gradient(90deg, #FFD700, #FFA500);
+  background: linear-gradient(90deg, #16a34a, #22c55e);
   color: #000000;
-  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
   font-weight: 600;
 }
 
