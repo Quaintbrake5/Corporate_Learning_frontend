@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Register.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import nlngLogo from '/NLNG logo.jpg';
+import nlngLogo from '/nlng.png';
 import { faUser, faLock, faEnvelope, faBuilding, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { register as registerUser } from '../../services/authService';
 import api from '../../services/api';

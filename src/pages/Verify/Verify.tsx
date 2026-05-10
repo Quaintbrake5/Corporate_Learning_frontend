@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import styles from './Verify.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import nlngLogo from '/NLNG logo.jpg';
+import nlngLogo from '/nlng.png';
 import { faCheckCircle, faTimesCircle, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { verifyEmail } from '../../services/authService';
 

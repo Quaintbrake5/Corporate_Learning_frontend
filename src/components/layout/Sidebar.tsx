@@ -4,6 +4,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAppDispatch } from '../../store/hooks';
 import { logout } from '../../store/authSlice';
+import nlngLogo from '/nlng.png';
 
 const navItems = [
   { path: '/', label: 'Overview', icon: 'fa-solid fa-home' },
@@ -28,8 +29,7 @@ const Sidebar: React.FC = () => {
           {isCollapsed ? <i className="fa-solid fa-xmark"></i> : <i className="fa-solid fa-bars"></i>}
         </button>
         <div className={styles.logoContent}>
-          <i className="fa-solid fa-anchor"></i>
-          {!isCollapsed && <h2>NLNG CLP</h2>}
+          <img src={nlngLogo} alt="NLNG" className={styles.logoImage} />
         </div>
       </div>
 

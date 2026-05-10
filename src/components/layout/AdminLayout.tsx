@@ -4,6 +4,7 @@ import Header from './Header';
 import { useAppDispatch } from '../../store/hooks';
 import { logout } from '../../store/authSlice';
 import styles from './AdminLayout.module.css';
+import nlngLogo from '/nlng.png';
 
 const adminNavItems = [
   { path: '/admin', label: 'Dashboard', icon: 'fa-solid fa-gauge' },
@@ -30,8 +31,7 @@ const AdminLayout: React.FC = () => {
             {isCollapsed ? <i className="fa-solid fa-xmark"></i> : <i className="fa-solid fa-bars"></i>}
           </button>
           <div className={styles.logoContent}>
-            <i className="fa-solid fa-shield-halved"></i>
-            {!isCollapsed && <h2>Admin CLP</h2>}
+            <img src={nlngLogo} alt="NLNG" className={styles.logoImage} />
           </div>
         </div>
 

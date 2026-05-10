@@ -44,7 +44,20 @@
 .logoContent {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
+}
+
+.logoImage {
+  max-width: 140px;
+  max-height: 50px;
+  object-fit: contain;
+  filter: brightness(0) invert(1); /* Make logo white for dark sidebar */
+}
+
+.sidebar.collapsed .logoImage {
+  max-width: 40px;
+  max-height: 40px;
 }
 
 .toggleButton {
@@ -65,19 +78,6 @@
   color: #ffffff;
   background-color: rgba(255, 255, 255, 0.3);
   transform: scale(1.1);
-}
-
-.logoContainer i {
-  font-size: 1.5rem;
-  color: #00B4DB;
-}
-
-.logoContainer h2 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0;
-  color: #ffffff;
-  letter-spacing: 0.5px;
 }
 
 .navMenu {
