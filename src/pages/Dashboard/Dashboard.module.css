@@ -1,8 +1,8 @@
 .dashboardContainer {
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
-  padding: 1rem 0;
+  gap: 2rem;
+  padding: 0;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -11,74 +11,76 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(11, 49, 73, 0.08);
+  padding: 1.5rem 2rem;
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+  margin: 0 -2rem 1rem -2rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
 }
 
 .title {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
-  color: var(--primary-blue);
-  margin: 0 0 0.5rem 0;
-  letter-spacing: -0.02em;
+  color: #004d00;
+  margin: 0 0 0.25rem 0;
 }
 
 .subtitle {
-  color: #6b7280;
-  font-size: 1.05rem;
+  color: #666666;
+  font-size: 1rem;
   margin: 0;
-  font-weight: 500;
 }
 
 .dashboardSection {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1rem;
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .sectionHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 0.25rem;
+  padding: 0;
 }
 
 .sectionTitle {
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: var(--primary-blue);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333333;
   margin: 0;
-  letter-spacing: -0.01em;
 }
 
 .btnLink {
-  background: rgba(11, 49, 73, 0.05);
-  border: 1px solid rgba(11, 49, 73, 0.1);
-  color: var(--primary-blue);
-  font-weight: 600;
+  background: #004d00;
+  border: none;
+  color: white;
+  font-weight: 500;
   font-size: 0.85rem;
   cursor: pointer;
-  padding: 0.5rem 1.25rem;
-  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
   transition: all 0.2s ease;
 }
 
 .btnLink:hover {
-  background: rgba(11, 49, 73, 0.1);
+  background: #003300;
   transform: translateY(-1px);
 }
 
 .analyticsGrid {
   display: grid;
-  grid-template-columns: 350px 1fr;
-  gap: 2rem;
-  background: rgba(255, 255, 255, 0.4);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  padding: 2rem;
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+  grid-template-columns: 300px 1fr;
+  gap: 1.5rem;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .statsColumn {
@@ -160,8 +162,7 @@
 
 .calendarWrapper {
   background: white;
-  border-radius: 16px;
-  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
   min-height: 400px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 }
