@@ -8,7 +8,7 @@ import ProfileModal from './ProfileModal';
 const departmentMap: Record<number, string> = {
   1: 'CS',
   2: 'ENG',
-  3: 'OPS',
+  3: 'CSD',
   4: 'FIN',
   5: 'HR',
 };
