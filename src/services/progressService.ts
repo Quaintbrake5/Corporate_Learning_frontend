@@ -5,6 +5,7 @@ export interface HeartbeatPayload {
   module_id: string;
   progress_percentage: number;
   session_id: string;
+  activity_state?: 'started' | 'paused' | 'finished';
 }
 
 export interface ProgressData {

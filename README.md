@@ -473,11 +473,11 @@ The CoursePlayer component supports multiple video formats with optimized render
 
 ```typescript
 // YouTube videos use direct iframe
-{activeModule.content_url.includes('youtube.com') || activeModule.content_url.includes('youtu.be') ? (
+  {activeModule.content_url && (activeModule.content_url.includes('youtube.com') || activeModule.content_url.includes('youtu.be')) ? (
   <iframe
     width="100%"
     height="100%"
-    src={`https://www.youtube.com/embed/${activeModule.content_url.split('v=')[1]}`}
+     src={`https://www.youtube.com/embed/${activeModule.content_url.split('v=')[1] || ''}`}
     title={activeModule.title}
     frameBorder="0"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

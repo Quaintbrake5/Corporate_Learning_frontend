@@ -53,7 +53,7 @@ const Calendar: React.FC<CalendarProps> = ({
   const getEventsForDay = (day: number): Event[] => {
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     return events.filter(event => {
-      const eventDate = new Date(event.start_time).toISOString().split('T')[0];
+       const eventDate = new Date(event.start_time).toISOString().split('T')[0] || '';
       return eventDate === dateStr;
     });
   };

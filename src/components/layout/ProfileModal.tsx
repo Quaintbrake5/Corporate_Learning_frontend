@@ -40,7 +40,6 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: '',
     division: '',
     department: '',
   });
@@ -82,18 +81,24 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
         setDivisions(divisionsData.data);
         
         // Initialize form data
+        // Find the division that this department belongs to
+        const userDivision = divisionsData.data.find(div => 
+          div.departments.some(dept => dept.id === departmentData.id)
+        );
+        
         setFormData({
           name: profileData.name,
           email: profileData.email,
-          phone: '', // Phone field doesn't exist in UserProfile, defaulting to empty string
-          division: String(profileData.department_id),
+          division: userDivision ? String(userDivision.id) : '',
           department: String(departmentData.id),
         });
         
-        // Load departments for the user's division
-        // In a real app, we would fetch departments for the selected division
-        // For now, we'll simulate by setting an empty array
-        setDepartments([]);
+        // Load departments for the user's division (the one containing their department)
+        if (userDivision) {
+          setDepartments(userDivision.departments);
+        } else {
+          setDepartments([]);
+        }
       } catch (error: unknown) {
         const message = error instanceof Error ? error.message : 'Failed to load profile data';
         setApiError(message);
@@ -244,16 +249,9 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
     // Load departments for selected division
     const selectedDivision = divisions.find(d => d.id === divisionId);
     if (selectedDivision) {
-      // In a real app, we'd fetch departments for this division
-      // For now, we'll use the departments from the division data if available
-      // Since we don't have that data readily available, we'll simulate it
-      setDepartmentsLoading(true);
-      // This would normally be an API call like: api.get(`/divisions/${divisionId}/departments`)
-      // For demo purposes, we'll use a timeout to simulate loading
-      setTimeout(() => {
-        // In a real implementation, this would come from the API
-        setDepartmentsLoading(false);
-      }, 500);
+      // Load departments from the division data
+      setDepartments(selectedDivision.departments ?? []);
+      setDepartmentsLoading(false);
     } else {
       setDepartments([]);
       setDepartmentsLoading(false);
@@ -350,18 +348,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
                       {formErrors.email && <span className={styles.errorText}>{formErrors.email}</span>}
                     </div>
                    
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel} htmlFor="phone-input">Phone</label>
-                       <input
-                         id="phone-input"
-                         type="tel"
-                         name="phone"
-                         value={formData.phone}
-                         onChange={handleInputChange}
-                         className={`${styles.formInput} ${formErrors.phone ? styles.inputError : ''}`}
-                       />
-                      {formErrors.phone && <span className={styles.errorText}>{formErrors.phone}</span>}
-                    </div>
+
                    
                     <div className={styles.formGroup}>
                       <label className={styles.formLabel} htmlFor="division-select">Division</label>
@@ -443,10 +430,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
                       <div className={styles.infoValue}>{profile.email}</div>
                     </div>
                     
-                    <div className={styles.infoGroup}>
-                      <div className={styles.infoLabel}>Phone</div>
-                      <div className={styles.infoValue}>{profile.phone || 'Not provided'}</div>
-                    </div>
+
                     
                     <div className={styles.infoGroup}>
                       <div className={styles.infoLabel}>Division</div>

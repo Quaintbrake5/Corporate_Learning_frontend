@@ -139,10 +139,10 @@ const Dashboard: React.FC = () => {
       <div className={styles.dashboardContainer}>
         
         <div className={styles.headerSection}>
-          <div>
-            <h1 className={styles.title}>Hello, {user?.name.split(' ')[0]}!</h1>
-            <p className={styles.subtitle}>Let's check your progress.</p>
-          </div>
+           <div>
+             <h1 className={styles.title}>Hello, {(user?.name || '').split(' ')[0] || ''}!</h1>
+             <p className={styles.subtitle}>Let's check your progress.</p>
+           </div>
         </div>
 
         {/* Priority 1: Overdue Mandatory Training */}

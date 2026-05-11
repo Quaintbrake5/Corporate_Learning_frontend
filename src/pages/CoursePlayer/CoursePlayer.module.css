@@ -115,6 +115,39 @@
   overflow: hidden;
 }
 
+.videoControls {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 11;
+}
+
+.videoControlButton {
+  background-color: #004d00;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.videoControlButton:hover {
+  background-color: #003300;
+}
+
+.videoStatusBadge {
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
 .videoFrame, .pdfFrame {
   width: 100%;
   height: 100%;
@@ -390,4 +423,66 @@
 .takeQuizButton:hover {
     background-color: #003300;
     transform: translateY(-1px);
+}
+
+/* Module Progress Container - positioned at bottom right of moduleList */
+.moduleProgressContainer {
+    padding: 1.25rem;
+    border-top: 1px solid #f0f0f0;
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* Style for the Start/Pause button in the moduleProgressContainer */
+.moduleProgressContainer .videoControlButton {
+    width: 100%;
+    text-align: center;
+}
+
+/* Style for the progress badge in the moduleProgressContainer */
+.moduleProgressContainer .videoStatusBadge {
+    width: 100%;
+    text-align: center;
+}
+
+/* SCORM Styles */
+.scormWrapper {
+    padding: 2rem;
+    text-align: center;
+}
+
+.scormPlaceholder {
+    border: 2px dashed #004d00;
+    border-radius: 8px;
+    padding: 3rem;
+    background-color: #f9f9f9;
+}
+
+.completeScormButton {
+    background-color: #004d00;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 1rem;
+}
+
+.completeScormButton:hover {
+    background-color: #003300;
+    transform: translateY(-1px);
+}
+
+.scormCompletionMessage {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 4px;
+    color: #155724;
 }

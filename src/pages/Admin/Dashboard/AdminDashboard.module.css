@@ -67,6 +67,20 @@
   font-size: 1.2rem;
 }
 
+.viewAllBtn {
+  border: none;
+  background-color: #228B22;
+  color: #fff;
+  padding: 0.55rem 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.viewAllBtn:hover {
+  background-color: #006400;
+}
+
 .statsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -189,6 +203,94 @@
   border-radius: 8px;
   text-align: center;
   font-weight: 500;
+}
+
+.progressSection {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.progressSummary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.summaryItem {
+  background: #f3f7fb;
+  color: #0B3149;
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.progressTableWrapper {
+  overflow-x: auto;
+}
+
+.progressTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.progressTable th,
+.progressTable td {
+  border-bottom: 1px solid #f0f0f0;
+  text-align: left;
+  padding: 0.85rem 0.65rem;
+  vertical-align: top;
+}
+
+.progressTable th {
+  color: #003366;
+  font-weight: 700;
+  background: #f9fafc;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.statusNotStarted {
+  background-color: #eef2f7;
+  color: #4a5568;
+}
+
+.statusStarted {
+  background-color: #d8f5df;
+  color: #186b31;
+}
+
+.statusPaused {
+  background-color: #fff3cd;
+  color: #8a6300;
+}
+
+.statusFinished {
+  background-color: #d1f2eb;
+  color: #0b5345;
+}
+
+.statusNotCompleted {
+  background-color: #fde2e2;
+  color: #a61b1b;
+}
+
+.emptyProgress {
+  text-align: center;
+  color: #888;
+  padding: 1rem;
 }
 
 .calendarSection {

@@ -27,6 +27,7 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({ module, onAssessmentSav
   const [assessment, setAssessment] = useState<AssessmentResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
 
   // AI generation state
@@ -51,6 +52,7 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({ module, onAssessmentSav
       try {
         setLoading(true);
         setError(null);
+        setNotice(null);
         const data = await adminService.getAssessmentByModule(module.id);
         setAssessment(data);
 
@@ -96,26 +98,44 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({ module, onAssessmentSav
     try {
       setGeneratingAI(true);
       setError(null);
+      setNotice(null);
 
       const result = await adminService.generateAIQuiz(module.id, 5);
 
       // Populate form with AI-generated questions
       setFormData({
-        questions: result.questions.map((q: ApiAssessmentQuestion) => ({
-          question_id: '',  // Will be generated on save
-          question: q.question,
-          options: q.options.length >= 2 ? q.options : ['', '', '', ''],
-          correct_option: q.correct_option,
-          topic: q.topic || ''
-        })),
+        questions: result.questions.map((q: ApiAssessmentQuestion) => {
+          const options = Array.isArray(q.options) ? q.options : [];
+          return ({
+            question_id: '',  // Will be generated on save
+            question: q.question || '',
+            options: options.length >= 2 ? options : ['', '', '', ''],
+            correct_option: q.correct_option || '',
+            topic: q.topic || ''
+          });
+        }),
         passing_score: 70
       });
 
       setAiGenerated(true);
       setShowForm(true);
 
-      // Parse the response: format is "provider|content_source" (e.g., "openai|youtube_transcript")
-      const [provider, contentSource] = result.generated_by.split('|');
+      // Support both legacy (`generated_by`) and current backend response (`model`, `content_source`)
+      let provider: 'mock' | 'gemini' | 'openai' | 'unknown' = 'unknown';
+      let contentSource = result.content_source || '';
+      const modelName = result.model || '';
+
+      if (typeof result.generated_by === 'string' && result.generated_by.includes('|')) {
+        const parts = result.generated_by.split('|');
+        provider = (parts[0] as typeof provider) || 'unknown';
+        contentSource = parts[1] || contentSource;
+      } else if (modelName.toLowerCase().includes('gemini')) {
+        provider = 'gemini';
+      } else if (modelName.toLowerCase().includes('gpt') || modelName.toLowerCase().includes('openai')) {
+        provider = 'openai';
+      } else if (modelName.toLowerCase() === 'mock') {
+        provider = 'mock';
+      }
 
       // Build informative message based on provider and content source
       let sourceMessage = '';
@@ -129,11 +149,17 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({ module, onAssessmentSav
 
       // Show notification about which provider was used
       if (provider === 'mock') {
-        setError(`Using mock questions (${sourceMessage}). Add OPENAI_API_KEY or GEMINI_API_KEY for AI-generated questions with correct answers.`);
+        const degradedReason = result.degradation_reason ? ` Reason: ${result.degradation_reason}.` : '';
+        const transcriptInfo = typeof result.transcript_chars === 'number' ? ` Transcript chars: ${result.transcript_chars}.` : '';
+        setNotice(`Using mock questions${sourceMessage ? ` (${sourceMessage})` : ''}.${transcriptInfo} Add OPENAI_API_KEY or GEMINI_API_KEY for AI-generated questions with correct answers.${degradedReason}`);
       } else if (provider === 'gemini') {
-        setError(`Questions generated using Google Gemini (${sourceMessage}). Please review and verify the correct answers before saving.`);
+        const fallbackNote = result.fallback_used ? ` (fallback model: ${modelName || 'used'})` : '';
+        const transcriptInfo = typeof result.transcript_chars === 'number' ? ` Transcript chars: ${result.transcript_chars}.` : '';
+        setNotice(`Questions generated using Google Gemini${fallbackNote}${sourceMessage ? ` (${sourceMessage})` : ''}.${transcriptInfo} Please review and verify the correct answers before saving.`);
       } else if (provider === 'openai') {
-        setError(`Questions generated using OpenAI GPT-4 (${sourceMessage}). Please review and verify the correct answers before saving.`);
+        const modelLabel = modelName ? ` (${modelName})` : '';
+        const transcriptInfo = typeof result.transcript_chars === 'number' ? ` Transcript chars: ${result.transcript_chars}.` : '';
+        setNotice(`Questions generated using OpenAI${modelLabel}${sourceMessage ? ` (${sourceMessage})` : ''}.${transcriptInfo} Please review and verify the correct answers before saving.`);
       }
     } catch (err: unknown) {
       setError(parseErrorMessage(err, 'Failed to generate quiz with AI'));
@@ -257,6 +283,7 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({ module, onAssessmentSav
       }
 
       setShowForm(false);
+      setNotice(null);
       onAssessmentSaved?.();
     } catch (err: unknown) {
       setError(parseErrorMessage(err, 'Failed to save assessment'));
@@ -333,6 +360,19 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({ module, onAssessmentSav
           borderRadius: '4px'
         }}>
           <strong>Error:</strong> {error}
+        </div>
+      )}
+
+      {notice && (
+        <div style={{
+          color: '#1e40af',
+          marginBottom: '1rem',
+          padding: '0.75rem',
+          backgroundColor: '#dbeafe',
+          border: '1px solid #3b82f6',
+          borderRadius: '4px'
+        }}>
+          <strong>Notice:</strong> {notice}
         </div>
       )}
 

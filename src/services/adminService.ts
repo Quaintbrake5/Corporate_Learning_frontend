@@ -53,7 +53,16 @@ export interface Enrollment {
   id: string;
   user_id: string;
   course_id: string;
-  enrolled_at: string;
+  user_name?: string;
+  user_email?: string;
+  user_department?: string;
+  status: string;
+  progress_percentage: number;
+  start_date: string;
+  deadline_date?: string | null;
+  completion_date?: string | null;
+  learning_status?: 'not_started' | 'started' | 'paused' | 'finished' | 'not_completed';
+  last_activity_at?: string | null;
 }
 
 // Assessment interfaces
@@ -80,6 +89,19 @@ export interface AssessmentResponse {
   module_id: string;
   questions: AssessmentQuestion[];
   passing_score: number;
+}
+
+export interface AIQuizGenerateResponse {
+  questions: AssessmentQuestion[];
+  // New backend shape (preferred)
+  model?: string;
+  fallback_used?: boolean;
+  content_source?: string;
+  transcript_chars?: number;
+  degraded?: boolean;
+  degradation_reason?: string | null;
+  // Legacy shape (backward compatibility)
+  generated_by?: string;
 }
 
 const adminService = {
@@ -194,7 +216,7 @@ const adminService = {
   },
 
   // AI Quiz Generation
-  generateAIQuiz: async (moduleId: string, numQuestions: number = 5): Promise<{ questions: AssessmentQuestion[]; generated_by: string }> => {
+  generateAIQuiz: async (moduleId: string, numQuestions: number = 5): Promise<AIQuizGenerateResponse> => {
     const response = await api.post(`/admin/modules/${moduleId}/generate-quiz`, {
       num_questions: numQuestions
     });

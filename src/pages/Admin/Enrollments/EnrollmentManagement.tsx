@@ -1,21 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { getCourses } from '../../../services/courseService';
 import adminService from '../../../services/adminService';
-import type { AdminUser } from '../../../services/adminService';
+import type { AdminUser, Enrollment } from '../../../services/adminService';
 import type { Course } from '../../../services/courseService';
 import { parseErrorMessage } from '../../../utils/errorUtils';
 import Modal from '../../../components/ui/Modal';
 import styles from './EnrollmentManagement.module.css';
 
-interface AdminEnrollment {
-  id: string;
-  user_id: string;
-  course_id: string;
+interface AdminEnrollment extends Enrollment {
   user_name: string;
   user_email: string;
   user_department: string;
-  progress_percentage: number;
-  created_at: string;
 }
 
 const EnrollmentManagement: React.FC = () => {
@@ -25,7 +20,9 @@ const EnrollmentManagement: React.FC = () => {
   const [allUsers, setAllUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [enrollmentSearchQuery, setEnrollmentSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'not_started' | 'started' | 'paused' | 'finished' | 'not_completed'>('all');
   const [error, setError] = useState<string | null>(null);
 
   const fetchInitialData = async () => {
@@ -35,9 +32,7 @@ const EnrollmentManagement: React.FC = () => {
       setCourses(coursesData.items);
       const usersData = await adminService.getUsers(1, 1000); // Fetch all users for picking
       setAllUsers(usersData.items);
-      if (coursesData.items.length > 0) {
-        setSelectedCourseId(coursesData.items[0].id);
-      }
+      setSelectedCourseId(''); // Default: view all courses
     } catch (err: unknown) {
       setError(parseErrorMessage(err, 'Failed to load courses or users'));
     } finally {
@@ -46,11 +41,10 @@ const EnrollmentManagement: React.FC = () => {
   };
 
   const fetchEnrollments = async (courseId: string) => {
-    if (!courseId) return;
     try {
       setLoading(true);
       setError(null);
-      const data = await adminService.getEnrollments(1, 100, undefined, courseId);
+      const data = await adminService.getEnrollments(1, 500, undefined, courseId || undefined);
       setEnrollments((data.items as unknown as AdminEnrollment[]) || []);
     } catch (err: unknown) {
       setError(parseErrorMessage(err, 'Failed to load current enrollments'));
@@ -64,9 +58,7 @@ const EnrollmentManagement: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (selectedCourseId) {
-      fetchEnrollments(selectedCourseId);
-    }
+    fetchEnrollments(selectedCourseId);
   }, [selectedCourseId]);
 
   const handleEnrollUser = async (userId: string) => {
@@ -97,6 +89,58 @@ const EnrollmentManagement: React.FC = () => {
 
   const enrolledUserIds = new Set(enrollments.map(e => e.user_id));
 
+  const courseTitleById = courses.reduce((acc, course) => {
+    acc[course.id] = course.title;
+    return acc;
+  }, {} as Record<string, string>);
+
+  const getLearningStatusLabel = (status?: AdminEnrollment['learning_status']) => {
+    switch (status) {
+      case 'started':
+        return 'Started';
+      case 'paused':
+        return 'Paused';
+      case 'finished':
+        return 'Finished';
+      case 'not_completed':
+        return 'Not Completed';
+      default:
+        return 'Not Started';
+    }
+  };
+
+  const getLearningStatusClass = (status?: AdminEnrollment['learning_status']) => {
+    switch (status) {
+      case 'started':
+        return styles.statusStarted;
+      case 'paused':
+        return styles.statusPaused;
+      case 'finished':
+        return styles.statusFinished;
+      case 'not_completed':
+        return styles.statusNotCompleted;
+      default:
+        return styles.statusNotStarted;
+    }
+  };
+
+  const filteredEnrollments = enrollments
+    .filter((enrollment) => {
+      if (statusFilter === 'all') return true;
+      return (enrollment.learning_status || 'not_started') === statusFilter;
+    })
+    .filter((enrollment) => {
+      if (!enrollmentSearchQuery.trim()) return true;
+      const q = enrollmentSearchQuery.toLowerCase();
+      const courseTitle = courseTitleById[enrollment.course_id] || '';
+      return (
+        enrollment.user_name?.toLowerCase().includes(q) ||
+        enrollment.user_email?.toLowerCase().includes(q) ||
+        enrollment.user_department?.toLowerCase().includes(q) ||
+        courseTitle.toLowerCase().includes(q)
+      );
+    });
+
   return (
     <div className={styles.container}>
       <div className={styles.pageHeader}>
@@ -105,31 +149,74 @@ const EnrollmentManagement: React.FC = () => {
       </div>
 
       <div className={styles.courseSelection}>
-        <div className={styles.selectGroup}>
-          <label htmlFor="course-select" className={styles.selectLabel}>Select Course to Manage</label>
-          <select 
-            id="course-select"
-            className={styles.select}
-            value={selectedCourseId}
-            onChange={(e) => setSelectedCourseId(e.target.value)}
-          >
-            {courses.map(c => (
-              <option key={c.id} value={c.id}>{c.title}</option>
-            ))}
-          </select>
+        <div className={styles.filtersRow}>
+          <div className={styles.selectGroup}>
+            <label htmlFor="course-select" className={styles.selectLabel}>Course Filter</label>
+            <select 
+              id="course-select"
+              className={styles.select}
+              value={selectedCourseId}
+              onChange={(e) => setSelectedCourseId(e.target.value)}
+            >
+              <option value="">All Courses</option>
+              {courses.map(c => (
+                <option key={c.id} value={c.id}>{c.title}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className={styles.selectGroup}>
+            <label htmlFor="status-filter" className={styles.selectLabel}>Status Filter</label>
+            <select
+              id="status-filter"
+              className={styles.select}
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
+            >
+              <option value="all">All Statuses</option>
+              <option value="not_started">Not Started</option>
+              <option value="started">Started</option>
+              <option value="paused">Paused</option>
+              <option value="finished">Finished</option>
+              <option value="not_completed">Not Completed</option>
+            </select>
+          </div>
+
+          <div className={styles.searchGroup}>
+            <label htmlFor="enrollment-search" className={styles.selectLabel}>Search</label>
+            <input
+              id="enrollment-search"
+              type="text"
+              className={styles.searchInput}
+              placeholder="Search user, email, department, course..."
+              value={enrollmentSearchQuery}
+              onChange={(e) => setEnrollmentSearchQuery(e.target.value)}
+            />
+          </div>
         </div>
       </div>
 
       <div className={styles.enrollmentSection}>
         <div className={styles.sectionHeader}>
           <h3 className={styles.sectionTitle}>Enrolled Users</h3>
-          <button 
-            className={styles.addUserBtn}
-            onClick={() => setIsModalOpen(true)}
-            disabled={!selectedCourseId}
-          >
-            <i className="fa-solid fa-user-plus"></i> Enroll User
-          </button>
+          <div className={styles.headerActions}>
+            <button
+              className={styles.refreshBtn}
+              onClick={() => fetchEnrollments(selectedCourseId)}
+              disabled={loading}
+              title="Refresh list"
+            >
+              <i className="fa-solid fa-rotate-right"></i> Refresh
+            </button>
+            <button 
+              className={styles.addUserBtn}
+              onClick={() => setIsModalOpen(true)}
+              disabled={!selectedCourseId}
+              title={!selectedCourseId ? 'Select a specific course to enroll users' : 'Enroll a user'}
+            >
+              <i className="fa-solid fa-user-plus"></i> Enroll User
+            </button>
+          </div>
         </div>
 
         {error && <div className={styles.error} style={{ color: 'red', marginBottom: '1rem', background: '#fff0f0', padding: '0.5rem', borderRadius: '4px' }}>{error}</div>}
@@ -146,19 +233,29 @@ const EnrollmentManagement: React.FC = () => {
                 <th>User Name</th>
                 <th>Email</th>
                 <th>Department</th>
+                <th>Course</th>
                 <th>Status</th>
                 <th>Enrolled On</th>
+                <th>Last Activity</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {enrollments.map((e) => (
+              {filteredEnrollments.map((e) => (
                 <tr key={e.id}>
                   <td><strong>{e.user_name}</strong></td>
                   <td>{e.user_email}</td>
                   <td>{e.user_department}</td>
-                  <td>{e.progress_percentage}% Done</td>
-                  <td>{new Date(e.created_at).toLocaleDateString()}</td>
+                  <td>{courseTitleById[e.course_id] || 'Unknown Course'}</td>
+                  <td>
+                    <span className={`${styles.statusBadge} ${getLearningStatusClass(e.learning_status)}`}>
+                      {getLearningStatusLabel(e.learning_status)}
+                    </span>
+                    <br />
+                    <small>{e.progress_percentage}% done</small>
+                  </td>
+                  <td>{new Date(e.start_date).toLocaleDateString()}</td>
+                  <td>{e.last_activity_at ? new Date(e.last_activity_at).toLocaleString() : '—'}</td>
                   <td>
                     <button 
                       className={styles.removeBtn} 
@@ -170,9 +267,9 @@ const EnrollmentManagement: React.FC = () => {
                   </td>
                 </tr>
               ))}
-              {enrollments.length === 0 && (
+              {filteredEnrollments.length === 0 && (
                 <tr>
-                  <td colSpan={6} className={styles.emptyState}>No users enrolled in this course yet.</td>
+                  <td colSpan={8} className={styles.emptyState}>No enrollments match the selected filters.</td>
                 </tr>
               )}
             </tbody>
@@ -191,12 +288,12 @@ const EnrollmentManagement: React.FC = () => {
             type="text" 
             className={styles.searchBox}
             placeholder="Search all users..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={userSearchQuery}
+            onChange={(e) => setUserSearchQuery(e.target.value)}
           />
           <div className={styles.userList}>
             {allUsers
-              .filter(u => u.name.toLowerCase().includes(searchQuery.toLowerCase()) || u.email.toLowerCase().includes(searchQuery.toLowerCase()))
+              .filter(u => u.name.toLowerCase().includes(userSearchQuery.toLowerCase()) || u.email.toLowerCase().includes(userSearchQuery.toLowerCase()))
               .filter(u => !enrolledUserIds.has(u.id))
               .map(u => (
                 <button 

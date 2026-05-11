@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import adminService from '../../../services/adminService';
-import type { AdminUser } from '../../../services/adminService';
+import type { AdminUser, Enrollment } from '../../../services/adminService';
 import { getCourses } from '../../../services/courseService';
 import type { Course } from '../../../services/courseService';
 import Calendar from '../../../components/ui/Calendar';
@@ -29,6 +29,7 @@ const AdminDashboard: React.FC = () => {
   
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
+  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,8 +47,10 @@ const AdminDashboard: React.FC = () => {
         adminService.getUsers(1, 100),
         getCourses(1, 100)
       ]);
+      const enrollmentResponse = await adminService.getEnrollments(1, 500);
       setUsers((usersResponse as unknown as { items: AdminUser[] }).items || (Array.isArray(usersResponse) ? usersResponse : []));
       setCourses(coursesData?.items || (Array.isArray(coursesData) ? coursesData : []));
+      setEnrollments(enrollmentResponse.items || []);
     } catch (err: unknown) {
       setError(parseErrorMessage(err, 'Failed to load dashboard data'));
     } finally {
@@ -118,6 +121,54 @@ const AdminDashboard: React.FC = () => {
     Users: usersByDepartment[key]
   }));
 
+  const activeProgressEnrollments = enrollments
+    .filter((enrollment) => enrollment.progress_percentage > 0 && enrollment.progress_percentage < 100)
+    .sort((a, b) => b.progress_percentage - a.progress_percentage)
+    .slice(0, 10);
+
+  const statusSummary = enrollments.reduce(
+    (summary, enrollment) => {
+      const status = enrollment.learning_status || 'not_started';
+      summary[status] = (summary[status] || 0) + 1;
+      return summary;
+    },
+    {} as Record<string, number>
+  );
+
+  const getStatusClass = (status?: Enrollment['learning_status']) => {
+    switch (status) {
+      case 'started':
+        return styles.statusStarted;
+      case 'paused':
+        return styles.statusPaused;
+      case 'finished':
+        return styles.statusFinished;
+      case 'not_completed':
+        return styles.statusNotCompleted;
+      default:
+        return styles.statusNotStarted;
+    }
+  };
+
+  const getStatusLabel = (status?: Enrollment['learning_status']) => {
+    switch (status) {
+      case 'started':
+        return 'Started';
+      case 'paused':
+        return 'Paused';
+      case 'finished':
+        return 'Finished';
+      case 'not_completed':
+        return 'Not Completed';
+      default:
+        return 'Not Started';
+    }
+  };
+
+  const getCourseTitle = (courseId: string) => {
+    return courses.find((course) => course.id === courseId)?.title ?? 'Unknown Course';
+  };
+
   return (
     <div className={styles.dashboardContainer}>
       <div className={styles.header}>
@@ -156,7 +207,75 @@ const AdminDashboard: React.FC = () => {
             <span className={styles.statValue}>{loading ? '...' : courses.length}</span>
           </div>
         </div>
+        <div className={styles.statCard}>
+          <div className={styles.iconWrapper}>
+            <i className="fa-solid fa-person-running"></i>
+          </div>
+          <div className={styles.statInfo}>
+            <span className={styles.statTitle}>Users In Progress</span>
+            <span className={styles.statValue}>{loading ? '...' : activeProgressEnrollments.length}</span>
+          </div>
+        </div>
       </div>
+
+      {!loading && (
+        <div className={styles.progressSection}>
+          <div className={styles.sectionHeader}>
+            <h3>Learner Progress Tracking</h3>
+            <button className={styles.viewAllBtn} onClick={() => navigate('/admin/enrollments')}>
+              View All Enrollments
+            </button>
+          </div>
+
+          <div className={styles.progressSummary}>
+            <span className={styles.summaryItem}>Not Started: {statusSummary.not_started || 0}</span>
+            <span className={styles.summaryItem}>Started: {statusSummary.started || 0}</span>
+            <span className={styles.summaryItem}>Paused: {statusSummary.paused || 0}</span>
+            <span className={styles.summaryItem}>Finished: {statusSummary.finished || 0}</span>
+            <span className={styles.summaryItem}>Not Completed: {statusSummary.not_completed || 0}</span>
+          </div>
+
+          <div className={styles.progressTableWrapper}>
+            <table className={styles.progressTable}>
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Course</th>
+                  <th>Progress</th>
+                  <th>Status</th>
+                  <th>Last Activity</th>
+                </tr>
+              </thead>
+              <tbody>
+                {activeProgressEnrollments.map((enrollment) => (
+                  <tr key={enrollment.id}>
+                    <td>
+                      <strong>{enrollment.user_name || 'Unknown User'}</strong>
+                      <br />
+                      <small>{enrollment.user_email || 'No email'}</small>
+                    </td>
+                    <td>{getCourseTitle(enrollment.course_id)}</td>
+                    <td>{Math.round(enrollment.progress_percentage)}%</td>
+                    <td>
+                      <span className={`${styles.statusBadge} ${getStatusClass(enrollment.learning_status)}`}>
+                        {getStatusLabel(enrollment.learning_status)}
+                      </span>
+                    </td>
+                    <td>{enrollment.last_activity_at ? new Date(enrollment.last_activity_at).toLocaleString() : '—'}</td>
+                  </tr>
+                ))}
+                {activeProgressEnrollments.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className={styles.emptyProgress}>
+                      No users are currently in active progress.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {loading ? (
         <div className={styles.loadingState}>
