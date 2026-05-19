@@ -108,11 +108,45 @@
 }
 
 .videoWrapper, .pdfWrapper {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  background-color: #111;
-  position: relative;
-  overflow: hidden;
+   width: 100%;
+   aspect-ratio: 16 / 9;
+   background-color: #111;
+   position: relative;
+   overflow: hidden;
+}
+
+/* PDF Progress Indicator Styles */
+.pdfProgressContainer {
+   position: absolute;
+   bottom: 20px;
+   left: 0;
+   right: 0;
+   padding: 0 20px;
+   display: flex;
+   flex-direction: column;
+   gap: 8px;
+   z-index: 10;
+}
+
+.pdfProgressBar {
+   height: 8px;
+   background-color: rgba(255, 255, 255, 0.2);
+   border-radius: 4px;
+   overflow: hidden;
+}
+
+.pdfProgressFill {
+   height: 100%;
+   background: linear-gradient(90deg, #004d00, #006600);
+   width: 0%;
+   transition: width 0.3s ease;
+}
+
+.pdfProgressText {
+   color: white;
+   font-size: 0.9rem;
+   text-align: center;
+   text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 .videoControls {
@@ -486,3 +520,43 @@
     border-radius: 4px;
     color: #155724;
 }
+
+.completedBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  padding: 40px;
+}
+
+.completedBlock h2 {
+  color: #059669;
+  font-size: 28px;
+  margin-bottom: 12px;
+}
+
+.completedBlock p {
+  color: #6b7280;
+  font-size: 16px;
+  margin-bottom: 24px;
+  max-width: 400px;
+}
+
+.closeCompletedBtn {
+  background: #059669;
+  color: #fff;
+  border: none;
+  padding: 12px 32px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.closeCompletedBtn:hover {
+  background: #047857;
+}
+

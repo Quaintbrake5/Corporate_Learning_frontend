@@ -123,8 +123,8 @@ const Dashboard: React.FC = () => {
     
     return courseList.map(course => (
       <CourseCard
-        key={course.id}
-        id={course.id}
+        key={course.id || course.title}
+        id={course.id || ''}
         title={course.title}
         department={course.department_owner}
         duration={formatDuration(course.duration_in_minutes)}

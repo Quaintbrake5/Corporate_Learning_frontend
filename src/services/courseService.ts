@@ -12,12 +12,13 @@ export interface Course {
 }
 
 export interface Module {
-  id: string;
-  course_id: string;
-  title: string;
-  content_type: string;
-  content_url: string;
-  order_index: number;
+   id: string;
+   course_id: string;
+   title: string;
+   content_type: string;
+   content_url: string;
+   order_index: number;
+   scorm_data?: any; // Optional SCORM data
 }
 
 export interface PaginatedCourses {

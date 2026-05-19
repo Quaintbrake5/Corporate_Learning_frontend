@@ -44,8 +44,17 @@ const Courses: React.FC = () => {
           getCourses(1, 10, false) as Promise<Course[] | PaginatedCourses>,
         ]);
 
-        setMandatoryCourses(Array.isArray(mandatoryRes) ? mandatoryRes : (mandatoryRes?.items || []));
-        setElectiveCourses(Array.isArray(electiveRes) ? electiveRes : (electiveRes?.items || []));
+        const mandatoryItems = Array.isArray(mandatoryRes) ? mandatoryRes : (mandatoryRes?.items || []);
+        const electiveItems = Array.isArray(electiveRes) ? electiveRes : (electiveRes?.items || []);
+        
+        console.log('[Courses] Mandatory courses:', mandatoryItems);
+        console.log('[Courses] Elective courses:', electiveItems);
+        if (mandatoryItems.length > 0) {
+          console.log('[Courses] First mandatory course:', JSON.stringify(mandatoryItems[0]));
+        }
+        
+        setMandatoryCourses(mandatoryItems);
+        setElectiveCourses(electiveItems);
       } catch (err) {
         console.error('Failed to fetch courses:', err);
         setError('Failed to load courses. Please try again later.');
@@ -89,8 +98,8 @@ const Courses: React.FC = () => {
                 {mandatoryCourses.length > 0 ? (
                   mandatoryCourses.map((course) => (
                     <CourseCard
-                      key={course.id}
-                      id={course.id}
+                      key={course.id || course.title}
+                      id={course.id || ''}
                       title={course.title}
                       department={mapDepartment(course.department_owner)}
                       duration={formatDuration(course.duration_in_minutes)}
@@ -110,8 +119,8 @@ const Courses: React.FC = () => {
                 {electiveCourses.length > 0 ? (
                   electiveCourses.map((course) => (
                     <CourseCard
-                      key={course.id}
-                      id={course.id}
+                      key={course.id || course.title}
+                      id={course.id || ''}
                       title={course.title}
                       department={mapDepartment(course.department_owner)}
                       duration={formatDuration(course.duration_in_minutes)}

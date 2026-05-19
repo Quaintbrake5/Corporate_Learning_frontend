@@ -4,8 +4,8 @@ import ReactPlayer from 'react-player';
 import { getCourse, getCourseModules, type Course, type Module } from '../../services/courseService';
 import { submitQuizForModule, type QuizQuestion, type QuizSubmitResponse } from '../../services/quizService';
 import { sendHeartbeat, getProgress } from '../../services/progressService';
-import { enrollInCourse } from '../../services/enrollmentService';
-import { generateQuizFromContent } from '../../services/aiQuizService';
+import { enrollInCourse, getEnrollmentStatus } from '../../services/enrollmentService';
+import { generateQuizFromContent, type QuizGenerationRequest } from '../../services/aiQuizService';
 import styles from './CoursePlayer.module.css';
 
 interface ApiError {
@@ -52,6 +52,7 @@ const CoursePlayer: React.FC = () => {
   const [activeModule, setActiveModule] = useState<Module | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [courseCompleted, setCourseCompleted] = useState(false);
   
   // Quiz states
   const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([]);
@@ -60,13 +61,15 @@ const CoursePlayer: React.FC = () => {
   const [quizError, setQuizError] = useState<string | null>(null);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [quizResult, setQuizResult] = useState<QuizSubmitResponse | null>(null);
-  const [videoCompleted, setVideoCompleted] = useState(false);
-  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-  const [videoProgress, setVideoProgress] = useState(0);
-  const [videoSessionId, setVideoSessionId] = useState('');
-  const [learningState, setLearningState] = useState<'not_started' | 'started' | 'paused' | 'finished'>('not_started');
-  const [pdfViewed, setPdfViewed] = useState(false);
-  const [scormCompleted, setScormCompleted] = useState(false);
+  const [showQuiz, setShowQuiz] = useState(false);
+      const [videoCompleted, setVideoCompleted] = useState(false);
+      const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+      const [videoProgress, setVideoProgress] = useState(0);
+      const [videoSessionId, setVideoSessionId] = useState('');
+      const [learningState, setLearningState] = useState<'not_started' | 'started' | 'paused' | 'finished'>('not_started');
+      const [pdfViewed, setPdfViewed] = useState(false);
+      const [pdfProgress, setPdfProgress] = useState(0);
+      const [scormCompleted, setScormCompleted] = useState(false);
   const videoProgressRef = useRef(0);
   const heartbeatIntervalRef = useRef<number | null>(null);
 
@@ -118,22 +121,69 @@ const sendLearningHeartbeat = useCallback(async (
     });
   };
 
-  const handlePauseVideo = () => {
-    setIsVideoPlaying(false);
-    setLearningState('paused');
-    const currentProgress = Math.max(videoProgressRef.current, 1);
-    void sendLearningHeartbeat(currentProgress, 'paused').catch((heartbeatError) => {
-      console.warn('Failed to send heartbeat update:', heartbeatError);
-    });
-  };
+   const handlePauseVideo = () => {
+     setIsVideoPlaying(false);
+     setLearningState('paused');
+     const currentProgress = Math.max(videoProgressRef.current, 1);
+     void sendLearningHeartbeat(currentProgress, 'paused').catch((heartbeatError) => {
+       console.warn('Failed to send heartbeat update:', heartbeatError);
+     });
+   };
 
-  const handleVideoEnded = () => {
-    setIsVideoPlaying(false);
-    setVideoCompleted(true);
-    setLearningState('finished');
-    setVideoProgress(100);
-    videoProgressRef.current = 100;
-  };
+   const handleVideoEnded = () => {
+     setIsVideoPlaying(false);
+     setVideoCompleted(true);
+     setLearningState('finished');
+     setVideoProgress(100);
+     videoProgressRef.current = 100;
+   };
+
+   // Helper function to handle start/pause for all content types
+   const handleToggleActivity = () => {
+     if (activeModule?.content_type === 'video') {
+       if (isVideoPlaying) {
+         handlePauseVideo();
+       } else {
+         handleStartVideo();
+       }
+     } else if (activeModule?.content_type === 'pdf') {
+       // For PDF, toggle between started and paused states
+       if (learningState === 'started') {
+         setLearningState('paused');
+       } else {
+         setLearningState('started');
+       }
+     } else if (activeModule?.content_type === 'scorm') {
+       // For SCORM, toggle between started and paused states
+       if (learningState === 'started') {
+         setLearningState('paused');
+       } else {
+         setLearningState('started');
+       }
+     }
+   };
+
+   // Helper function to get overall progress based on content type
+   const getOverallProgress = () => {
+     if (activeModule?.content_type === 'video') {
+       return videoProgress;
+     } else if (activeModule?.content_type === 'pdf') {
+       return pdfProgress;
+     } else if (activeModule?.content_type === 'scorm') {
+       return scormCompleted ? 100 : 0;
+     }
+     return 0;
+   };
+
+   // Helper function to check if activity is active (playing/started)
+   const isActive = () => {
+     if (activeModule?.content_type === 'video') {
+       return isVideoPlaying;
+     } else if (activeModule?.content_type === 'pdf' || activeModule?.content_type === 'scorm') {
+       return learningState === 'started';
+     }
+     return false;
+   };
 
     const handleSelectAnswer = (questionId: string, option: string) => {
       setQuizAnswers(prev => ({ ...prev, [questionId]: option }));
@@ -193,34 +243,51 @@ const sendLearningHeartbeat = useCallback(async (
       setVideoSessionId(createSessionId());
     }, [activeModule?.id]);
 
-     useEffect(() => {
-       if (!isVideoPlaying || !activeModule || activeModule.content_type !== 'video') {
-         if (heartbeatIntervalRef.current !== null) {
-           window.clearInterval(heartbeatIntervalRef.current);
-           heartbeatIntervalRef.current = null;
-         }
-         return;
-       }
+      useEffect(() => {
+        // Determine if we should send heartbeats based on content type and state
+        const shouldSendHeartbeat = 
+          (activeModule?.content_type === 'video' && isVideoPlaying) ||
+          (activeModule?.content_type === 'pdf' && learningState === 'started') ||
+          (activeModule?.content_type === 'scorm' && learningState === 'started');
 
-       heartbeatIntervalRef.current = window.setInterval(() => {
-         const currentProgress = Math.max(videoProgressRef.current, 1);
-         void sendLearningHeartbeat(currentProgress, 'started').catch((heartbeatError) => {
-           console.warn('Failed to send heartbeat update:', heartbeatError);
-         });
-       }, 30000);
+        if (!shouldSendHeartbeat || !activeModule) {
+          if (heartbeatIntervalRef.current !== null) {
+            window.clearInterval(heartbeatIntervalRef.current);
+            heartbeatIntervalRef.current = null;
+          }
+          return;
+        }
 
-       return () => {
-         if (heartbeatIntervalRef.current !== null) {
-           window.clearInterval(heartbeatIntervalRef.current);
-           heartbeatIntervalRef.current = null;
-         }
-       };
-     }, [activeModule, isVideoPlaying, videoSessionId, sendLearningHeartbeat]);
+        heartbeatIntervalRef.current = window.setInterval(() => {
+          let currentProgress = 0;
+          let activityState = 'started';
+
+          if (activeModule.content_type === 'video') {
+            currentProgress = Math.max(videoProgressRef.current, 1);
+          } else if (activeModule.content_type === 'pdf') {
+            currentProgress = pdfProgress;
+          } else if (activeModule.content_type === 'scorm') {
+            currentProgress = scormCompleted ? 100 : 0;
+          }
+
+          void sendLearningHeartbeat(currentProgress, activityState).catch((heartbeatError) => {
+            console.warn('Failed to send heartbeat update:', heartbeatError);
+          });
+        }, 30000);
+
+        return () => {
+          if (heartbeatIntervalRef.current !== null) {
+            window.clearInterval(heartbeatIntervalRef.current);
+            heartbeatIntervalRef.current = null;
+          }
+        };
+      }, [activeModule, isVideoPlaying, learningState, videoProgressRef, pdfProgress, scormCompleted, videoSessionId, sendLearningHeartbeat]);
  
         // Handle module completion for quiz generation (works for all content types)
         useEffect(() => {
           // Early return conditions for better readability
           if (!activeModule) return;
+          if (showQuiz || quizQuestions.length > 0 || quizSubmitted) return;
           
           // Check if module is complete based on content type
           let isComplete = false;
@@ -255,23 +322,24 @@ const sendLearningHeartbeat = useCallback(async (
               // heartbeat updates enrollment progress in database
               await waitForEnrollmentCompletion(courseId);
               
-              // Generate quiz for this module using AI (works for all content types)
-              const quizRequest = {
-                contentType: activeModule.content_type as 'video' | 'pdf' | 'scorm',
-                contentUrl: activeModule.content_url,
-                moduleId: activeModule.id,
-                courseId: courseId
-              };
-              
-              // For SCORM, we might need to pass additional data
-              if (activeModule.content_type === 'scorm' && activeModule.scorm_data) {
-                // In a real implementation, we'd process the SCORM data first
-                // For now, we'll pass what we have
-                quizRequest.contentData = activeModule.scorm_data;
-              }
+               // Generate quiz for this module using AI (works for all content types)
+               const quizRequest: QuizGenerationRequest = {
+                 contentType: activeModule.content_type as 'video' | 'pdf' | 'scorm',
+                 contentUrl: activeModule.content_url,
+                 moduleId: activeModule.id,
+                 courseId: courseId
+               };
+               
+               // For SCORM, we might need to pass additional data
+               if (activeModule.content_type === 'scorm' && activeModule.scorm_data) {
+                 // In a real implementation, we'd process the SCORM data first
+                 // For now, we'll pass what we have
+                 quizRequest.contentData = activeModule.scorm_data;
+               }
               
               const quizResponse = await generateQuizFromContent(quizRequest);
               setQuizQuestions(quizResponse.questions);
+              setShowQuiz(true);
               
             } catch (err) {
               console.error('Error handling module completion:', err);
@@ -282,6 +350,7 @@ const sendLearningHeartbeat = useCallback(async (
                 const message = err instanceof Error ? err.message : 'Failed to load quiz';
                 setQuizError(message);
               }
+              setShowQuiz(true);
             } finally {
               setQuizLoading(false);
             }
@@ -289,7 +358,7 @@ const sendLearningHeartbeat = useCallback(async (
           
           setQuizLoading(true);
           handleModuleComplete();
-        }, [activeModule, courseId, videoCompleted, pdfViewed, scormCompleted, sendLearningHeartbeat]);
+        }, [activeModule, courseId, videoCompleted, pdfViewed, scormCompleted, sendLearningHeartbeat, showQuiz, quizQuestions.length, quizSubmitted]);
 
     // Handle quiz submission
     const handleQuizSubmit = async () => {
@@ -320,10 +389,37 @@ const sendLearningHeartbeat = useCallback(async (
     };
 
   useEffect(() => {
+    if (!courseId) {
+      setError('Course ID is missing. Please navigate from the courses page.');
+      setLoading(false);
+      return;
+    }
     const fetchData = async () => {
       if (!courseId) return;
       try {
         setLoading(true);
+
+        // Check enrollment status first
+        try {
+          const enrollmentStatus = await getEnrollmentStatus(courseId);
+          if (enrollmentStatus.status === 'completed') {
+            setCourseCompleted(true);
+            setCourse({
+              id: enrollmentStatus.course_id,
+              title: enrollmentStatus.title,
+              description: enrollmentStatus.description || '',
+              duration_in_minutes: enrollmentStatus.duration_in_minutes || 0,
+              is_mandatory: enrollmentStatus.is_mandatory || false,
+              department_owner: enrollmentStatus.department_owner || '',
+              thumbnail_url: enrollmentStatus.thumbnail_url || '',
+            } as Course);
+            setLoading(false);
+            return;
+          }
+        } catch {
+          // Not enrolled yet, proceed to load course
+        }
+
         const [courseData, modulesData] = await Promise.all([
           getCourse(courseId),
           getCourseModules(courseId)
@@ -338,7 +434,6 @@ const sendLearningHeartbeat = useCallback(async (
           try {
             await enrollInCourse(courseId);
             console.log('[CoursePlayer] Auto-enrolled successfully, reloading modules...');
-            // Re-fetch modules after enrollment
             const reloadedModules = await getCourseModules(courseId);
             if (Array.isArray(reloadedModules) && reloadedModules.length > 0) {
               setModules(reloadedModules);
@@ -353,7 +448,6 @@ const sendLearningHeartbeat = useCallback(async (
             if (enrollError.response?.status === 403) {
               setError('Access Denied: You do not have permission to enroll in this course.');
             } else if (enrollError.response?.status === 409) {
-              // Already enrolled but still no modules - real error
               setError('No training modules found for this course. Please contact your administrator.');
             } else {
               setError('Failed to enroll in course. Please try again or contact support.');
@@ -364,11 +458,9 @@ const sendLearningHeartbeat = useCallback(async (
         const error = err as ApiError;
         console.error('Failed to load course data:', err);
         if (error.response?.status === 403) {
-          // 403 on load - try enrolling first
           console.log('[CoursePlayer] Access denied on load, attempting enrollment...');
           try {
             await enrollInCourse(courseId);
-            // Re-fetch everything after enrollment
             const [courseData, modulesData] = await Promise.all([
               getCourse(courseId),
               getCourseModules(courseId)
@@ -396,6 +488,16 @@ const sendLearningHeartbeat = useCallback(async (
   }, [courseId]);
 
     if (loading) return <div className={styles.loading}>Loading training content...</div>;
+    if (courseCompleted) return (
+      <div className={styles.completedBlock}>
+        <i className="fa-solid fa-circle-check" style={{ fontSize: '64px', color: '#059669', marginBottom: '16px' }}></i>
+        <h2>Course Completed</h2>
+        <p>You have already completed this course. Completed courses cannot be replayed.</p>
+        <button onClick={() => window.close()} className={styles.closeCompletedBtn}>
+          Close
+        </button>
+      </div>
+    );
     if (error || !course) return <div className={styles.error}>{error || 'Course not found'}</div>;
 
     // Calculate module index safely
@@ -447,8 +549,8 @@ const sendLearningHeartbeat = useCallback(async (
          return renderQuizResult();
        }
 
-       // If we are loading the quiz or have quiz questions to show, render the quiz
-       if ((quizLoading || quizQuestions.length > 0) && !quizSubmitted) {
+       // If quiz is showing, render it
+       if (showQuiz || quizQuestions.length > 0) {
          return renderQuiz();
        }
 
@@ -541,33 +643,54 @@ return (
                       }
                     }}
                   />
-                  {videoCompleted && (
+                  {videoCompleted && quizLoading && (
                     <div className={styles.videoCompletedActions}>
-                      <button onClick={handleLoadQuiz} className={styles.takeQuizButton}>
-                        Take Quiz
-                      </button>
+                      <p>Loading quiz...</p>
                     </div>
                   )}
               </div>
             );
-          case 'pdf':
-            return (
-              <div className={styles.pdfWrapper}>
-                <iframe
-                  src={activeModule.content_url || ''}
-                  title={activeModule.title}
-                  className={styles.pdfFrame}
-                  onLoad={() => {
-                    // In a real implementation, we'd add event listeners to track PDF viewing
-                    // For now, we'll simulate completion after a delay or based on user interaction
-                    // This is a simplified approach - production would need proper PDF tracking
-                    setTimeout(() => {
-                      setPdfViewed(true);
-                    }, 30000); // Simulate 30 seconds of viewing as completion
-                  }}
-                ></iframe>
-              </div>
-            );
+           case 'pdf':
+             return (
+               <div className={styles.pdfWrapper}>
+                 <div className={styles.pdfProgressContainer}>
+                   <div className={styles.pdfProgressBar}>
+                     <div 
+                       className={styles.pdfProgressFill} 
+                       style={{ width: `${pdfProgress}%` }}
+                     ></div>
+                   </div>
+                   <span className={styles.pdfProgressText}>
+                     {pdfProgress}% Complete
+                   </span>
+                 </div>
+                 <iframe
+                   src={activeModule.content_url || ''}
+                   title={activeModule.title}
+                   className={styles.pdfFrame}
+                   onLoad={() => {
+                     // Reset progress when PDF loads
+                     setPdfProgress(0);
+                     // Simulate PDF reading progress
+                     const interval = setInterval(() => {
+                       setPdfProgress(prev => {
+                         const newProgress = Math.min(prev + 10, 100);
+                         if (newProgress >= 100) {
+                           setPdfViewed(true);
+                           clearInterval(interval);
+                         }
+                         return newProgress;
+                       });
+                     }, 3000); // Update every 3 seconds
+                   }}
+                  ></iframe>
+                  {pdfViewed && quizLoading && (
+                    <div className={styles.videoCompletedActions}>
+                      <p>Loading quiz...</p>
+                    </div>
+                  )}
+                </div>
+             );
           case 'scorm':
             return (
               <div className={styles.scormWrapper}>
@@ -645,20 +768,20 @@ return (
       </button>
     )) : []}
     {/* Start button and Progress report moved to moduleList bottom right */}
-    {activeModule && (
-      <div className={styles.moduleProgressContainer}>
-        <button
-          type="button"
-          onClick={isVideoPlaying ? handlePauseVideo : handleStartVideo}
-          className={styles.videoControlButton}
-        >
-          {isVideoPlaying ? 'Pause' : 'Start'}
-        </button>
-        <span className={styles.videoStatusBadge}>
-          {formatLearningState(learningState)} • {videoProgress}%
-        </span>
-      </div>
-    )}
+     {activeModule && (
+       <div className={styles.moduleProgressContainer}>
+         <button
+           type="button"
+           onClick={handleToggleActivity}
+           className={styles.videoControlButton}
+         >
+           {isActive ? 'Pause' : 'Start'}
+         </button>
+         <span className={styles.videoStatusBadge}>
+           {formatLearningState(learningState)} • {getOverallProgress()}%
+         </span>
+       </div>
+     )}
   </div>
 </aside>
           </div>

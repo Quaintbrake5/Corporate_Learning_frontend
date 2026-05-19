@@ -157,3 +157,20 @@
   background-color: var(--primary-blue);
   color: white;
 }
+
+.completedOverlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(5, 150, 105, 0.9);
+  color: #fff;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
